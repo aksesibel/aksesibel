@@ -1,58 +1,112 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Modul Laporan Masyarakat — panduan pengerjaan
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Penanggung jawab modul: Riyana Kartika Pratiwi. PBI: 07, 08, dan 09.
 
-## About Laravel
+Dokumen ini mencatat pekerjaan nyata dan membantu reviewer menghubungkan PBI,
+perubahan kode, hasil uji, serta commit. Dokumen bukan bukti bahwa fitur sudah
+diimplementasikan. Penilaian akhir tetap mengikuti rubrik dosen.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Isi
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- [Rencana harian dan pesan commit](rencana-harian.md)
+- [Kriteria penerimaan PBI-07–09](kriteria-penerimaan.md)
+- [Kontrak dan ketergantungan integrasi](integrasi.md)
+- [Jurnal harian dan bukti pengerjaan](jurnal-harian.md)
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Hasil hari pertama
 
-## Learning Laravel
+Empat hasil analisis: pembagian pekerjaan per tanggal, kriteria penerimaan,
+pemetaan skema yang sudah ada, dan daftar ketergantungan antarmodul.
+Hari pertama hanya menambah lima dokumen dalam folder ini. Perilaku aplikasi
+belum berubah; implementasi fitur dimulai pada hari berikutnya.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+Pesan commit:
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
-
-```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+```text
+docs(laporan): petakan PBI dan rencana pengerjaan harian
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+Deskripsi commit:
 
-## Contributing
+```text
+Petakan kriteria penerimaan PBI-07, PBI-08, dan PBI-09.
+Susun target harian sampai 29 November 2026 dan format jurnal pengerjaan.
+Catat relasi database, ketergantungan login, fasilitas, periode, dan status.
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## Memasukkan hasil hari pertama di laptop melalui GitHub Desktop
 
-## Code of Conduct
+1. Ekstrak paket hari pertama di luar folder project.
+2. Salin folder `docs/laporan-masyarakat` ke
+   `C:\Users\User\Documents\GitHub\aksesibel\docs\laporan-masyarakat`.
+   Gabungkan dengan folder `docs` yang sudah ada bila diperlukan; pertahankan
+   dokumen lain milik kelompok.
+3. Buka GitHub Desktop, pilih repository `aksesibel`, lalu pilih branch kerja
+   **`Riyana_branch`**, sesuai nama yang terlihat pada sesi setup.
+4. Buka tab **Changes**. Periksa dan centang lima file dokumentasi modul ini.
+   Perubahan lain yang sudah ada di laptop diperiksa terpisah.
+5. Isi **Summary** dan **Description** dengan teks di atas.
+6. Pastikan akun dan email Git pada pengaturan GitHub Desktop adalah milikmu,
+   lalu klik **Commit to Riyana_branch**.
+7. Klik **Push origin**. Jika branch belum dipublikasikan, gunakan
+   **Publish branch**. Push memerlukan akses tulis ke repo kelompok.
+8. Periksa **History** dan halaman branch di GitHub. Catat SHA commit milikmu
+   pada bukti harian pribadi atau jurnal hari berikutnya.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Commit yang dibuat di salinan repo pendamping tidak otomatis masuk ke laptop
+atau akun GitHub milikmu. Langkah Desktop di atas membuat commit dari hasil
+analisis ini menggunakan identitas Git yang terpasang di laptopmu.
 
-## Security Vulnerabilities
+## Rutinitas harian
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+1. Mulai dari perubahan sebelumnya yang sudah di-commit. Ambil update `main`
+   melalui **Fetch origin**, pilih `main`, lalu **Pull origin** bila tersedia.
+   Kembali ke `Riyana_branch` dan gunakan **Branch → Merge into current branch**
+   untuk memasukkan `main` jika ada perubahan baru. Selesaikan konflik sebelum
+   melanjutkan pekerjaan.
+2. Baca target tanggal hari ini dan catatan integrasi. Jalankan
+   `composer install` jika dependensi berubah, serta `php artisan migrate`
+   jika ada migration baru. Database yang dipakai harus database lokal project.
+3. Kerjakan satu hasil yang dapat diperiksa. Untuk tugas besar, pecah menjadi
+   beberapa commit yang masing-masing menjelaskan satu perubahan.
+4. Jalankan pemeriksaan yang relevan. Catat hasil sebenarnya di jurnal.
+   Tes fitur diprioritaskan untuk akses pengguna, aturan status, validasi,
+   penyimpanan data, dan upload. Dokumentasi cukup diperiksa isinya dan diff.
+5. Periksa diff di Desktop. Sertakan kode, migration baru jika ada, dan tes
+   terkait. Tambahkan jurnal pada commit yang sama agar bukti terhubung.
+6. Isi pesan commit sesuai hasil aktual, commit, lalu push sebelum mengakhiri
+   pekerjaan hari tersebut. Screenshot tampilan atau hasil uji boleh menjadi
+   bukti pendamping selama tidak berisi kredensial atau data pribadi asli.
 
-## License
+Targetnya minimal satu commit bermakna per hari sesuai pekerjaan yang selesai.
+Pesan dalam kalender adalah usulan: gunakan setelah hasilnya benar-benar ada.
+Jika terhambat integrasi, catat temuan dan hasil investigasi yang bisa diperiksa,
+lalu lanjutkan pekerjaan mandiri yang tidak bergantung pada hambatan tersebut.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## Pemeriksaan sesuai jenis perubahan
+
+| Perubahan | Pemeriksaan | Bukti yang dicatat |
+|---|---|---|
+| Dokumentasi | Baca ulang kriteria, tautan, tanggal, dan `git diff --check` | Berkas dan hasil pemeriksaan |
+| Alur laporan | Tes pengguna pemilik/bukan pemilik, status, dan validasi | Nama tes serta hasilnya |
+| Kategori | Tes role pengelola, validasi, kategori nonaktif, dan referensi lama | Nama tes serta hasilnya |
+| Lampiran | Tes file valid/tidak valid, ukuran, akses file, dan cleanup | Hasil uji dengan file dummy |
+| Tampilan | `npm run build`, pemeriksaan desktop dan ponsel | Hasil build dan screenshot |
+| Integrasi akhir | Alur lengkap PBI, tes relevan, dan build | Daftar kasus lulus/gagal dan PR |
+
+Perintah PHP dijalankan menggunakan PHP yang cocok dengan `composer.lock`.
+Di sesi setup, PHP 8.5.12 dan Composer 2.11.0 berhasil dikenali. Pengaturan
+`$env:Path` dan `$env:PHPRC` yang dibuat saat setup hanya berlaku pada terminal
+tersebut; periksa `php -v` saat membuka terminal lain.
+
+Perubahan yang dimasukkan ke commit mengikuti standar database kelompok:
+`.env`, `vendor`, `node_modules`, hasil build, file upload pengguna, dan dump
+berisi data asli tidak masuk commit. Migration yang sudah berada di `main`
+dipertahankan; perubahan skema dibuat melalui migration baru.
+
+## Batas penyiapan agent
+
+`AGENTS.md` repo meminta pemasangan Laravel Boost sebelum perubahan aplikasi
+oleh agent. Saat mulai mengubah kode aplikasi, ikuti bootstrap tersebut,
+baca ulang pedoman yang dihasilkan, dan periksa diff dependensinya. Paket
+hari pertama ini hanya dokumentasi dan tidak mengubah dependensi aplikasi.
