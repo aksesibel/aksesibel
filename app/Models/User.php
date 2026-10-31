@@ -16,6 +16,8 @@ use Illuminate\Notifications\Notifiable;
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
+    public const STATUSES = ['active', 'inactive', 'suspended'];
+
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
 
@@ -35,6 +37,12 @@ class User extends Authenticatable
     public function role(): BelongsTo
     {
         return $this->belongsTo(Role::class, 'role_id', 'role_id');
+    }
+
+    public function canManageSupportingData(): bool
+    {
+        return $this->account_status === 'active'
+            && $this->role?->role_name === Role::FACILITY_MANAGER;
     }
 
     public function reports(): HasMany

@@ -6,7 +6,7 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Data master awal. Isinya CONTOH, silakan sesuaikan dengan dokumen proposal.
+ * Data master bersama. Peran mengikuti proposal; peran lama tetap dipertahankan.
  * Aman dijalankan berulang kali (tidak membuat duplikat).
  */
 class MasterDataSeeder extends Seeder
@@ -16,8 +16,7 @@ class MasterDataSeeder extends Seeder
         $this->seed('roles', 'role_name', [
             ['role_name' => 'Admin'],
             ['role_name' => 'Masyarakat'],
-            ['role_name' => 'Verifikator'],
-            ['role_name' => 'Petugas Tindak Lanjut'],
+            ['role_name' => 'Pengelola Fasilitas'],
         ]);
 
         $this->seed('verification_statuses', 'status_name', [
@@ -56,7 +55,9 @@ class MasterDataSeeder extends Seeder
     private function seed(string $table, string $key, array $rows): void
     {
         foreach ($rows as $row) {
-            DB::table($table)->updateOrInsert([$key => $row[$key]], $row);
+            if (! DB::table($table)->where($key, $row[$key])->exists()) {
+                DB::table($table)->insert($row);
+            }
         }
     }
 }
