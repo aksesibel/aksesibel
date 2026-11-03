@@ -25,6 +25,19 @@ class FollowUpAssignment extends Model
         ];
     }
 
+    public function getRouteKeyName(): string
+    {
+        return 'assignment_id';
+    }
+
+    /**
+     * Scope: hanya penugasan dengan status tertentu.
+     */
+    public function scopeWithStatus($query, string $status)
+    {
+        return $query->where('assignment_status', $status);
+    }
+
     public function report(): BelongsTo
     {
         return $this->belongsTo(Report::class, 'report_id', 'report_id');

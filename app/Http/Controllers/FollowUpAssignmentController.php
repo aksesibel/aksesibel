@@ -23,7 +23,7 @@ class FollowUpAssignmentController extends Controller
         $user = $request->user();
         $roleName = $user->role?->role_name;
 
-        $query = FollowUpAssignment::with(['report', 'assignee', 'assigner']);
+        $query = FollowUpAssignment::with(['report.facility', 'assignee', 'assigner']);
 
         if ($roleName === 'Petugas Tindak Lanjut') {
             $query->where('assigned_to', $user->id);
@@ -36,6 +36,28 @@ class FollowUpAssignmentController extends Controller
     }
 
     /**
+     * Daftar laporan yang memenuhi syarat untuk ditugaskan.
+     *
+     * Hanya laporan berstatus "Dalam Tindak Lanjut".
+     */
+    public function readyReports(Request $request)
+    {
+        $statusDalamTindakLanjut = VerificationStatus::where('status_name', 'Dalam Tindak Lanjut')->first();
+
+        $reports = Report::query()
+            ->when($statusDalamTindakLanjut, function ($q) use ($statusDalamTindakLanjut) {
+                $q->where('status_id', $statusDalamTindakLanjut->status_id);
+            }, function ($q) {
+                $q->whereRaw('1 = 0');
+            })
+            ->with(['facility', 'issueCategory', 'status'])
+            ->orderByDesc('report_id')
+            ->paginate(15);
+
+        return view('follow-up-assignments.ready-reports', compact('reports'));
+    }
+
+    /**
      * Form buat penugasan baru.
      */
     public function create(Request $request)
@@ -45,16 +67,22 @@ class FollowUpAssignmentController extends Controller
         $reports = collect();
         if ($statusDalamTindakLanjut) {
             $reports = Report::where('status_id', $statusDalamTindakLanjut->status_id)
-                ->with('facility', 'issueCategory')
+                ->with(['facility', 'issueCategory', 'status'])
                 ->orderByDesc('report_id')
                 ->get();
+        }
+
+        $selectedReportId = $request->query('report_id');
+        $selectedReport = null;
+        if ($selectedReportId) {
+            $selectedReport = $reports->firstWhere('report_id', (int) $selectedReportId);
         }
 
         $officers = \App\Models\User::whereHas('role', function ($q) {
             $q->where('role_name', 'Petugas Tindak Lanjut');
         })->where('account_status', 'active')->get();
 
-        return view('follow-up-assignments.create', compact('reports', 'officers'));
+        return view('follow-up-assignments.create', compact('reports', 'officers', 'selectedReport'));
     }
 
     /**
@@ -94,7 +122,14 @@ class FollowUpAssignmentController extends Controller
             abort(403, 'Anda tidak memiliki akses ke penugasan ini.');
         }
 
-        $follow_up_assignment->load(['report.facility', 'report.issueCategory', 'report.status', 'assignee', 'assigner']);
+        $follow_up_assignment->load([
+            'report.facility',
+            'report.issueCategory',
+            'report.status',
+            'report.verifications.verifier',
+            'assignee',
+            'assigner',
+        ]);
 
         return view('follow-up-assignments.show', ['assignment' => $follow_up_assignment]);
     }
