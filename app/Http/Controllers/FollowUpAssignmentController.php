@@ -44,17 +44,53 @@ class FollowUpAssignmentController extends Controller
     {
         $statusDalamTindakLanjut = VerificationStatus::where('status_name', 'Dalam Tindak Lanjut')->first();
 
-        $reports = Report::query()
+        // Statistik aktual
+        $readyCount = 0;
+        if ($statusDalamTindakLanjut) {
+            $readyCount = Report::where('status_id', $statusDalamTindakLanjut->status_id)->count();
+        }
+        $inProgressCount = FollowUpAssignment::whereIn('assignment_status', ['assigned', 'in_progress'])->count();
+        $completedCount = FollowUpAssignment::where('assignment_status', 'completed')->count();
+
+        $query = Report::query()
             ->when($statusDalamTindakLanjut, function ($q) use ($statusDalamTindakLanjut) {
                 $q->where('status_id', $statusDalamTindakLanjut->status_id);
             }, function ($q) {
                 $q->whereRaw('1 = 0');
             })
-            ->with(['facility', 'issueCategory', 'status'])
-            ->orderByDesc('report_id')
-            ->paginate(15);
+            ->with(['facility.category', 'issueCategory', 'status', 'verifications.verifier'])
+            ->orderByDesc('report_id');
 
-        return view('follow-up-assignments.ready-reports', compact('reports'));
+        if ($search = trim((string) $request->query('search'))) {
+            $query->where(function ($q) use ($search) {
+                $q->where('report_number', 'like', "%{$search}%")
+                    ->orWhereHas('facility', function ($fq) use ($search) {
+                        $fq->where('name', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('issueCategory', function ($iq) use ($search) {
+                        $iq->where('category_name', 'like', "%{$search}%");
+                    });
+            });
+        }
+
+        $reports = $query->paginate(10)->withQueryString();
+
+        $selectedId = $request->query('selected_id');
+        $selectedReport = null;
+        if ($selectedId) {
+            $selectedReport = $reports->firstWhere('report_id', (int) $selectedId);
+        }
+        if (! $selectedReport && $reports->isNotEmpty()) {
+            $selectedReport = $reports->first();
+        }
+
+        return view('follow-up-assignments.ready-reports', compact(
+            'reports',
+            'selectedReport',
+            'readyCount',
+            'inProgressCount',
+            'completedCount'
+        ));
     }
 
     /**
@@ -129,6 +165,9 @@ class FollowUpAssignmentController extends Controller
             'report.verifications.verifier',
             'assignee',
             'assigner',
+            'progress' => function ($q) {
+                $q->with('actor')->orderByDesc('recorded_at');
+            },
         ]);
 
         return view('follow-up-assignments.show', ['assignment' => $follow_up_assignment]);

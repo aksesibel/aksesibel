@@ -12,9 +12,14 @@ class StoreFollowUpAssignmentRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        $roleName = $this->user()?->role?->role_name;
+        $user = $this->user();
+        if (! $user) {
+            return false;
+        }
 
-        return $roleName === 'Admin';
+        $user->loadMissing('role');
+
+        return $user->role?->role_name === 'Admin';
     }
 
     /**

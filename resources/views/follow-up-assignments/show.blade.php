@@ -148,6 +148,140 @@
                     @endforelse
                 </div>
             </div>
+
+            <!-- KARTU 3: Riwayat Progres Penanganan (PBI-14) -->
+            <div class="bg-white shadow-sm rounded-lg border border-gray-200 overflow-hidden">
+                <div class="px-6 py-4 border-b border-gray-100 bg-gray-50/50 flex items-center justify-between">
+                    <div>
+                        <h2 class="text-base font-semibold text-gray-900">Riwayat Progres Penanganan</h2>
+                        <p class="text-xs text-gray-500">Catatan perkembangan tindakan lapangan dari petugas.</p>
+                    </div>
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                        {{ $assignment->progress ? $assignment->progress->count() : 0 }} Catatan
+                    </span>
+                </div>
+                <div class="p-6">
+                    @php
+                        $progressList = $assignment->progress ?? collect();
+                    @endphp
+
+                    @forelse ($progressList as $progress)
+                        <div class="border-l-2 border-emerald-500 pl-4 py-2 space-y-2 mb-4 last:mb-0 bg-emerald-50/20 rounded-r-md">
+                            <div class="flex items-center justify-between text-xs text-gray-500">
+                                <div class="flex items-center space-x-2">
+                                    <span class="font-semibold text-gray-900 text-sm">
+                                        {{ $progress->actor?->name ?? 'Petugas' }}
+                                    </span>
+                                    <span class="text-gray-400">&bull;</span>
+                                    <span class="text-gray-600 font-medium">
+                                        {{ $progress->actor?->role?->role_name ?? 'Petugas Tindak Lanjut' }}
+                                    </span>
+                                </div>
+                                <span class="text-gray-500">
+                                    {{ $progress->recorded_at ? $progress->recorded_at->format('d/m/Y H:i') : '-' }} WIB
+                                </span>
+                            </div>
+
+                            <div class="flex items-center space-x-2 text-sm">
+                                <span class="text-xs text-gray-500 uppercase font-semibold">Status:</span>
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold {{ in_array(strtolower($progress->progress_status), ['selesai', 'completed', 'tuntas']) ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800' }}">
+                                    {{ $progress->progress_status ?? 'Dalam Penanganan' }}
+                                </span>
+                            </div>
+
+                            <div class="text-sm text-gray-800 leading-relaxed bg-white p-3 rounded border border-emerald-200/50 whitespace-pre-line">
+                                {{ $progress->action_description }}
+                            </div>
+                        </div>
+                    @empty
+                        <div class="text-center py-6 text-gray-500 text-sm">
+                            <svg class="mx-auto h-8 w-8 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            Belum ada catatan progres penanganan untuk penugasan ini.
+                        </div>
+                    @endforelse
+                </div>
+            </div>
+
+            <!-- KARTU 4: Form Tambah Progres Penanganan (PBI-14) -->
+            @php
+                $canAddProgress = Auth::user()?->role?->role_name === 'Admin' || (int) Auth::id() === (int) $assignment->assigned_to;
+            @endphp
+
+            @if ($canAddProgress)
+                <div class="bg-white shadow-sm rounded-lg border border-gray-200 overflow-hidden">
+                    <div class="px-6 py-4 border-b border-gray-100 bg-gray-50/50">
+                        <h2 class="text-base font-semibold text-gray-900">Tambah Progres Penanganan</h2>
+                        <p class="text-xs text-gray-500">Catat tindakan yang telah atau sedang dilakukan di lapangan.</p>
+                    </div>
+                    <form action="{{ route('follow-up-assignments.progress.store', $assignment->assignment_id) }}" method="POST" class="p-6 space-y-4">
+                        @csrf
+
+                        <!-- Status Progres -->
+                        <div>
+                            <label for="progress_status" class="block text-sm font-medium text-gray-700">
+                                Status Progres Penanganan <span class="text-red-500" aria-hidden="true">*</span>
+                            </label>
+                            <div class="mt-1">
+                                <select id="progress_status"
+                                        name="progress_status"
+                                        required
+                                        aria-describedby="@error('progress_status') progress_status_error @enderror"
+                                        class="block w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm p-2.5 border @error('progress_status') border-red-500 @enderror">
+                                    <option value="">-- Pilih Status Progres --</option>
+                                    <option value="Sedang Dikerjakan" {{ old('progress_status') === 'Sedang Dikerjakan' ? 'selected' : '' }}>
+                                        Sedang Dikerjakan
+                                    </option>
+                                    <option value="Dalam Koordinasi Lapangan" {{ old('progress_status') === 'Dalam Koordinasi Lapangan' ? 'selected' : '' }}>
+                                        Dalam Koordinasi Lapangan
+                                    </option>
+                                    <option value="Menunggu Material/Peralatan" {{ old('progress_status') === 'Menunggu Material/Peralatan' ? 'selected' : '' }}>
+                                        Menunggu Material / Peralatan
+                                    </option>
+                                    <option value="Selesai" {{ old('progress_status') === 'Selesai' ? 'selected' : '' }}>
+                                        Selesai Ditangani
+                                    </option>
+                                </select>
+                            </div>
+                            @error('progress_status')
+                                <p id="progress_status_error" class="mt-1 text-xs text-red-600 font-medium">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <!-- Uraian Tindakan -->
+                        <div>
+                            <label for="action_description" class="block text-sm font-medium text-gray-700">
+                                Uraian Tindakan / Catatan Lapangan <span class="text-red-500" aria-hidden="true">*</span>
+                            </label>
+                            <div class="mt-1">
+                                <textarea id="action_description"
+                                          name="action_description"
+                                          rows="4"
+                                          required
+                                          maxlength="2000"
+                                          placeholder="Jelaskan secara rinci tindakan penanganan yang telah dilakukan, kendala yang dihadapi, atau hasil perbaikan di lapangan..."
+                                          aria-describedby="action_description_help @error('action_description') action_description_error @enderror"
+                                          class="block w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm p-2.5 border @error('action_description') border-red-500 @enderror">{{ old('action_description') }}</textarea>
+                            </div>
+                            <p id="action_description_help" class="mt-1 text-xs text-gray-500">
+                                Maksimal 2.000 karakter. Bukti foto/dokumen akan dikelola melalui modul bukti tindak lanjut (PBI-15).
+                            </p>
+                            @error('action_description')
+                                <p id="action_description_error" class="mt-1 text-xs text-red-600 font-medium">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <!-- Tombol Simpan -->
+                        <div class="pt-2 flex justify-end">
+                            <button type="submit"
+                                    class="inline-flex items-center px-5 py-2 border border-transparent shadow-sm text-sm font-semibold rounded-md text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500">
+                                Simpan Catatan Progres
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            @endif
         </div>
 
         <!-- Kolom Kanan: Ringkasan Laporan & Fasilitas (1 Span) -->
