@@ -14,4 +14,4 @@ Route::get('/', function () {
 |--------------------------------------------------------------------------
 */
 Route::resource('accessibility-types', AccessibilityTypeController::class)
-    ->only(['index']);
+    ->except(['show']);
