@@ -24,6 +24,8 @@ class MasterDataSeeder extends Seeder
             ['status_name' => 'Menunggu Verifikasi'],
             ['status_name' => 'Terverifikasi'],
             ['status_name' => 'Ditolak'],
+            ['status_name' => 'Memerlukan Pemeriksaan Lanjutan'],
+            ['status_name' => 'Dibatalkan'],
             ['status_name' => 'Dalam Tindak Lanjut'],
             ['status_name' => 'Selesai'],
         ]);
