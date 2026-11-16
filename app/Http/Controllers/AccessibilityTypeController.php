@@ -17,12 +17,12 @@ class AccessibilityTypeController extends Controller
             ->orderBy('type_name')
             ->get();
 
-        return view('accessibility.types.index', compact('types', 'q'));
+        return view('accessibility-types.index', compact('types', 'q'));
     }
 
     public function create()
     {
-        return view('accessibility.types.create');
+        return view('accessibility-types.create');
     }
 
     public function store(Request $request)
@@ -39,7 +39,7 @@ class AccessibilityTypeController extends Controller
 
     public function edit(AccessibilityType $accessibilityType)
     {
-        return view('accessibility.types.edit', compact('accessibilityType'));
+        return view('accessibility-types.edit', compact('accessibilityType'));
     }
 
     public function update(Request $request, AccessibilityType $accessibilityType)
