@@ -67,7 +67,11 @@ class FacilityAccessibilityController extends Controller
 
     public function show(FacilityAccessibility $facilityAccessibility)
     {
-        $facilityAccessibility->load(['facility', 'accessibilityType']);
+        $facilityAccessibility->load([
+            'facility',
+            'accessibilityType',
+            'inspections.inspector'
+        ]);
 
         return view('facility-accessibilities.show', compact('facilityAccessibility'));
     }
