@@ -54,4 +54,11 @@ class Report extends Model
     {
         return $this->hasMany(FollowUpAssignment::class, 'report_id', 'report_id');
     }
+    protected function casts(): array
+    {
+        return [
+            'incident_date' => 'date',
+            'is_anonymous' => 'boolean',
+        ];
+    }
 }

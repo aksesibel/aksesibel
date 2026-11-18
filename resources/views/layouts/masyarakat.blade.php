@@ -102,6 +102,11 @@
             padding: 10px 12px;
         }
 
+        
+        .nav-short {
+            display: none;
+        }
+
         @media (max-width: 768px) {
             .sidebar {
                 width: 65px;
@@ -110,13 +115,19 @@
 
             .brand,
             .sidebar-label,
-            .sidebar a span {
+            .sidebar a > span:not(.nav-short) {
                 display: none;
             }
 
             .sidebar a {
                 text-align: center;
                 font-size: 12px;
+                padding: 12px 5px;
+            }
+
+            .nav-short {
+                display: inline;
+                font-weight: 600;
             }
 
             .main-content {
@@ -127,32 +138,48 @@
                 padding: 18px 12px;
             }
         }
+
     </style>
 
     @stack('styles')
 </head>
+
 <body>
 
+    <!-- Sidebar -->
     <aside class="sidebar">
-        <div class="brand">♿ Aksesibel</div>
+        <div class="brand">
+            Aksesibel
+        </div>
 
-        <div class="sidebar-label">RUANG KERJA</div>
+        <div class="sidebar-label">
+            MENU UTAMA
+        </div>
 
-        <a href="#">
-            <span>Laporan saya</span>
-        </a>
+        <nav>
+            <a href="{{ route('reports.index') }}"
+               class="{{ request()->routeIs('reports.index') || request()->routeIs('reports.show') ? 'active' : '' }}">
+                <span class="nav-short">LS</span>
+                <span>Laporan Saya</span>
+            </a>
 
-        <a href="{{ route('issue-categories.index') }}"
-           class="{{ request()->routeIs('issue-categories.*') ? 'active' : '' }}">
-            <span>Kategori kendala</span>
-        </a>
+            <a href="{{ route('issue-categories.index') }}"
+               class="{{ request()->routeIs('issue-categories.*') ? 'active' : '' }}">
+                <span class="nav-short">KK</span>
+                <span>Kategori Kendala</span>
+            </a>
 
-        <a href="#">
-            <span>Buat laporan</span>
-        </a>
+            <a href="{{ route('reports.create') }}"
+               class="{{ request()->routeIs('reports.create') ? 'active' : '' }}">
+                <span class="nav-short">BL</span>
+                <span>Buat Laporan</span>
+            </a>
+        </nav>
     </aside>
 
+    <!-- Konten Utama -->
     <main class="main-content">
+
         <header class="topbar">
             <div class="text-muted">
                 Aksesibel / @yield('breadcrumb', 'Dashboard')
@@ -166,9 +193,12 @@
         <section class="page-content">
             @yield('content')
         </section>
+
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
     @stack('scripts')
+
 </body>
 </html>
