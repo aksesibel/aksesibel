@@ -1,8 +1,9 @@
 <x-layout :title="$period->exists ? 'Edit Periode Pelaporan' : 'Tambah Periode Pelaporan'">
-    <form method="POST" action="{{ $period->exists ? route('manage.reporting-periods.update', $period) : route('manage.reporting-periods.store') }}" class="panel">
+    <form method="POST" action="{{ $period->exists ? route('manage.reporting-periods.update', $period) : route('manage.reporting-periods.store') }}" class="panel editor-panel">
         @csrf
         @if ($period->exists) @method('PUT') @endif
-        <div class="form-grid">
+        <div class="form-heading"><h2>Informasi periode</h2><p>Tentukan nama dan rentang tanggal pelaporan.</p></div>
+        <div class="form-grid editor-grid">
             <div class="md:col-span-2">
                 <label for="period_name">Nama periode <span aria-hidden="true">*</span></label>
                 <input class="field" id="period_name" name="period_name" value="{{ old('period_name', $period->period_name) }}" maxlength="255" required autofocus
@@ -22,7 +23,7 @@
                 @error('end_date') <p id="period-end-error" class="text-red-700">{{ $message }}</p> @enderror
             </div>
         </div>
-        <p>Perubahan tanggal tidak memindahkan laporan yang sudah terhubung. Filter periode menggunakan hubungan periode pada laporan.</p>
+        <div class="information-note"><x-icon name="info" /><p>Periode laporan baru ditentukan otomatis berdasarkan tanggal laporan dibuat. Tanggal mulai dan selesai termasuk dalam periode dan tidak boleh tumpang tindih dengan periode lain. Perubahan tanggal tidak memindahkan laporan yang sudah terhubung.</p></div>
         <div class="mt-6 flex flex-wrap gap-2">
             <button class="button" type="submit">Simpan periode</button>
             <a class="button-secondary" href="{{ $period->exists ? route('manage.reporting-periods.show', $period) : route('manage.reporting-periods.index') }}">Batal</a>

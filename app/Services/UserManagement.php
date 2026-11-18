@@ -46,6 +46,12 @@ class UserManagement
                     throw new AuthorizationException('Hak pengelolaan akun Anda telah berubah.');
                 }
 
+                $assignableRoleIds = $roles->whereInStrict('role_name', Role::PROPOSAL_ROLES)->modelKeys();
+
+                if (array_key_exists('role_id', $data) && ! in_array((int) $data['role_id'], $assignableRoleIds, true)) {
+                    throw ValidationException::withMessages(['role_id' => 'Pilih peran Masyarakat, Admin, atau Pengelola Fasilitas.']);
+                }
+
                 if ($target === null) {
                     return User::create($data);
                 }

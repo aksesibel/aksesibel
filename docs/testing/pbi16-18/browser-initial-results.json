@@ -1,0 +1,1074 @@
+{
+  "config": {
+    "argv": [
+      "/Users/haimac/.hermes/node/bin/node",
+      "/Users/haimac/Documents/GitHub/aksesibel/node_modules/@playwright/test/cli.js",
+      "test"
+    ],
+    "configFile": "/Users/haimac/Documents/GitHub/aksesibel/playwright.config.js",
+    "rootDir": "/Users/haimac/Documents/GitHub/aksesibel/tests/Browser",
+    "failOnFlakyTests": false,
+    "forbidOnly": true,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/Users/haimac/Documents/GitHub/aksesibel/storage/framework/testing/playwright-artifacts",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "",
+        "name": "",
+        "testDir": "/Users/haimac/Documents/GitHub/aksesibel/tests/Browser",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 90000
+      }
+    ],
+    "filteredProjects": [
+      {
+        "grep": {},
+        "grepInvert": null,
+        "outputDir": "/Users/haimac/Documents/GitHub/aksesibel/storage/framework/testing/playwright-artifacts",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "name": "",
+        "testDir": "/Users/haimac/Documents/GitHub/aksesibel/tests/Browser",
+        "snapshotDir": "/Users/haimac/Documents/GitHub/aksesibel/tests/Browser",
+        "testIgnore": [],
+        "testMatch": "**/*.@(spec|test).?(c|m)[jt]s?(x)",
+        "timeout": 90000,
+        "use": {
+          "baseURL": "http://127.0.0.1:8876",
+          "browserName": "chromium",
+          "headless": true,
+          "viewport": {
+            "width": 1440,
+            "height": 1000
+          },
+          "actionTimeout": 15000,
+          "navigationTimeout": 20000,
+          "trace": "off",
+          "video": "off"
+        },
+        "dependencies": [],
+        "ignoreSnapshots": false,
+        "__projectId": ""
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "docs/testing/pbi16-18/browser-results.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "default",
+    "updateSourceMethod": "patch",
+    "version": "1.64.1",
+    "workers": 1,
+    "webServer": {
+      "command": "php -S 127.0.0.1:8876 -t public tests/Support/browser-router.php",
+      "url": "http://127.0.0.1:8876/__pbi-testing/health",
+      "reuseExistingServer": false,
+      "timeout": 30000,
+      "stdout": "pipe",
+      "stderr": "pipe"
+    }
+  },
+  "suites": [
+    {
+      "title": "pbi16-18.spec.js",
+      "file": "pbi16-18.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "guest diarahkan ke login untuk semua URL internal langsung",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1510,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-01T06:17:22.879Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "01-guest-login",
+                      "contentType": "image/png",
+                      "path": "/Users/haimac/Documents/GitHub/aksesibel/storage/framework/testing/playwright-artifacts/pbi16-18-guest-diarahkan-k-15e54-semua-URL-internal-langsung/attachments/01-guest-login-ed336cfb7694f051b836ae3e3e9a01296d19467b.png"
+                    },
+                    {
+                      "name": "browser-diagnostics",
+                      "contentType": "application/json",
+                      "body": "ewogICJwYWdlRXJyb3JzIjogW10sCiAgImNvbnNvbGVFcnJvcnMiOiBbXSwKICAiZmFpbGVkUmVxdWVzdHMiOiBbXSwKICAiaHR0cEVycm9ycyI6IFtdCn0="
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "a2c003df57d5736ea446-7e60846eb3960e2f6b30",
+          "file": "pbi16-18.spec.js",
+          "line": 162,
+          "column": 1
+        },
+        {
+          "title": "POST login tanpa token CSRF ditolak server dengan 419",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 557,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m419\u001b[39m\nReceived: \u001b[31m302\u001b[39m",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m419\u001b[39m\nReceived: \u001b[31m302\u001b[39m\n    at /Users/haimac/Documents/GitHub/aksesibel/tests/Browser/pbi16-18.spec.js:180:39",
+                    "location": {
+                      "file": "/Users/haimac/Documents/GitHub/aksesibel/tests/Browser/pbi16-18.spec.js",
+                      "column": 39,
+                      "line": 180
+                    },
+                    "snippet": "  178 |     await page.getByRole('button', { name: 'Masuk', exact: true }).click();\n  179 |\n> 180 |     expect((await response).status()).toBe(419);\n      |                                       ^\n  181 |     await expect(page.locator('body')).toContainText('419');\n  182 |     await screenshot(page, '01b-csrf-tanpa-token-ditolak', testInfo);\n  183 |     await page.goto('/pengelola/users');"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/Users/haimac/Documents/GitHub/aksesibel/tests/Browser/pbi16-18.spec.js",
+                        "column": 39,
+                        "line": 180
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m419\u001b[39m\nReceived: \u001b[31m302\u001b[39m\n\n  178 |     await page.getByRole('button', { name: 'Masuk', exact: true }).click();\n  179 |\n> 180 |     expect((await response).status()).toBe(419);\n      |                                       ^\n  181 |     await expect(page.locator('body')).toContainText('419');\n  182 |     await screenshot(page, '01b-csrf-tanpa-token-ditolak', testInfo);\n  183 |     await page.goto('/pengelola/users');\n    at /Users/haimac/Documents/GitHub/aksesibel/tests/Browser/pbi16-18.spec.js:180:39"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-01T06:17:24.976Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "failed-post-login-tanpa-token-csrf-ditolak-server-dengan-419",
+                      "contentType": "image/png",
+                      "path": "/Users/haimac/Documents/GitHub/aksesibel/storage/framework/testing/playwright-artifacts/pbi16-18-POST-login-tanpa--38162-F-ditolak-server-dengan-419/attachments/failed-post-login-tanpa-token-csrf-ditolak-server-dengan-419-9742645a210f8eeb51a8e3fefc1952ee50792484.png"
+                    },
+                    {
+                      "name": "browser-diagnostics",
+                      "contentType": "application/json",
+                      "body": "ewogICJwYWdlRXJyb3JzIjogW10sCiAgImNvbnNvbGVFcnJvcnMiOiBbXSwKICAiZmFpbGVkUmVxdWVzdHMiOiBbXSwKICAiaHR0cEVycm9ycyI6IFtdCn0="
+                    },
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/Users/haimac/Documents/GitHub/aksesibel/storage/framework/testing/playwright-artifacts/pbi16-18-POST-login-tanpa--38162-F-ditolak-server-dengan-419/error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/Users/haimac/Documents/GitHub/aksesibel/tests/Browser/pbi16-18.spec.js",
+                    "column": 39,
+                    "line": 180
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "a2c003df57d5736ea446-9e1c230461392287c8f8",
+          "file": "pbi16-18.spec.js",
+          "line": 171,
+          "column": 1
+        },
+        {
+          "title": "pengelola melihat lima navigasi dan logout mencabut sesi",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 844,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-01T06:17:25.868Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "02-pengelola-navigasi",
+                      "contentType": "image/png",
+                      "path": "/Users/haimac/Documents/GitHub/aksesibel/storage/framework/testing/playwright-artifacts/pbi16-18-pengelola-melihat-3d4a6-si-dan-logout-mencabut-sesi/attachments/02-pengelola-navigasi-73de21afce14219673c43a2e03fb38a9e2a3a7a8.png"
+                    },
+                    {
+                      "name": "browser-diagnostics",
+                      "contentType": "application/json",
+                      "body": "ewogICJwYWdlRXJyb3JzIjogW10sCiAgImNvbnNvbGVFcnJvcnMiOiBbXSwKICAiZmFpbGVkUmVxdWVzdHMiOiBbXSwKICAiaHR0cEVycm9ycyI6IFtdCn0="
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "a2c003df57d5736ea446-79ccb4b79e4948071fc8",
+          "file": "pbi16-18.spec.js",
+          "line": 187,
+          "column": 1
+        },
+        {
+          "title": "peran Admin ditolak saat mengakses URL modul secara langsung",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 946,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-01T06:17:26.903Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "03-akses-ditolak-admin",
+                      "contentType": "image/png",
+                      "path": "/Users/haimac/Documents/GitHub/aksesibel/storage/framework/testing/playwright-artifacts/pbi16-18-peran-Admin-ditol-88656-s-URL-modul-secara-langsung/attachments/03-akses-ditolak-admin-23a9928486718e667f8607d4e921500751c0090a.png"
+                    },
+                    {
+                      "name": "browser-diagnostics",
+                      "contentType": "application/json",
+                      "body": "ewogICJwYWdlRXJyb3JzIjogW10sCiAgImNvbnNvbGVFcnJvcnMiOiBbCiAgICAiRmFpbGVkIHRvIGxvYWQgcmVzb3VyY2U6IHRoZSBzZXJ2ZXIgcmVzcG9uZGVkIHdpdGggYSBzdGF0dXMgb2YgNDAzIChGb3JiaWRkZW4pIiwKICAgICJGYWlsZWQgdG8gbG9hZCByZXNvdXJjZTogdGhlIHNlcnZlciByZXNwb25kZWQgd2l0aCBhIHN0YXR1cyBvZiA0MDMgKEZvcmJpZGRlbikiLAogICAgIkZhaWxlZCB0byBsb2FkIHJlc291cmNlOiB0aGUgc2VydmVyIHJlc3BvbmRlZCB3aXRoIGEgc3RhdHVzIG9mIDQwMyAoRm9yYmlkZGVuKSIsCiAgICAiRmFpbGVkIHRvIGxvYWQgcmVzb3VyY2U6IHRoZSBzZXJ2ZXIgcmVzcG9uZGVkIHdpdGggYSBzdGF0dXMgb2YgNDAzIChGb3JiaWRkZW4pIiwKICAgICJGYWlsZWQgdG8gbG9hZCByZXNvdXJjZTogdGhlIHNlcnZlciByZXNwb25kZWQgd2l0aCBhIHN0YXR1cyBvZiA0MDMgKEZvcmJpZGRlbikiLAogICAgIkZhaWxlZCB0byBsb2FkIHJlc291cmNlOiB0aGUgc2VydmVyIHJlc3BvbmRlZCB3aXRoIGEgc3RhdHVzIG9mIDQwMyAoRm9yYmlkZGVuKSIsCiAgICAiRmFpbGVkIHRvIGxvYWQgcmVzb3VyY2U6IHRoZSBzZXJ2ZXIgcmVzcG9uZGVkIHdpdGggYSBzdGF0dXMgb2YgNDAzIChGb3JiaWRkZW4pIiwKICAgICJGYWlsZWQgdG8gbG9hZCByZXNvdXJjZTogdGhlIHNlcnZlciByZXNwb25kZWQgd2l0aCBhIHN0YXR1cyBvZiA0MDMgKEZvcmJpZGRlbikiLAogICAgIkZhaWxlZCB0byBsb2FkIHJlc291cmNlOiB0aGUgc2VydmVyIHJlc3BvbmRlZCB3aXRoIGEgc3RhdHVzIG9mIDQwMyAoRm9yYmlkZGVuKSIKICBdLAogICJmYWlsZWRSZXF1ZXN0cyI6IFtdLAogICJodHRwRXJyb3JzIjogWwogICAgewogICAgICAicGF0aCI6ICIvcGVuZ2Vsb2xhL3VzZXJzIiwKICAgICAgInR5cGUiOiAiZG9jdW1lbnQiLAogICAgICAic3RhdHVzIjogNDAzCiAgICB9LAogICAgewogICAgICAicGF0aCI6ICIvcGVuZ2Vsb2xhL3VzZXJzL2NyZWF0ZSIsCiAgICAgICJ0eXBlIjogImRvY3VtZW50IiwKICAgICAgInN0YXR1cyI6IDQwMwogICAgfSwKICAgIHsKICAgICAgInBhdGgiOiAiL3BlbmdlbG9sYS9mYWNpbGl0eS1jYXRlZ29yaWVzIiwKICAgICAgInR5cGUiOiAiZG9jdW1lbnQiLAogICAgICAic3RhdHVzIjogNDAzCiAgICB9LAogICAgewogICAgICAicGF0aCI6ICIvcGVuZ2Vsb2xhL2ZhY2lsaXR5LWNhdGVnb3JpZXMvY3JlYXRlIiwKICAgICAgInR5cGUiOiAiZG9jdW1lbnQiLAogICAgICAic3RhdHVzIjogNDAzCiAgICB9LAogICAgewogICAgICAicGF0aCI6ICIvcGVuZ2Vsb2xhL2lzc3VlLWNhdGVnb3JpZXMiLAogICAgICAidHlwZSI6ICJkb2N1bWVudCIsCiAgICAgICJzdGF0dXMiOiA0MDMKICAgIH0sCiAgICB7CiAgICAgICJwYXRoIjogIi9wZW5nZWxvbGEvaXNzdWUtY2F0ZWdvcmllcy9jcmVhdGUiLAogICAgICAidHlwZSI6ICJkb2N1bWVudCIsCiAgICAgICJzdGF0dXMiOiA0MDMKICAgIH0sCiAgICB7CiAgICAgICJwYXRoIjogIi9wZW5nZWxvbGEvcmVwb3J0aW5nLXBlcmlvZHMiLAogICAgICAidHlwZSI6ICJkb2N1bWVudCIsCiAgICAgICJzdGF0dXMiOiA0MDMKICAgIH0sCiAgICB7CiAgICAgICJwYXRoIjogIi9wZW5nZWxvbGEvcmVwb3J0aW5nLXBlcmlvZHMvY3JlYXRlIiwKICAgICAgInR5cGUiOiAiZG9jdW1lbnQiLAogICAgICAic3RhdHVzIjogNDAzCiAgICB9LAogICAgewogICAgICAicGF0aCI6ICIvcGVuZ2Vsb2xhL3N0YXRpc3RpY3MiLAogICAgICAidHlwZSI6ICJkb2N1bWVudCIsCiAgICAgICJzdGF0dXMiOiA0MDMKICAgIH0KICBdCn0="
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "a2c003df57d5736ea446-168ec88862e2777d902c",
+          "file": "pbi16-18.spec.js",
+          "line": 208,
+          "column": 5
+        },
+        {
+          "title": "peran Masyarakat ditolak saat mengakses URL modul secara langsung",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 895,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-01T06:17:27.865Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "03-akses-ditolak-masyarakat",
+                      "contentType": "image/png",
+                      "path": "/Users/haimac/Documents/GitHub/aksesibel/storage/framework/testing/playwright-artifacts/pbi16-18-peran-Masyarakat--10259-s-URL-modul-secara-langsung/attachments/03-akses-ditolak-masyarakat-d082b257f58d8897910fd4512df47bed8b49b106.png"
+                    },
+                    {
+                      "name": "browser-diagnostics",
+                      "contentType": "application/json",
+                      "body": "ewogICJwYWdlRXJyb3JzIjogW10sCiAgImNvbnNvbGVFcnJvcnMiOiBbCiAgICAiRmFpbGVkIHRvIGxvYWQgcmVzb3VyY2U6IHRoZSBzZXJ2ZXIgcmVzcG9uZGVkIHdpdGggYSBzdGF0dXMgb2YgNDAzIChGb3JiaWRkZW4pIiwKICAgICJGYWlsZWQgdG8gbG9hZCByZXNvdXJjZTogdGhlIHNlcnZlciByZXNwb25kZWQgd2l0aCBhIHN0YXR1cyBvZiA0MDMgKEZvcmJpZGRlbikiLAogICAgIkZhaWxlZCB0byBsb2FkIHJlc291cmNlOiB0aGUgc2VydmVyIHJlc3BvbmRlZCB3aXRoIGEgc3RhdHVzIG9mIDQwMyAoRm9yYmlkZGVuKSIsCiAgICAiRmFpbGVkIHRvIGxvYWQgcmVzb3VyY2U6IHRoZSBzZXJ2ZXIgcmVzcG9uZGVkIHdpdGggYSBzdGF0dXMgb2YgNDAzIChGb3JiaWRkZW4pIiwKICAgICJGYWlsZWQgdG8gbG9hZCByZXNvdXJjZTogdGhlIHNlcnZlciByZXNwb25kZWQgd2l0aCBhIHN0YXR1cyBvZiA0MDMgKEZvcmJpZGRlbikiLAogICAgIkZhaWxlZCB0byBsb2FkIHJlc291cmNlOiB0aGUgc2VydmVyIHJlc3BvbmRlZCB3aXRoIGEgc3RhdHVzIG9mIDQwMyAoRm9yYmlkZGVuKSIsCiAgICAiRmFpbGVkIHRvIGxvYWQgcmVzb3VyY2U6IHRoZSBzZXJ2ZXIgcmVzcG9uZGVkIHdpdGggYSBzdGF0dXMgb2YgNDAzIChGb3JiaWRkZW4pIiwKICAgICJGYWlsZWQgdG8gbG9hZCByZXNvdXJjZTogdGhlIHNlcnZlciByZXNwb25kZWQgd2l0aCBhIHN0YXR1cyBvZiA0MDMgKEZvcmJpZGRlbikiLAogICAgIkZhaWxlZCB0byBsb2FkIHJlc291cmNlOiB0aGUgc2VydmVyIHJlc3BvbmRlZCB3aXRoIGEgc3RhdHVzIG9mIDQwMyAoRm9yYmlkZGVuKSIKICBdLAogICJmYWlsZWRSZXF1ZXN0cyI6IFtdLAogICJodHRwRXJyb3JzIjogWwogICAgewogICAgICAicGF0aCI6ICIvcGVuZ2Vsb2xhL3VzZXJzIiwKICAgICAgInR5cGUiOiAiZG9jdW1lbnQiLAogICAgICAic3RhdHVzIjogNDAzCiAgICB9LAogICAgewogICAgICAicGF0aCI6ICIvcGVuZ2Vsb2xhL3VzZXJzL2NyZWF0ZSIsCiAgICAgICJ0eXBlIjogImRvY3VtZW50IiwKICAgICAgInN0YXR1cyI6IDQwMwogICAgfSwKICAgIHsKICAgICAgInBhdGgiOiAiL3BlbmdlbG9sYS9mYWNpbGl0eS1jYXRlZ29yaWVzIiwKICAgICAgInR5cGUiOiAiZG9jdW1lbnQiLAogICAgICAic3RhdHVzIjogNDAzCiAgICB9LAogICAgewogICAgICAicGF0aCI6ICIvcGVuZ2Vsb2xhL2ZhY2lsaXR5LWNhdGVnb3JpZXMvY3JlYXRlIiwKICAgICAgInR5cGUiOiAiZG9jdW1lbnQiLAogICAgICAic3RhdHVzIjogNDAzCiAgICB9LAogICAgewogICAgICAicGF0aCI6ICIvcGVuZ2Vsb2xhL2lzc3VlLWNhdGVnb3JpZXMiLAogICAgICAidHlwZSI6ICJkb2N1bWVudCIsCiAgICAgICJzdGF0dXMiOiA0MDMKICAgIH0sCiAgICB7CiAgICAgICJwYXRoIjogIi9wZW5nZWxvbGEvaXNzdWUtY2F0ZWdvcmllcy9jcmVhdGUiLAogICAgICAidHlwZSI6ICJkb2N1bWVudCIsCiAgICAgICJzdGF0dXMiOiA0MDMKICAgIH0sCiAgICB7CiAgICAgICJwYXRoIjogIi9wZW5nZWxvbGEvcmVwb3J0aW5nLXBlcmlvZHMiLAogICAgICAidHlwZSI6ICJkb2N1bWVudCIsCiAgICAgICJzdGF0dXMiOiA0MDMKICAgIH0sCiAgICB7CiAgICAgICJwYXRoIjogIi9wZW5nZWxvbGEvcmVwb3J0aW5nLXBlcmlvZHMvY3JlYXRlIiwKICAgICAgInR5cGUiOiAiZG9jdW1lbnQiLAogICAgICAic3RhdHVzIjogNDAzCiAgICB9LAogICAgewogICAgICAicGF0aCI6ICIvcGVuZ2Vsb2xhL3N0YXRpc3RpY3MiLAogICAgICAidHlwZSI6ICJkb2N1bWVudCIsCiAgICAgICJzdGF0dXMiOiA0MDMKICAgIH0KICBdCn0="
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "a2c003df57d5736ea446-80e47285e21b81535d7b",
+          "file": "pbi16-18.spec.js",
+          "line": 208,
+          "column": 5
+        },
+        {
+          "title": "peran Tidak dikenal ditolak saat mengakses URL modul secara langsung",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 710,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-01T06:17:28.767Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "03-akses-ditolak-tidak-dikenal",
+                      "contentType": "image/png",
+                      "path": "/Users/haimac/Documents/GitHub/aksesibel/storage/framework/testing/playwright-artifacts/pbi16-18-peran-Tidak-diken-18540-s-URL-modul-secara-langsung/attachments/03-akses-ditolak-tidak-dikenal-f92e0ebd002407c552cf947f2a803a37adc3b2f5.png"
+                    },
+                    {
+                      "name": "browser-diagnostics",
+                      "contentType": "application/json",
+                      "body": "ewogICJwYWdlRXJyb3JzIjogW10sCiAgImNvbnNvbGVFcnJvcnMiOiBbCiAgICAiRmFpbGVkIHRvIGxvYWQgcmVzb3VyY2U6IHRoZSBzZXJ2ZXIgcmVzcG9uZGVkIHdpdGggYSBzdGF0dXMgb2YgNDAzIChGb3JiaWRkZW4pIiwKICAgICJGYWlsZWQgdG8gbG9hZCByZXNvdXJjZTogdGhlIHNlcnZlciByZXNwb25kZWQgd2l0aCBhIHN0YXR1cyBvZiA0MDMgKEZvcmJpZGRlbikiLAogICAgIkZhaWxlZCB0byBsb2FkIHJlc291cmNlOiB0aGUgc2VydmVyIHJlc3BvbmRlZCB3aXRoIGEgc3RhdHVzIG9mIDQwMyAoRm9yYmlkZGVuKSIsCiAgICAiRmFpbGVkIHRvIGxvYWQgcmVzb3VyY2U6IHRoZSBzZXJ2ZXIgcmVzcG9uZGVkIHdpdGggYSBzdGF0dXMgb2YgNDAzIChGb3JiaWRkZW4pIiwKICAgICJGYWlsZWQgdG8gbG9hZCByZXNvdXJjZTogdGhlIHNlcnZlciByZXNwb25kZWQgd2l0aCBhIHN0YXR1cyBvZiA0MDMgKEZvcmJpZGRlbikiLAogICAgIkZhaWxlZCB0byBsb2FkIHJlc291cmNlOiB0aGUgc2VydmVyIHJlc3BvbmRlZCB3aXRoIGEgc3RhdHVzIG9mIDQwMyAoRm9yYmlkZGVuKSIsCiAgICAiRmFpbGVkIHRvIGxvYWQgcmVzb3VyY2U6IHRoZSBzZXJ2ZXIgcmVzcG9uZGVkIHdpdGggYSBzdGF0dXMgb2YgNDAzIChGb3JiaWRkZW4pIiwKICAgICJGYWlsZWQgdG8gbG9hZCByZXNvdXJjZTogdGhlIHNlcnZlciByZXNwb25kZWQgd2l0aCBhIHN0YXR1cyBvZiA0MDMgKEZvcmJpZGRlbikiLAogICAgIkZhaWxlZCB0byBsb2FkIHJlc291cmNlOiB0aGUgc2VydmVyIHJlc3BvbmRlZCB3aXRoIGEgc3RhdHVzIG9mIDQwMyAoRm9yYmlkZGVuKSIsCiAgICAiRmFpbGVkIHRvIGxvYWQgcmVzb3VyY2U6IHRoZSBzZXJ2ZXIgcmVzcG9uZGVkIHdpdGggYSBzdGF0dXMgb2YgNDAzIChGb3JiaWRkZW4pIgogIF0sCiAgImZhaWxlZFJlcXVlc3RzIjogW10sCiAgImh0dHBFcnJvcnMiOiBbCiAgICB7CiAgICAgICJwYXRoIjogIi9hY2NvdW50IiwKICAgICAgInR5cGUiOiAiZG9jdW1lbnQiLAogICAgICAic3RhdHVzIjogNDAzCiAgICB9LAogICAgewogICAgICAicGF0aCI6ICIvcGVuZ2Vsb2xhL3VzZXJzIiwKICAgICAgInR5cGUiOiAiZG9jdW1lbnQiLAogICAgICAic3RhdHVzIjogNDAzCiAgICB9LAogICAgewogICAgICAicGF0aCI6ICIvcGVuZ2Vsb2xhL3VzZXJzL2NyZWF0ZSIsCiAgICAgICJ0eXBlIjogImRvY3VtZW50IiwKICAgICAgInN0YXR1cyI6IDQwMwogICAgfSwKICAgIHsKICAgICAgInBhdGgiOiAiL3BlbmdlbG9sYS9mYWNpbGl0eS1jYXRlZ29yaWVzIiwKICAgICAgInR5cGUiOiAiZG9jdW1lbnQiLAogICAgICAic3RhdHVzIjogNDAzCiAgICB9LAogICAgewogICAgICAicGF0aCI6ICIvcGVuZ2Vsb2xhL2ZhY2lsaXR5LWNhdGVnb3JpZXMvY3JlYXRlIiwKICAgICAgInR5cGUiOiAiZG9jdW1lbnQiLAogICAgICAic3RhdHVzIjogNDAzCiAgICB9LAogICAgewogICAgICAicGF0aCI6ICIvcGVuZ2Vsb2xhL2lzc3VlLWNhdGVnb3JpZXMiLAogICAgICAidHlwZSI6ICJkb2N1bWVudCIsCiAgICAgICJzdGF0dXMiOiA0MDMKICAgIH0sCiAgICB7CiAgICAgICJwYXRoIjogIi9wZW5nZWxvbGEvaXNzdWUtY2F0ZWdvcmllcy9jcmVhdGUiLAogICAgICAidHlwZSI6ICJkb2N1bWVudCIsCiAgICAgICJzdGF0dXMiOiA0MDMKICAgIH0sCiAgICB7CiAgICAgICJwYXRoIjogIi9wZW5nZWxvbGEvcmVwb3J0aW5nLXBlcmlvZHMiLAogICAgICAidHlwZSI6ICJkb2N1bWVudCIsCiAgICAgICJzdGF0dXMiOiA0MDMKICAgIH0sCiAgICB7CiAgICAgICJwYXRoIjogIi9wZW5nZWxvbGEvcmVwb3J0aW5nLXBlcmlvZHMvY3JlYXRlIiwKICAgICAgInR5cGUiOiAiZG9jdW1lbnQiLAogICAgICAic3RhdHVzIjogNDAzCiAgICB9LAogICAgewogICAgICAicGF0aCI6ICIvcGVuZ2Vsb2xhL3N0YXRpc3RpY3MiLAogICAgICAidHlwZSI6ICJkb2N1bWVudCIsCiAgICAgICJzdGF0dXMiOiA0MDMKICAgIH0KICBdCn0="
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "a2c003df57d5736ea446-6c1bd41c72b35c6c36b2",
+          "file": "pbi16-18.spec.js",
+          "line": 208,
+          "column": 5
+        },
+        {
+          "title": "peran Kosong ditolak saat mengakses URL modul secara langsung",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 653,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-01T06:17:29.495Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "03-akses-ditolak-kosong",
+                      "contentType": "image/png",
+                      "path": "/Users/haimac/Documents/GitHub/aksesibel/storage/framework/testing/playwright-artifacts/pbi16-18-peran-Kosong-dito-6b34a-s-URL-modul-secara-langsung/attachments/03-akses-ditolak-kosong-919f6f0e188113f9d1607dc4777a95c3c92f7fe3.png"
+                    },
+                    {
+                      "name": "browser-diagnostics",
+                      "contentType": "application/json",
+                      "body": "ewogICJwYWdlRXJyb3JzIjogW10sCiAgImNvbnNvbGVFcnJvcnMiOiBbCiAgICAiRmFpbGVkIHRvIGxvYWQgcmVzb3VyY2U6IHRoZSBzZXJ2ZXIgcmVzcG9uZGVkIHdpdGggYSBzdGF0dXMgb2YgNDAzIChGb3JiaWRkZW4pIiwKICAgICJGYWlsZWQgdG8gbG9hZCByZXNvdXJjZTogdGhlIHNlcnZlciByZXNwb25kZWQgd2l0aCBhIHN0YXR1cyBvZiA0MDMgKEZvcmJpZGRlbikiLAogICAgIkZhaWxlZCB0byBsb2FkIHJlc291cmNlOiB0aGUgc2VydmVyIHJlc3BvbmRlZCB3aXRoIGEgc3RhdHVzIG9mIDQwMyAoRm9yYmlkZGVuKSIsCiAgICAiRmFpbGVkIHRvIGxvYWQgcmVzb3VyY2U6IHRoZSBzZXJ2ZXIgcmVzcG9uZGVkIHdpdGggYSBzdGF0dXMgb2YgNDAzIChGb3JiaWRkZW4pIiwKICAgICJGYWlsZWQgdG8gbG9hZCByZXNvdXJjZTogdGhlIHNlcnZlciByZXNwb25kZWQgd2l0aCBhIHN0YXR1cyBvZiA0MDMgKEZvcmJpZGRlbikiLAogICAgIkZhaWxlZCB0byBsb2FkIHJlc291cmNlOiB0aGUgc2VydmVyIHJlc3BvbmRlZCB3aXRoIGEgc3RhdHVzIG9mIDQwMyAoRm9yYmlkZGVuKSIsCiAgICAiRmFpbGVkIHRvIGxvYWQgcmVzb3VyY2U6IHRoZSBzZXJ2ZXIgcmVzcG9uZGVkIHdpdGggYSBzdGF0dXMgb2YgNDAzIChGb3JiaWRkZW4pIiwKICAgICJGYWlsZWQgdG8gbG9hZCByZXNvdXJjZTogdGhlIHNlcnZlciByZXNwb25kZWQgd2l0aCBhIHN0YXR1cyBvZiA0MDMgKEZvcmJpZGRlbikiLAogICAgIkZhaWxlZCB0byBsb2FkIHJlc291cmNlOiB0aGUgc2VydmVyIHJlc3BvbmRlZCB3aXRoIGEgc3RhdHVzIG9mIDQwMyAoRm9yYmlkZGVuKSIsCiAgICAiRmFpbGVkIHRvIGxvYWQgcmVzb3VyY2U6IHRoZSBzZXJ2ZXIgcmVzcG9uZGVkIHdpdGggYSBzdGF0dXMgb2YgNDAzIChGb3JiaWRkZW4pIgogIF0sCiAgImZhaWxlZFJlcXVlc3RzIjogW10sCiAgImh0dHBFcnJvcnMiOiBbCiAgICB7CiAgICAgICJwYXRoIjogIi9hY2NvdW50IiwKICAgICAgInR5cGUiOiAiZG9jdW1lbnQiLAogICAgICAic3RhdHVzIjogNDAzCiAgICB9LAogICAgewogICAgICAicGF0aCI6ICIvcGVuZ2Vsb2xhL3VzZXJzIiwKICAgICAgInR5cGUiOiAiZG9jdW1lbnQiLAogICAgICAic3RhdHVzIjogNDAzCiAgICB9LAogICAgewogICAgICAicGF0aCI6ICIvcGVuZ2Vsb2xhL3VzZXJzL2NyZWF0ZSIsCiAgICAgICJ0eXBlIjogImRvY3VtZW50IiwKICAgICAgInN0YXR1cyI6IDQwMwogICAgfSwKICAgIHsKICAgICAgInBhdGgiOiAiL3BlbmdlbG9sYS9mYWNpbGl0eS1jYXRlZ29yaWVzIiwKICAgICAgInR5cGUiOiAiZG9jdW1lbnQiLAogICAgICAic3RhdHVzIjogNDAzCiAgICB9LAogICAgewogICAgICAicGF0aCI6ICIvcGVuZ2Vsb2xhL2ZhY2lsaXR5LWNhdGVnb3JpZXMvY3JlYXRlIiwKICAgICAgInR5cGUiOiAiZG9jdW1lbnQiLAogICAgICAic3RhdHVzIjogNDAzCiAgICB9LAogICAgewogICAgICAicGF0aCI6ICIvcGVuZ2Vsb2xhL2lzc3VlLWNhdGVnb3JpZXMiLAogICAgICAidHlwZSI6ICJkb2N1bWVudCIsCiAgICAgICJzdGF0dXMiOiA0MDMKICAgIH0sCiAgICB7CiAgICAgICJwYXRoIjogIi9wZW5nZWxvbGEvaXNzdWUtY2F0ZWdvcmllcy9jcmVhdGUiLAogICAgICAidHlwZSI6ICJkb2N1bWVudCIsCiAgICAgICJzdGF0dXMiOiA0MDMKICAgIH0sCiAgICB7CiAgICAgICJwYXRoIjogIi9wZW5nZWxvbGEvcmVwb3J0aW5nLXBlcmlvZHMiLAogICAgICAidHlwZSI6ICJkb2N1bWVudCIsCiAgICAgICJzdGF0dXMiOiA0MDMKICAgIH0sCiAgICB7CiAgICAgICJwYXRoIjogIi9wZW5nZWxvbGEvcmVwb3J0aW5nLXBlcmlvZHMvY3JlYXRlIiwKICAgICAgInR5cGUiOiAiZG9jdW1lbnQiLAogICAgICAic3RhdHVzIjogNDAzCiAgICB9LAogICAgewogICAgICAicGF0aCI6ICIvcGVuZ2Vsb2xhL3N0YXRpc3RpY3MiLAogICAgICAidHlwZSI6ICJkb2N1bWVudCIsCiAgICAgICJzdGF0dXMiOiA0MDMKICAgIH0KICBdCn0="
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "a2c003df57d5736ea446-ca0399d57fae7ccf04c0",
+          "file": "pbi16-18.spec.js",
+          "line": 208,
+          "column": 5
+        },
+        {
+          "title": "akun inactive tidak dapat login",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 623,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-01T06:17:30.159Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "04-login-inactive-ditolak",
+                      "contentType": "image/png",
+                      "path": "/Users/haimac/Documents/GitHub/aksesibel/storage/framework/testing/playwright-artifacts/pbi16-18-akun-inactive-tidak-dapat-login/attachments/04-login-inactive-ditolak-e7c9e31f796f49be9dcd70bb267fd24ada082d6b.png"
+                    },
+                    {
+                      "name": "browser-diagnostics",
+                      "contentType": "application/json",
+                      "body": "ewogICJwYWdlRXJyb3JzIjogW10sCiAgImNvbnNvbGVFcnJvcnMiOiBbXSwKICAiZmFpbGVkUmVxdWVzdHMiOiBbXSwKICAiaHR0cEVycm9ycyI6IFtdCn0="
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "a2c003df57d5736ea446-e8c6d6a6ac08891455f5",
+          "file": "pbi16-18.spec.js",
+          "line": 223,
+          "column": 5
+        },
+        {
+          "title": "akun suspended tidak dapat login",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 750,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-01T06:17:30.788Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "04-login-suspended-ditolak",
+                      "contentType": "image/png",
+                      "path": "/Users/haimac/Documents/GitHub/aksesibel/storage/framework/testing/playwright-artifacts/pbi16-18-akun-suspended-tidak-dapat-login/attachments/04-login-suspended-ditolak-3640fbc25691a516c0afd29f41195a9ae90481b9.png"
+                    },
+                    {
+                      "name": "browser-diagnostics",
+                      "contentType": "application/json",
+                      "body": "ewogICJwYWdlRXJyb3JzIjogW10sCiAgImNvbnNvbGVFcnJvcnMiOiBbXSwKICAiZmFpbGVkUmVxdWVzdHMiOiBbXSwKICAiaHR0cEVycm9ycyI6IFtdCn0="
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "a2c003df57d5736ea446-f4b5d9381ce5e08af846",
+          "file": "pbi16-18.spec.js",
+          "line": 223,
+          "column": 5
+        },
+        {
+          "title": "registrasi dan profil menolak injeksi peran serta status",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1017,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-01T06:17:31.546Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "05-registrasi-eskalasi-ditolak",
+                      "contentType": "image/png",
+                      "path": "/Users/haimac/Documents/GitHub/aksesibel/storage/framework/testing/playwright-artifacts/pbi16-18-registrasi-dan-pr-5dd03--injeksi-peran-serta-status/attachments/05-registrasi-eskalasi-ditolak-f17d173eefedd83363531872af62e7307449b56f.png"
+                    },
+                    {
+                      "name": "browser-diagnostics",
+                      "contentType": "application/json",
+                      "body": "ewogICJwYWdlRXJyb3JzIjogW10sCiAgImNvbnNvbGVFcnJvcnMiOiBbCiAgICAiRmFpbGVkIHRvIGxvYWQgcmVzb3VyY2U6IHRoZSBzZXJ2ZXIgcmVzcG9uZGVkIHdpdGggYSBzdGF0dXMgb2YgNDAzIChGb3JiaWRkZW4pIgogIF0sCiAgImZhaWxlZFJlcXVlc3RzIjogW10sCiAgImh0dHBFcnJvcnMiOiBbCiAgICB7CiAgICAgICJwYXRoIjogIi9wZW5nZWxvbGEvdXNlcnMiLAogICAgICAidHlwZSI6ICJkb2N1bWVudCIsCiAgICAgICJzdGF0dXMiOiA0MDMKICAgIH0KICBdCn0="
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "a2c003df57d5736ea446-058a5940e8d7d3eadb64",
+          "file": "pbi16-18.spec.js",
+          "line": 234,
+          "column": 1
+        },
+        {
+          "title": "pengguna dapat dibuat diedit dicari dan password kosong tetap berlaku",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1750,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-01T06:17:32.572Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "06-validasi-pengguna",
+                      "contentType": "image/png",
+                      "path": "/Users/haimac/Documents/GitHub/aksesibel/storage/framework/testing/playwright-artifacts/pbi16-18-pengguna-dapat-di-ca776-ssword-kosong-tetap-berlaku/attachments/06-validasi-pengguna-f2669adc06dfb5cbe6a5565516aff3280148bedb.png"
+                    },
+                    {
+                      "name": "07-detail-pengguna-diperbarui",
+                      "contentType": "image/png",
+                      "path": "/Users/haimac/Documents/GitHub/aksesibel/storage/framework/testing/playwright-artifacts/pbi16-18-pengguna-dapat-di-ca776-ssword-kosong-tetap-berlaku/attachments/07-detail-pengguna-diperbarui-26861f9bbbd0997eca2d027797cdcd0b4cd34a19.png"
+                    },
+                    {
+                      "name": "browser-diagnostics",
+                      "contentType": "application/json",
+                      "body": "ewogICJwYWdlRXJyb3JzIjogW10sCiAgImNvbnNvbGVFcnJvcnMiOiBbCiAgICAiRmFpbGVkIHRvIGxvYWQgcmVzb3VyY2U6IHRoZSBzZXJ2ZXIgcmVzcG9uZGVkIHdpdGggYSBzdGF0dXMgb2YgNDAzIChGb3JiaWRkZW4pIgogIF0sCiAgImZhaWxlZFJlcXVlc3RzIjogW10sCiAgImh0dHBFcnJvcnMiOiBbCiAgICB7CiAgICAgICJwYXRoIjogIi9wZW5nZWxvbGEvdXNlcnMiLAogICAgICAidHlwZSI6ICJkb2N1bWVudCIsCiAgICAgICJzdGF0dXMiOiA0MDMKICAgIH0KICBdCn0="
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "a2c003df57d5736ea446-435b2be75f5e06c047f4",
+          "file": "pbi16-18.spec.js",
+          "line": 275,
+          "column": 1
+        },
+        {
+          "title": "penonaktifan dan penangguhan mencabut sesi browser yang sudah login",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1801,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-01T06:17:34.334Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "08-sesi-inactive-dicabut",
+                      "contentType": "image/png",
+                      "path": "/Users/haimac/Documents/GitHub/aksesibel/storage/framework/testing/playwright-artifacts/pbi16-18-penonaktifan-dan--bfc80-si-browser-yang-sudah-login/attachments/08-sesi-inactive-dicabut-014bfaa93c5fb3d57822c32743c397c3425f2256.png"
+                    },
+                    {
+                      "name": "08-sesi-suspended-dicabut",
+                      "contentType": "image/png",
+                      "path": "/Users/haimac/Documents/GitHub/aksesibel/storage/framework/testing/playwright-artifacts/pbi16-18-penonaktifan-dan--bfc80-si-browser-yang-sudah-login/attachments/08-sesi-suspended-dicabut-56c4e29f5344edd8cb699f720bd7e9674b8bfb2d.png"
+                    },
+                    {
+                      "name": "browser-diagnostics",
+                      "contentType": "application/json",
+                      "body": "ewogICJwYWdlRXJyb3JzIjogW10sCiAgImNvbnNvbGVFcnJvcnMiOiBbXSwKICAiZmFpbGVkUmVxdWVzdHMiOiBbXSwKICAiaHR0cEVycm9ycyI6IFtdCn0="
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "a2c003df57d5736ea446-7c0a3e59c681f48cefd5",
+          "file": "pbi16-18.spec.js",
+          "line": 317,
+          "column": 1
+        },
+        {
+          "title": "akun sendiri dan pengelola aktif terakhir dilindungi",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1276,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-01T06:17:36.146Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "09-pengelola-terakhir-dilindungi",
+                      "contentType": "image/png",
+                      "path": "/Users/haimac/Documents/GitHub/aksesibel/storage/framework/testing/playwright-artifacts/pbi16-18-akun-sendiri-dan--4924d-a-aktif-terakhir-dilindungi/attachments/09-pengelola-terakhir-dilindungi-0c98d5be4d8650bf13c2d887b832516aceed642f.png"
+                    },
+                    {
+                      "name": "browser-diagnostics",
+                      "contentType": "application/json",
+                      "body": "ewogICJwYWdlRXJyb3JzIjogW10sCiAgImNvbnNvbGVFcnJvcnMiOiBbXSwKICAiZmFpbGVkUmVxdWVzdHMiOiBbXSwKICAiaHR0cEVycm9ycyI6IFtdCn0="
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "a2c003df57d5736ea446-51b0706f28989deddf4b",
+          "file": "pbi16-18.spec.js",
+          "line": 341,
+          "column": 1
+        },
+        {
+          "title": "Kategori Fasilitas memiliki CRUD status duplikasi dan perlindungan kategori terpakai",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1704,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-01T06:17:37.428Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "10-kategori-fasilitas-nonaktif",
+                      "contentType": "image/png",
+                      "path": "/Users/haimac/Documents/GitHub/aksesibel/storage/framework/testing/playwright-artifacts/pbi16-18-Kategori-Fasilita-7782d-lindungan-kategori-terpakai/attachments/10-kategori-fasilitas-nonaktif-ffdda2e0cb7fe3861ed1b8ec004314223024516e.png"
+                    },
+                    {
+                      "name": "11-kategori-fasilitas-terpakai-dilindungi",
+                      "contentType": "image/png",
+                      "path": "/Users/haimac/Documents/GitHub/aksesibel/storage/framework/testing/playwright-artifacts/pbi16-18-Kategori-Fasilita-7782d-lindungan-kategori-terpakai/attachments/11-kategori-fasilitas-terpakai-dilindungi-792ad7a2f8043e5bbaac2fff016c88cb4b2717a1.png"
+                    },
+                    {
+                      "name": "browser-diagnostics",
+                      "contentType": "application/json",
+                      "body": "ewogICJwYWdlRXJyb3JzIjogW10sCiAgImNvbnNvbGVFcnJvcnMiOiBbXSwKICAiZmFpbGVkUmVxdWVzdHMiOiBbXSwKICAiaHR0cEVycm9ycyI6IFtdCn0="
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "a2c003df57d5736ea446-2a696fd298637bb91d39",
+          "file": "pbi16-18.spec.js",
+          "line": 365,
+          "column": 5
+        },
+        {
+          "title": "Kategori Kendala memiliki CRUD status duplikasi dan perlindungan kategori terpakai",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1711,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-01T06:17:39.138Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "10-kategori-kendala-nonaktif",
+                      "contentType": "image/png",
+                      "path": "/Users/haimac/Documents/GitHub/aksesibel/storage/framework/testing/playwright-artifacts/pbi16-18-Kategori-Kendala--63b53-lindungan-kategori-terpakai/attachments/10-kategori-kendala-nonaktif-a1c1218c6f177bd27646a58b0ca9776db2b2d09f.png"
+                    },
+                    {
+                      "name": "11-kategori-kendala-terpakai-dilindungi",
+                      "contentType": "image/png",
+                      "path": "/Users/haimac/Documents/GitHub/aksesibel/storage/framework/testing/playwright-artifacts/pbi16-18-Kategori-Kendala--63b53-lindungan-kategori-terpakai/attachments/11-kategori-kendala-terpakai-dilindungi-69f2f21614d7bcd887303d0068b87b93a95ca7d8.png"
+                    },
+                    {
+                      "name": "browser-diagnostics",
+                      "contentType": "application/json",
+                      "body": "ewogICJwYWdlRXJyb3JzIjogW10sCiAgImNvbnNvbGVFcnJvcnMiOiBbXSwKICAiZmFpbGVkUmVxdWVzdHMiOiBbXSwKICAiaHR0cEVycm9ycyI6IFtdCn0="
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "a2c003df57d5736ea446-545ddcb6b800aaedbefa",
+          "file": "pbi16-18.spec.js",
+          "line": 365,
+          "column": 5
+        },
+        {
+          "title": "periode memvalidasi tanggal mengizinkan overlap dan melindungi periode terpakai",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1374,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-01T06:17:40.857Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "12-validasi-tanggal-periode",
+                      "contentType": "image/png",
+                      "path": "/Users/haimac/Documents/GitHub/aksesibel/storage/framework/testing/playwright-artifacts/pbi16-18-periode-memvalida-f7004-melindungi-periode-terpakai/attachments/12-validasi-tanggal-periode-89fc84c93dffe4c4ef1391fecc82071a5878b4fc.png"
+                    },
+                    {
+                      "name": "13-periode-terpakai-dilindungi",
+                      "contentType": "image/png",
+                      "path": "/Users/haimac/Documents/GitHub/aksesibel/storage/framework/testing/playwright-artifacts/pbi16-18-periode-memvalida-f7004-melindungi-periode-terpakai/attachments/13-periode-terpakai-dilindungi-3125824a37ce2df47e374348e543a8a59ea3bb70.png"
+                    },
+                    {
+                      "name": "browser-diagnostics",
+                      "contentType": "application/json",
+                      "body": "ewogICJwYWdlRXJyb3JzIjogW10sCiAgImNvbnNvbGVFcnJvcnMiOiBbXSwKICAiZmFpbGVkUmVxdWVzdHMiOiBbXSwKICAiaHR0cEVycm9ycyI6IFtdCn0="
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "a2c003df57d5736ea446-74543363ec7c4c792da9",
+          "file": "pbi16-18.spec.js",
+          "line": 403,
+          "column": 1
+        },
+        {
+          "title": "pencarian dan pagination daftar mempertahankan filter",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1776,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-01T06:17:42.240Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "14-pagination-periode",
+                      "contentType": "image/png",
+                      "path": "/Users/haimac/Documents/GitHub/aksesibel/storage/framework/testing/playwright-artifacts/pbi16-18-pencarian-dan-pag-aa61c-aftar-mempertahankan-filter/attachments/14-pagination-periode-362fcff2eab6a043a930c8b27f9c09578e46c1e1.png"
+                    },
+                    {
+                      "name": "browser-diagnostics",
+                      "contentType": "application/json",
+                      "body": "ewogICJwYWdlRXJyb3JzIjogW10sCiAgImNvbnNvbGVFcnJvcnMiOiBbXSwKICAiZmFpbGVkUmVxdWVzdHMiOiBbXSwKICAiaHR0cEVycm9ycyI6IFtdCn0="
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "a2c003df57d5736ea446-75f45fed1a5cf595a100",
+          "file": "pbi16-18.spec.js",
+          "line": 437,
+          "column": 1
+        },
+        {
+          "title": "statistik menghitung laporan sekali dengan filter konsisten dan kondisi kosong jelas",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1790,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-01T06:17:44.026Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "15-statistik-semua-laporan",
+                      "contentType": "image/png",
+                      "path": "/Users/haimac/Documents/GitHub/aksesibel/storage/framework/testing/playwright-artifacts/pbi16-18-statistik-menghit-57196-en-dan-kondisi-kosong-jelas/attachments/15-statistik-semua-laporan-3d6df7c97a176891a37e3817174d996aff136c1a.png"
+                    },
+                    {
+                      "name": "16-statistik-tiga-filter",
+                      "contentType": "image/png",
+                      "path": "/Users/haimac/Documents/GitHub/aksesibel/storage/framework/testing/playwright-artifacts/pbi16-18-statistik-menghit-57196-en-dan-kondisi-kosong-jelas/attachments/16-statistik-tiga-filter-cca533ad9cd7a6310a5588c0b93952e220c0ab8c.png"
+                    },
+                    {
+                      "name": "17-statistik-filter-kosong",
+                      "contentType": "image/png",
+                      "path": "/Users/haimac/Documents/GitHub/aksesibel/storage/framework/testing/playwright-artifacts/pbi16-18-statistik-menghit-57196-en-dan-kondisi-kosong-jelas/attachments/17-statistik-filter-kosong-b889e24fc97cdfe3d50fe3c93495383ec29e9953.png"
+                    },
+                    {
+                      "name": "browser-diagnostics",
+                      "contentType": "application/json",
+                      "body": "ewogICJwYWdlRXJyb3JzIjogW10sCiAgImNvbnNvbGVFcnJvcnMiOiBbXSwKICAiZmFpbGVkUmVxdWVzdHMiOiBbXSwKICAiaHR0cEVycm9ycyI6IFtdCn0="
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "a2c003df57d5736ea446-5ad6372ea67361d45a2c",
+          "file": "pbi16-18.spec.js",
+          "line": 459,
+          "column": 1
+        },
+        {
+          "title": "navigasi keyboard dan layout seluler dapat digunakan",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 689,
+                  "error": {
+                    "message": "Error: /pengelola/users\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32mtrue\u001b[39m\nReceived: \u001b[31mfalse\u001b[39m",
+                    "stack": "Error: /pengelola/users\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32mtrue\u001b[39m\nReceived: \u001b[31mfalse\u001b[39m\n    at /Users/haimac/Documents/GitHub/aksesibel/tests/Browser/pbi16-18.spec.js:516:116",
+                    "location": {
+                      "file": "/Users/haimac/Documents/GitHub/aksesibel/tests/Browser/pbi16-18.spec.js",
+                      "column": 116,
+                      "line": 516
+                    },
+                    "snippet": "  514 |         await page.goto(pathname);\n  515 |         await expect(page.locator('h1')).toBeVisible();\n> 516 |         expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1), pathname).toBe(true);\n      |                                                                                                                    ^\n  517 |     }\n  518 |     await screenshot(page, '18-statistik-seluler', testInfo);\n  519 | });"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/Users/haimac/Documents/GitHub/aksesibel/tests/Browser/pbi16-18.spec.js",
+                        "column": 116,
+                        "line": 516
+                      },
+                      "message": "Error: /pengelola/users\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32mtrue\u001b[39m\nReceived: \u001b[31mfalse\u001b[39m\n\n  514 |         await page.goto(pathname);\n  515 |         await expect(page.locator('h1')).toBeVisible();\n> 516 |         expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1), pathname).toBe(true);\n      |                                                                                                                    ^\n  517 |     }\n  518 |     await screenshot(page, '18-statistik-seluler', testInfo);\n  519 | });\n    at /Users/haimac/Documents/GitHub/aksesibel/tests/Browser/pbi16-18.spec.js:516:116"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-01T06:17:45.824Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "failed-navigasi-keyboard-dan-layout-seluler-dapat-digunakan",
+                      "contentType": "image/png",
+                      "path": "/Users/haimac/Documents/GitHub/aksesibel/storage/framework/testing/playwright-artifacts/pbi16-18-navigasi-keyboard-fbb8e-out-seluler-dapat-digunakan/attachments/failed-navigasi-keyboard-dan-layout-seluler-dapat-digunakan-d6b4112ebf31335f02c114257ad73cbe6dc375ee.png"
+                    },
+                    {
+                      "name": "browser-diagnostics",
+                      "contentType": "application/json",
+                      "body": "ewogICJwYWdlRXJyb3JzIjogW10sCiAgImNvbnNvbGVFcnJvcnMiOiBbXSwKICAiZmFpbGVkUmVxdWVzdHMiOiBbXSwKICAiaHR0cEVycm9ycyI6IFtdCn0="
+                    },
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/Users/haimac/Documents/GitHub/aksesibel/storage/framework/testing/playwright-artifacts/pbi16-18-navigasi-keyboard-fbb8e-out-seluler-dapat-digunakan/error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/Users/haimac/Documents/GitHub/aksesibel/tests/Browser/pbi16-18.spec.js",
+                    "column": 116,
+                    "line": 516
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "a2c003df57d5736ea446-dd54f0e6671cc0a36f95",
+          "file": "pbi16-18.spec.js",
+          "line": 505,
+          "column": 1
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-11-01T06:17:22.244Z",
+    "duration": 24320.234,
+    "expected": 17,
+    "skipped": 0,
+    "unexpected": 2,
+    "flaky": 0
+  }
+}

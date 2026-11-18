@@ -32,7 +32,7 @@ class UserController extends Controller
 
     public function create(): View
     {
-        return view('users.form', ['record' => new User, 'roles' => Role::orderBy('role_name')->get()]);
+        return view('users.form', ['record' => new User, 'roles' => Role::orderBy('role_name')->get()->whereInStrict('role_name', Role::PROPOSAL_ROLES)]);
     }
 
     public function store(UserRequest $request, UserManagement $management): RedirectResponse
@@ -49,7 +49,7 @@ class UserController extends Controller
 
     public function edit(User $user): View
     {
-        return view('users.form', ['record' => $user, 'roles' => Role::orderBy('role_name')->get()]);
+        return view('users.form', ['record' => $user->load('role'), 'roles' => Role::orderBy('role_name')->get()->whereInStrict('role_name', Role::PROPOSAL_ROLES)]);
     }
 
     public function update(UserRequest $request, User $user, UserManagement $management): RedirectResponse

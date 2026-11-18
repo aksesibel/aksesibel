@@ -4,21 +4,56 @@ namespace Tests\Feature;
 
 use App\Models\FacilityCategory;
 use App\Models\IssueCategory;
-use App\Models\Role;
-use App\Models\User;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\UniqueConstraintViolationException;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 use PHPUnit\Framework\Attributes\DataProvider;
 use RuntimeException;
+use Tests\Support\TestingDatabaseSafety;
 use Tests\TestCase;
 
 class CategorySchemaTest extends TestCase
 {
-    use LazilyRefreshDatabase;
+    /**
+     * MySQL DDL commits implicitly. A separate connection and disposable table
+     * prefix keep these migration tests outside the suite's data transactions.
+     */
+    protected function setUp(): void
+    {
+        parent::setUp();
+        TestingDatabaseSafety::assertSafe($this->app);
+        $originalConnection = DB::getDefaultConnection();
+        $connectionName = 'category_schema_fixture';
+        $prefix = 'cat_schema_'.bin2hex(random_bytes(6)).'_';
+        config(['database.connections.'.$connectionName => [
+            ...DB::connection()->getConfig(),
+            'name' => $connectionName,
+            'prefix' => $prefix,
+            'prefix_indexes' => false,
+        ]]);
+        DB::setDefaultConnection($connectionName);
+        $connection = DB::connection($connectionName);
+        $this->assertSame($prefix, $connection->getTablePrefix());
+
+        $this->beforeApplicationDestroyed(function () use ($connection, $connectionName, $originalConnection): void {
+            try {
+                $schema = $connection->getSchemaBuilder();
+                $schema->dropIfExists('issue_categories');
+                $schema->dropIfExists('facility_categories');
+            } finally {
+                DB::setDefaultConnection($originalConnection);
+                DB::purge($connectionName);
+            }
+        });
+
+        (require database_path('migrations/2026_10_28_100003_create_facility_categories_table.php'))->up();
+        (require database_path('migrations/2026_10_28_100009_create_issue_categories_table.php'))->up();
+        $this->categoryNameMigration()->up();
+    }
 
     public static function categoryTypes(): array
     {
@@ -81,22 +116,23 @@ class CategorySchemaTest extends TestCase
     }
 
     #[DataProvider('categoryTypes')]
-    public function test_trimmed_validation_and_unique_index_follow_native_sqlite_case_sensitivity(string $modelClass, string $tableName, string $routePrefix): void
+    public function test_validation_and_unique_index_follow_native_database_case_sensitivity(string $modelClass, string $tableName, string $routePrefix): void
     {
-        $role = Role::firstOrCreate(['role_name' => 'Pengelola Fasilitas']);
-        $this->actingAs(User::factory()->create(['role_id' => $role->getKey(), 'account_status' => 'active']));
         $original = $modelClass::create(['category_name' => 'Transportasi', 'is_active' => true]);
-
-        $this->post(route($routePrefix.'.store'), ['category_name' => '  transportasi  ', 'is_active' => 1])
-            ->assertSessionHasNoErrors()->assertSessionHas('success');
-
-        $this->assertDatabaseHas($tableName, ['category_name' => 'transportasi']);
-        $this->assertDatabaseCount($tableName, 2);
+        $rules = ['category_name' => [Rule::unique($tableName, 'category_name')]];
+        $caseVariant = Validator::make(['category_name' => 'transportasi'], $rules);
         $this->assertSame('Transportasi', $original->fresh()->category_name);
 
-        $this->post(route($routePrefix.'.store'), ['category_name' => ' transportasi ', 'is_active' => 1])
-            ->assertSessionHasErrors(['category_name' => 'Nama kategori sudah digunakan.']);
-        $this->assertDatabaseCount($tableName, 2);
+        if (in_array(DB::connection()->getDriverName(), ['mysql', 'mariadb'], true)) {
+            $this->assertTrue($caseVariant->fails());
+            $this->assertDatabaseCount($tableName, 1);
+        } else {
+            $this->assertFalse($caseVariant->fails());
+            $modelClass::create(['category_name' => 'transportasi']);
+            $this->assertDatabaseCount($tableName, 2);
+        }
+
+        $this->assertTrue(Validator::make(['category_name' => 'Transportasi'], $rules)->fails());
         $this->expectException(UniqueConstraintViolationException::class);
 
         $modelClass::create(['category_name' => 'transportasi']);

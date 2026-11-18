@@ -15,6 +15,7 @@ use App\Models\Verification;
 use App\Models\VerificationHistory;
 use App\Models\VerificationStatus;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
@@ -206,16 +207,26 @@ class StatisticsTest extends TestCase
     public function test_explains_missing_report_dependency_without_inventing_totals(): void
     {
         $manager = $this->manager();
-        Schema::rename('reports', 'reports_unavailable');
+        $originalConnection = DB::getDefaultConnection();
+        $connectionName = 'missing_statistics_fixture';
+        $manager->setConnection($originalConnection);
+        config(['database.connections.'.$connectionName => [
+            ...DB::connection()->getConfig(),
+            'name' => $connectionName,
+            'prefix' => 'missing_stats_'.bin2hex(random_bytes(6)).'_',
+        ]]);
+        DB::setDefaultConnection($connectionName);
 
         try {
+            $this->assertFalse(Schema::hasTable('reports'));
             $response = $this->actingAs($manager)->get(route('manage.statistics'));
 
             $response->assertOk()->assertSee('Statistik belum dapat ditampilkan')
                 ->assertSee('reports')->assertSee('Data laporan dari modul pelaporan belum tersedia.')
                 ->assertDontSee('Jumlah laporan sesuai filter');
         } finally {
-            Schema::rename('reports_unavailable', 'reports');
+            DB::setDefaultConnection($originalConnection);
+            DB::purge($connectionName);
         }
     }
 

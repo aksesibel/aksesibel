@@ -1,9 +1,10 @@
 <x-layout :title="($category->exists ? 'Edit ' : 'Tambah ').$title">
-    <form method="POST" action="{{ $category->exists ? route($routePrefix.'.update', $category) : route($routePrefix.'.store') }}" class="panel"
+    <form method="POST" action="{{ $category->exists ? route($routePrefix.'.update', $category) : route($routePrefix.'.store') }}" class="panel editor-panel"
         @if ($category->exists) data-confirm="Simpan perubahan kategori? Kategori nonaktif tidak tersedia untuk pilihan baru; histori tetap tersimpan." @endif>
         @csrf
         @if ($category->exists) @method('PUT') @endif
-        <div class="form-grid">
+        <div class="form-heading"><h2>Informasi kategori</h2><p>Lengkapi nama, status, dan deskripsi kategori.</p></div>
+        <div class="form-grid editor-grid">
             <div>
                 <label for="category_name">Nama kategori <span aria-hidden="true">*</span></label>
                 <input class="field" id="category_name" name="category_name" value="{{ old('category_name', $category->category_name) }}" maxlength="255" required autofocus
@@ -24,7 +25,7 @@
                 @error('description') <p id="category-description-error" class="text-red-700">{{ $message }}</p> @enderror
             </div>
         </div>
-        <p>Kategori aktif tersedia untuk pilihan baru. Penonaktifan tidak mengubah fasilitas atau laporan yang sudah terhubung.</p>
+        <div class="information-note"><x-icon name="info" /><p>Kategori aktif tersedia untuk pilihan baru. Penonaktifan tidak mengubah fasilitas atau laporan yang sudah terhubung.</p></div>
         <div class="mt-6 flex flex-wrap gap-2">
             <button class="button" type="submit">Simpan kategori</button>
             <a class="button-secondary" href="{{ $category->exists ? route($routePrefix.'.show', $category) : route($routePrefix.'.index') }}">Batal</a>

@@ -4,9 +4,11 @@ namespace Tests\Feature;
 
 use App\Models\Role;
 use App\Models\User;
+use App\Services\UserManagement;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\ValidationException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
@@ -109,6 +111,97 @@ class UserManagementTest extends TestCase
         $this->assertSame($oldHash, $user->fresh()->password);
         $this->assertSame('Nama Diubah', $user->fresh()->name);
         $this->assertSame($adminRole->getKey(), $user->fresh()->role_id);
+    }
+
+    /** @return array<string, array{string}> */
+    public static function nonProposalRoles(): array
+    {
+        return [
+            'verifikator' => ['Verifikator'],
+            'petugas tindak lanjut' => ['Petugas Tindak Lanjut'],
+            'peran tidak dikenal' => ['Operator'],
+            'kapitalisasi tidak sesuai' => ['pengelola fasilitas'],
+        ];
+    }
+
+    #[DataProvider('nonProposalRoles')]
+    public function test_manager_cannot_create_a_user_with_a_non_proposal_role(string $roleName): void
+    {
+        $manager = $this->manager();
+        $role = Role::create(['role_name' => $roleName]);
+
+        $this->actingAs($manager)->post(route('manage.users.store'), $this->validPayload($role))
+            ->assertSessionHasErrors(['role_id' => 'Pilih peran Masyarakat, Admin, atau Pengelola Fasilitas.']);
+
+        $this->assertDatabaseCount('users', 1);
+        $this->assertModelExists($role);
+    }
+
+    #[DataProvider('nonProposalRoles')]
+    public function test_manager_cannot_change_a_user_to_a_non_proposal_role(string $roleName): void
+    {
+        $manager = $this->manager();
+        $publicRole = Role::create(['role_name' => 'Masyarakat']);
+        $user = User::factory()->create(['role_id' => $publicRole->getKey(), 'account_status' => 'active']);
+        $role = Role::create(['role_name' => $roleName]);
+
+        $this->actingAs($manager)->put(route('manage.users.update', $user), array_replace($this->validPayload($role), ['email' => $user->email]))
+            ->assertSessionHasErrors(['role_id' => 'Pilih peran Masyarakat, Admin, atau Pengelola Fasilitas.']);
+
+        $this->assertSame($publicRole->getKey(), $user->fresh()->role_id);
+        $this->assertModelExists($role);
+    }
+
+    public function test_user_forms_only_offer_the_three_proposal_roles_even_when_legacy_roles_exist(): void
+    {
+        $manager = $this->manager();
+        Role::create(['role_name' => 'Admin']);
+        Role::create(['role_name' => 'Masyarakat']);
+        $legacyRole = Role::create(['role_name' => 'Verifikator']);
+        Role::create(['role_name' => 'Petugas Tindak Lanjut']);
+        Role::create(['role_name' => 'pengelola fasilitas']);
+        $user = User::factory()->create(['role_id' => $legacyRole->getKey(), 'account_status' => 'active']);
+
+        $this->actingAs($manager)->get(route('manage.users.create'))->assertOk()
+            ->assertViewHas('roles', fn ($roles): bool => $roles->pluck('role_name')->all() === ['Admin', 'Masyarakat', 'Pengelola Fasilitas']);
+        $this->get(route('manage.users.edit', $user))->assertOk()
+            ->assertViewHas('roles', fn ($roles): bool => $roles->pluck('role_name')->all() === ['Admin', 'Masyarakat', 'Pengelola Fasilitas'])
+            ->assertSee('Peran saat ini: Verifikator. Pilih salah satu dari tiga peran sebelum menyimpan perubahan.');
+    }
+
+    public function test_legacy_users_can_be_found_deactivated_and_explicitly_mapped_to_a_proposal_role(): void
+    {
+        $manager = $this->manager();
+        $legacyRole = Role::create(['role_name' => 'Verifikator']);
+        $publicRole = Role::create(['role_name' => 'Masyarakat']);
+        $user = User::factory()->create(['role_id' => $legacyRole->getKey(), 'account_status' => 'active']);
+
+        $this->actingAs($manager)->get(route('manage.users.index', ['role_id' => $legacyRole->getKey()]))->assertOk()
+            ->assertViewHas('users', fn ($users): bool => $users->total() === 1 && $users->first()->is($user));
+        $this->patch(route('manage.users.status', $user), ['account_status' => 'inactive'])->assertSessionHasNoErrors();
+        $this->assertSame('inactive', $user->fresh()->account_status);
+        $this->assertSame($legacyRole->getKey(), $user->fresh()->role_id);
+
+        $this->put(route('manage.users.update', $user), array_replace($this->validPayload($publicRole), ['email' => $user->email]))
+            ->assertRedirect(route('manage.users.show', $user))->assertSessionHasNoErrors();
+
+        $this->assertSame($publicRole->getKey(), $user->fresh()->role_id);
+        $this->assertModelExists($legacyRole);
+    }
+
+    public function test_user_management_service_rejects_non_proposal_roles_without_request_validation(): void
+    {
+        $manager = $this->manager();
+        $legacyRole = Role::create(['role_name' => 'Verifikator']);
+
+        try {
+            app(UserManagement::class)->create($manager, $this->validPayload($legacyRole));
+            $this->fail('Service harus menolak pemberian peran lama.');
+        } catch (ValidationException $exception) {
+            $this->assertSame(['role_id' => ['Pilih peran Masyarakat, Admin, atau Pengelola Fasilitas.']], $exception->errors());
+        }
+
+        $this->assertDatabaseCount('users', 1);
     }
 
     public function test_editing_with_a_new_confirmed_password_replaces_its_hash(): void

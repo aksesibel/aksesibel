@@ -119,15 +119,72 @@ class ReportingPeriodManagementTest extends TestCase
         $this->assertDatabaseCount('reporting_periods', 0);
     }
 
-    public function test_overlapping_periods_are_allowed(): void
+    /** @return array<string, array{string, string}> */
+    public static function overlappingDates(): array
+    {
+        return [
+            'rentang sama' => ['2026-10-01', '2026-10-31'],
+            'mencakup periode lama' => ['2026-09-01', '2026-12-31'],
+            'di dalam periode lama' => ['2026-10-10', '2026-10-20'],
+            'menyentuh tanggal mulai' => ['2026-09-01', '2026-10-01'],
+            'menyentuh tanggal selesai' => ['2026-10-31', '2026-11-30'],
+        ];
+    }
+
+    #[DataProvider('overlappingDates')]
+    public function test_overlapping_periods_are_rejected(string $start, string $end): void
     {
         $this->asManager();
         $this->createPeriod();
 
-        $this->post(route('manage.reporting-periods.store'), ['period_name' => 'Triwulan IV', 'start_date' => '2026-10-01', 'end_date' => '2026-12-31'])
+        $this->post(route('manage.reporting-periods.store'), ['period_name' => 'Periode bentrok', 'start_date' => $start, 'end_date' => $end])
+            ->assertSessionHasErrors(['start_date' => 'Rentang tanggal bertumpang tindih dengan periode lain. Gunakan rentang terpisah agar periode laporan dapat ditentukan otomatis.']);
+
+        $this->assertDatabaseCount('reporting_periods', 1);
+    }
+
+    public function test_periods_on_the_day_before_and_after_an_existing_period_are_allowed(): void
+    {
+        $this->asManager();
+        $this->createPeriod();
+
+        $this->post(route('manage.reporting-periods.store'), ['period_name' => 'September', 'start_date' => '2026-09-01', 'end_date' => '2026-09-30'])
+            ->assertSessionHasNoErrors()->assertSessionHas('success');
+        $this->post(route('manage.reporting-periods.store'), ['period_name' => 'November', 'start_date' => '2026-11-01', 'end_date' => '2026-11-30'])
             ->assertSessionHasNoErrors()->assertSessionHas('success');
 
+        $this->assertDatabaseCount('reporting_periods', 3);
+    }
+
+    public function test_editing_a_period_does_not_conflict_with_its_own_dates(): void
+    {
+        $this->asManager();
+        $period = $this->createPeriod();
+
+        $this->put(route('manage.reporting-periods.update', $period), [
+            'period_name' => 'Oktober diperbarui',
+            'start_date' => '2026-10-01',
+            'end_date' => '2026-10-31',
+        ])->assertRedirect(route('manage.reporting-periods.show', $period))->assertSessionHasNoErrors();
+
+        $this->assertSame('Oktober diperbarui', $period->fresh()->period_name);
+    }
+
+    public function test_editing_a_period_cannot_overlap_another_period(): void
+    {
+        $this->asManager();
+        $this->createPeriod();
+        $period = $this->createPeriod(['period_name' => 'November', 'start_date' => '2026-11-01', 'end_date' => '2026-11-30']);
+
+        $this->put(route('manage.reporting-periods.update', $period), [
+            'period_name' => 'Periode bentrok',
+            'start_date' => '2026-10-31',
+            'end_date' => '2026-11-30',
+        ])->assertSessionHasErrors('start_date');
+
         $this->assertDatabaseCount('reporting_periods', 2);
+        $this->assertSame('November', $period->fresh()->period_name);
+        $this->assertSame('2026-11-01', $period->fresh()->start_date->format('Y-m-d'));
     }
 
     public function test_changing_period_dates_preserves_existing_report_period_link(): void

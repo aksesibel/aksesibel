@@ -4,7 +4,7 @@ namespace Tests;
 
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
-use RuntimeException;
+use Tests\Support\TestingDatabaseSafety;
 
 abstract class TestCase extends BaseTestCase
 {
@@ -18,12 +18,7 @@ abstract class TestCase extends BaseTestCase
     {
         $app = parent::createApplication();
 
-        if (! $app->environment('testing')
-            || $app['config']->get('database.default') !== 'sqlite'
-            || $app['config']->get('database.connections.sqlite.database') !== ':memory:'
-            || $app['config']->get('database.connections.sqlite.url')) {
-            throw new RuntimeException('Tes dibatalkan: gunakan APP_ENV=testing dan SQLite :memory: tanpa DB_URL. Database kerja tidak boleh direset.');
-        }
+        TestingDatabaseSafety::assertSafe($app);
 
         return $app;
     }

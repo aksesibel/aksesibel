@@ -2,10 +2,11 @@
 
 namespace App\Models;
 
+use Carbon\CarbonImmutable;
+use DateTimeInterface;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Validation\ValidationException;
 
 class ReportingPeriod extends Model
 {
@@ -16,6 +17,30 @@ class ReportingPeriod extends Model
     public $timestamps = false;
 
     protected $guarded = [];
+
+    public static function forReportDate(DateTimeInterface $createdAt): self
+    {
+        $date = CarbonImmutable::instance($createdAt)->setTimezone(config('app.timezone'))->toDateString();
+        $periods = static::query()
+            ->whereDate('start_date', '<=', $date)
+            ->whereDate('end_date', '>=', $date)
+            ->limit(2)
+            ->get();
+
+        if ($periods->isEmpty()) {
+            throw ValidationException::withMessages([
+                'period_id' => 'Belum ada periode pelaporan untuk tanggal laporan dibuat. Hubungi Pengelola Fasilitas.',
+            ]);
+        }
+
+        if ($periods->count() > 1) {
+            throw ValidationException::withMessages([
+                'period_id' => 'Tanggal laporan cocok dengan beberapa periode pelaporan. Hubungi Pengelola Fasilitas untuk memperbaiki rentang periode.',
+            ]);
+        }
+
+        return $periods->first();
+    }
 
     protected function casts(): array
     {
