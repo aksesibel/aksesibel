@@ -389,7 +389,7 @@ input[type="file"].control::file-selector-button:hover {
     justify-self: center;
 }
 
-/* INI KUNCI UTAMANYA: Targetkan <span> langsung di dalam div terakhir */
+/* Targetkan <span> langsung di dalam div terakhir */
 .pagination nav > div:last-child > div:last-child > span {
     display: inline-flex;
     align-items: center;
@@ -449,5 +449,21 @@ input[type="file"].control::file-selector-button:hover {
         display: flex;
         flex-direction: column;
         align-items: center;
+    }
+}
+
+.detail-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+}
+
+.detail-grid .field p {
+    margin: 6px 0 0;
+}
+
+@media (max-width: 768px) {
+    .detail-grid {
+        grid-template-columns: 1fr;
     }
 }
