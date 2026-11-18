@@ -1,5 +1,4 @@
-
-@extends('layout.accessibility-types')
+@extends('layout.pengelola')
 
 @section('title', 'Tambah Jenis Aksesibilitas')
 @section('breadcrumb', 'Aksesibel / Tambah Jenis')

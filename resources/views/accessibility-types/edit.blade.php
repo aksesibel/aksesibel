@@ -1,5 +1,4 @@
-
-@extends('layout.accessibility-types')
+@extends('layout.pengelola')
 
 @section('title', 'Edit Jenis Aksesibilitas')
 @section('breadcrumb', 'Aksesibel / Edit Jenis')
@@ -13,10 +12,7 @@
     </div>
 
     <div class="card form-card">
-        <form
-            action="{{ route('accessibility-types.update', $accessibilityType->accessibility_type_id) }}"
-            method="POST"
-        >
+        <form action="{{ route('accessibility-types.update', $accessibilityType->accessibility_type_id) }}" method="POST">
             @csrf
             @method('PUT')
 
