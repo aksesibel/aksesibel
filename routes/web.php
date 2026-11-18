@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AccessibilityTypeController;
+use App\Http\Controllers\FacilityAccessibilityController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -14,3 +15,5 @@ Route::get('/', function () {
 */
 Route::resource('accessibility-types', AccessibilityTypeController::class)
     ->except(['show']);
+
+Route::resource('facility-accessibilities', FacilityAccessibilityController::class);

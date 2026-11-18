@@ -5,7 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class FacilityAccessibility extends Model
 {
@@ -16,6 +15,25 @@ class FacilityAccessibility extends Model
     public $timestamps = false;
 
     protected $guarded = [];
+
+    public const AVAILABILITY_AVAILABLE = 'available';
+    public const AVAILABILITY_UNAVAILABLE = 'unavailable';
+
+    public const CONDITION_GOOD = 'good';
+    public const CONDITION_MINOR_DAMAGE = 'minor_damage';
+    public const CONDITION_MAJOR_DAMAGE = 'major_damage';
+
+    // di kode tetap bahasa Inggris, di interface akan menjadi bahasa Indonesia)
+    public const AVAILABILITY_LABELS = [
+        self::AVAILABILITY_AVAILABLE => 'Tersedia',
+        self::AVAILABILITY_UNAVAILABLE => 'Tidak tersedia',
+    ];
+
+    public const CONDITION_LABELS = [
+        self::CONDITION_GOOD => 'Baik',
+        self::CONDITION_MINOR_DAMAGE => 'Rusak ringan',
+        self::CONDITION_MAJOR_DAMAGE => 'Rusak berat',
+    ];
 
     public function facility(): BelongsTo
     {
