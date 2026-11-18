@@ -65,15 +65,25 @@ class FacilityAccessibilityController extends Controller
             ->with('success', 'Data aksesibilitas fasilitas berhasil ditambahkan.');
     }
 
+
     public function show(FacilityAccessibility $facilityAccessibility)
     {
         $facilityAccessibility->load([
             'facility',
             'accessibilityType',
-            'inspections.inspector'
         ]);
 
-        return view('facility-accessibilities.show', compact('facilityAccessibility'));
+        $inspections = $facilityAccessibility->inspections()
+            ->with('inspector')
+            ->orderByDesc('inspection_date')
+            ->orderByDesc('inspection_id')
+            ->paginate(3)
+            ->withQueryString();
+
+        return view('facility-accessibilities.show', compact(
+            'facilityAccessibility',
+            'inspections'
+        ));
     }
 
     public function edit(FacilityAccessibility $facilityAccessibility)
