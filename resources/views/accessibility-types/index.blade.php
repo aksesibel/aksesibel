@@ -1,8 +1,7 @@
-
-@extends('layout.accessibility-types')
+@extends('layout.pengelola')
 
 @section('title', 'Kelola Jenis Aksesibilitas')
-@section('breadcrumb', 'Aksesibel / Jenis Aksesibilitas')
+@section('breadcrumb', 'Aksesibel / Data Aksesibilitas / Jenis Aksesibilitas')
 
 @section('content')
     <div class="page-header">
@@ -17,12 +16,6 @@
     </div>
 
     {{-- Notifikasi --}}
-    @if (session('success'))
-        <div class="alert alert-success">
-            {{ session('success') }}
-        </div>
-    @endif
-
     @if ($errors->has('hapus'))
         <div class="alert alert-danger">
             {{ $errors->first('hapus') }}
@@ -36,14 +29,8 @@
                 <label for="q">Cari Jenis Aksesibilitas</label>
 
                 <div class="row">
-                    <input
-                        type="text"
-                        name="q"
-                        id="q"
-                        class="control"
-                        placeholder="Masukkan nama jenis aksesibilitas..."
-                        value="{{ $q }}"
-                    >
+                    <input type="text" name="q" id="q" class="control" placeholder="Masukkan nama jenis aksesibilitas..."
+                        value="{{ $q }}">
 
                     <button type="submit" class="btn btn-primary">
                         Cari
@@ -80,7 +67,7 @@
 
                             <td>{{ $type->type_name }}</td>
 
-                            <td>
+                            <td class="description-cell">
                                 {{ $type->description ?: '-' }}
                             </td>
 
@@ -90,26 +77,24 @@
                             </td>
 
                             <td>
-                                <a
-                                    href="{{ route('accessibility-types.edit', $type->accessibility_type_id) }}"
-                                    class="btn btn-sm"
-                                >
-                                    Edit
-                                </a>
+                                <div class="table-actions">
+                                    <a href="{{ route('accessibility-types.edit', $type->accessibility_type_id) }}"
+                                        class="btn btn-sm">
+                                        Edit
+                                    </a>
 
-                                <form
-                                    action="{{ route('accessibility-types.destroy', $type->accessibility_type_id) }}"
-                                    method="POST"
-                                    style="display: inline;"
-                                    onsubmit="return confirm('Yakin ingin menghapus jenis aksesibilitas ini?')"
-                                >
-                                    @csrf
-                                    @method('DELETE')
+                                    <form action="{{ route('accessibility-types.destroy', $type->accessibility_type_id) }}"
+                                        method="POST"
+                                        onsubmit="return confirm('Yakin ingin menghapus jenis aksesibilitas ini?')">
 
-                                    <button type="submit" class="btn btn-danger btn-sm">
-                                        Hapus
-                                    </button>
-                                </form>
+                                        @csrf
+                                        @method('DELETE')
+
+                                        <button type="submit" class="btn btn-danger btn-sm">
+                                            Hapus
+                                        </button>
+                                    </form>
+                                </div>
                             </td>
                         </tr>
                     @empty
