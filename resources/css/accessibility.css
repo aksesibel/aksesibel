@@ -347,3 +347,107 @@ input[type="file"].control::file-selector-button:hover {
     overflow-wrap: break-word;
     line-height: 1.5;
 }
+
+/* Pagination */
+.pagination {
+    margin-top: 20px;
+}
+
+.pagination nav {
+    width: 100%;
+}
+
+/* Sembunyikan navigasi versi mobile bawaan Laravel */
+.pagination nav > div:first-child {
+    display: none;
+}
+
+/* Layout utama pagination desktop (Kiri: Info, Tengah: Tombol) */
+.pagination nav > div:last-child {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    width: 100%;
+    gap: 16px;
+}
+
+/* Teks "Showing X to Y of Z results" di sebelah kiri */
+.pagination nav > div:last-child > div:first-child {
+    grid-column: 1;
+    justify-self: start;
+}
+
+.pagination nav > div:last-child > div:first-child p {
+    margin: 0;
+    font-size: 14px;
+    color: var(--muted);
+}
+
+/* Pembungkus tombol halaman di tengah */
+.pagination nav > div:last-child > div:last-child {
+    grid-column: 2;
+    justify-self: center;
+}
+
+/* INI KUNCI UTAMANYA: Targetkan <span> langsung di dalam div terakhir */
+.pagination nav > div:last-child > div:last-child > span {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px; /* Atur jarak antar tombol di sini */
+}
+
+/* Styling semua tombol (Link, Halaman Aktif, dan Disabled) */
+.pagination a,
+.pagination span[aria-current="page"] > span,
+.pagination span[aria-disabled="true"] > span {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    min-width: 36px;
+    height: 36px;
+    padding: 0 12px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background-color: #fff;
+    color: var(--text);
+    font-size: 14px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+/* Ukuran ikon panah Previous & Next bawaan Laravel agar tidak raksasa */
+.pagination svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* Hover */
+.pagination a:hover {
+    background-color: var(--primary-soft);
+    color: var(--primary);
+    border-color: var(--primary);
+}
+
+/* Halaman Aktif */
+.pagination span[aria-current="page"] > span {
+    background-color: var(--primary);
+    color: #fff;
+    border-color: var(--primary);
+    font-weight: 600;
+}
+
+/* Tombol Disabled (misal panah Prev di halaman 1) */
+.pagination span[aria-disabled="true"] > span {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background-color: var(--bg);
+}
+
+/* Responsif untuk layar HP */
+@media (max-width: 768px) {
+    .pagination nav > div:last-child {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+}

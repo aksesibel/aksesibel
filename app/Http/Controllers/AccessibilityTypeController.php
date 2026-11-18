@@ -10,12 +10,18 @@ class AccessibilityTypeController extends Controller
 {
     public function index(Request $request)
     {
-        $q = trim((string) $request->query('q', ''));
+        $query = AccessibilityType::withCount('facilityAccessibilities');
 
-        $types = AccessibilityType::withCount('facilityAccessibilities')
-            ->when($q !== '', fn ($query) => $query->where('type_name', 'like', "%{$q}%"))
+        if ($request->filled('q')) {
+            $query->where('type_name', 'like', '%' . $request->q . '%');
+        }
+
+        $types = $query
             ->orderBy('type_name')
-            ->get();
+            ->paginate(10)
+            ->withQueryString();
+
+        $q = $request->q;
 
         return view('accessibility-types.index', compact('types', 'q'));
     }
@@ -28,7 +34,7 @@ class AccessibilityTypeController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'type_name'   => ['required', 'string', 'max:255', 'unique:accessibility_types,type_name'],
+            'type_name' => ['required', 'string', 'max:255', 'unique:accessibility_types,type_name'],
             'description' => ['nullable', 'string'],
         ]);
         AccessibilityType::create($data);
@@ -45,9 +51,13 @@ class AccessibilityTypeController extends Controller
     public function update(Request $request, AccessibilityType $accessibilityType)
     {
         $data = $request->validate([
-            'type_name'   => ['required', 'string', 'max:255',
+            'type_name' => [
+                'required',
+                'string',
+                'max:255',
                 Rule::unique('accessibility_types', 'type_name')
-                    ->ignore($accessibilityType->accessibility_type_id, 'accessibility_type_id')],
+                    ->ignore($accessibilityType->accessibility_type_id, 'accessibility_type_id')
+            ],
             'description' => ['nullable', 'string'],
         ]);
         $accessibilityType->update($data);

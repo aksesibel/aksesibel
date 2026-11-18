@@ -63,7 +63,7 @@
                 <tbody>
                     @forelse ($types as $type)
                         <tr>
-                            <td>{{ $loop->iteration }}</td>
+                            <td>{{ $types->firstItem() + $loop->index }}</td>
 
                             <td>{{ $type->type_name }}</td>
 
@@ -106,6 +106,10 @@
                     @endforelse
                 </tbody>
             </table>
+        </div>
+
+        <div class="pagination">
+            {{ $types->links() }}
         </div>
     </div>
 
