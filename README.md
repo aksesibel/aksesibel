@@ -1,58 +1,152 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Aksesibel
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+**Platform informasi aksesibilitas fasilitas publik: direktori fasilitas, pelaporan masyarakat, verifikasi, dan tindak lanjut.**
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Tentang Aplikasi
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Aksesibel membantu masyarakat, terutama penyandang disabilitas, lansia, ibu hamil, pengguna kursi roda, dan pendamping, mengetahui kondisi sarana aksesibilitas di fasilitas publik **sebelum** mereka berkunjung. Selain direktori informasi, Aksesibel menyediakan jalur pelaporan: masyarakat dapat melaporkan kendala (misalnya lift rusak atau *ramp* terhalang), laporan diverifikasi, lalu diteruskan ke tindak lanjut sampai selesai, dengan dashboard statistik untuk pemantauan.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
 
-## Learning Laravel
+## Fitur Utama
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+| Kelompok | Fitur |
+|---|---|
+| **Direktori Fasilitas** | Daftar, pencarian, filter, detail fasilitas, dan lokasi pada peta |
+| **Data Fasilitas** | Kelola fasilitas, kategori fasilitas, dan lokasi |
+| **Data Aksesibilitas** | Kelola jenis aksesibilitas, sarana aksesibilitas per fasilitas, dan catatan pemeriksaan |
+| **Laporan Masyarakat** | Buat, lihat, ubah, batalkan laporan; kategori kendala; unggah bukti |
+| **Verifikasi** | Pemeriksaan laporan, riwayat verifikasi, dan status verifikasi |
+| **Tindak Lanjut** | Penugasan, progres penanganan, dan bukti tindak lanjut |
+| **Data Pendukung dan Statistik** | Pengguna dan hak akses, kategori, periode pelaporan, dashboard statistik |
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+## Peran Pengguna
 
-## Agentic Development
+| Peran | Hak akses |
+|---|---|
+| **Pengunjung** (tanpa akun) | Melihat dan mencari fasilitas, detail aksesibilitas, dan peta. Tidak perlu login. |
+| **Masyarakat** (pengguna terdaftar) | Membuat dan memantau laporan sendiri, mengunggah bukti sendiri. |
+| **Admin** | Memeriksa antrean laporan dan menetapkan hasil verifikasi. Tidak mengelola master data, akun, penugasan, atau progres. |
+| **Pengelola Fasilitas** | Mengelola data fasilitas, kategori, lokasi, aksesibilitas, pemeriksaan, tindak lanjut, pengguna, periode, dan statistik. |
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+Nama peran di database: `Admin`, `Masyarakat`, `Pengelola Fasilitas`.
+
+---
+
+## Tim Pengembang
+
+**Kelompok:** B-C | **Project Manager:** Rajendra Aulya Marsa Ilham
+
+| Anggota | Modul | PBI | Tabel yang dimiliki |
+|---|---|---|---|
+| Elyasa Reva Kinanthy | Direktori Fasilitas | PBI-01, PBI-02, PBI-03 | `facilities`, `facility_categories`, `facility_locations` |
+| Annisa Shafira Putri Puspita | Data Aksesibilitas | PBI-04, PBI-05, PBI-06 | `accessibility_types`, `facility_accessibilities`, `accessibility_inspections` |
+| Riyana Kartika Pratiwi | Laporan Masyarakat | PBI-07, PBI-08, PBI-09 | `reports`, `issue_categories`, `report_evidences` |
+| Siti Bilqis | Verifikasi | PBI-10, PBI-11, PBI-12 | `verifications`, `verification_histories`, `verification_statuses` |
+| Muhammad Fachri Fathurrahman | Tindak Lanjut | PBI-13, PBI-14, PBI-15 | `follow_up_assignments`, `follow_up_progress`, `follow_up_evidences` |
+| Rajendra Aulya Marsa Ilham | Data Pendukung dan Statistik | PBI-16, PBI-17, PBI-18 | `users`, `roles`, `reporting_periods`, serta dashboard statistik |
+
+Total **18 PBI** (6 anggota x 3 PBI). Setiap anggota bekerja di branch sendiri dan menggabungkan hasilnya ke `main` lewat Pull Request.
+
+## Teknologi
+
+| Komponen | Teknologi |
+|---|---|
+| Backend | PHP (8.3), [Laravel](https://laravel.com) (13.17) |
+| Database | MySQL (InnoDB, `utf8mb4_unicode_ci`) |
+| Frontend | Blade, CSS kustom (tanpa Bootstrap), JavaScript |
+| Build asset | Vite, Node.js, npm |
+| Alat bantu | Git dan GitHub, Jira, Slack (daily report) |
+
+---
+
+## Instalasi dan Konfigurasi
+
+### Prasyarat
+
+- PHP dan [Composer](https://getcomposer.org)
+- MySQL
+- Node.js dan npm
+- Git
+
+### Langkah
 
 ```bash
-composer require laravel/boost --dev
+# 1. Clone dan masuk ke folder proyek
+git clone https://github.com/aksesibel/aksesibel.git
+cd [isi: nama folder]
 
-php artisan boost:install
+# 2. Pasang dependensi
+composer install
+npm install
+
+# 3. Siapkan environment
+cp .env.example .env
+php artisan key:generate
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+Buat database kosong bernama `aksesibel` (charset `utf8mb4`, collation `utf8mb4_unicode_ci`), lalu sesuaikan `.env` (lihat tabel di bawah).
 
-## Contributing
+```bash
+# 4. Buat tabel dan isi data awal
+php artisan migrate --seed
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+# 5. Tautkan folder storage (untuk foto yang diunggah)
+php artisan storage:link
 
-## Code of Conduct
+# 6. Jalankan aplikasi (dua terminal)
+npm run dev
+php artisan serve
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Aplikasi dapat dibuka di `http://127.0.0.1:8000`.
 
-## Security Vulnerabilities
+### Konfigurasi database yang wajib sama
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+| Item | Nilai |
+|---|---|
+| Nama database | `aksesibel` |
+| Charset / collation | `utf8mb4` / `utf8mb4_unicode_ci` |
+| Engine | InnoDB (bawaan) |
+| `DB_CONNECTION` | `mysql` |
+| `DB_HOST` | `127.0.0.1` |
+| `DB_USERNAME` | `root` |
 
-## License
+### Reset database lokal
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+```bash
+php artisan migrate:fresh --seed
+```
+
+Perintah ini menghapus semua data di database **lokal**. Cek kesamaan dengan tim lewat `php artisan migrate:status` (semua berstatus `Ran`).
+
+---
+
+## Data Awal (Seeder)
+
+`MasterDataSeeder` mengisi data master. Tiap blok diisi oleh pemilik tabelnya dan aman dijalankan berulang (`updateOrInsert`).
+
+| Tabel | Isi contoh | 
+|---|---|
+| `roles` | Admin, Masyarakat, Pengelola Fasilitas |
+| `facility_categories` | Taman, Fasilitas Kesehatan, Pendidikan, ... |
+| `accessibility_types` | Ramp / Jalur Kursi Roda, Toilet Difabel, Guiding Block, Parkir Difabel, Lift, Handrail |
+| `issue_categories` | Fasilitas rusak, Fasilitas tidak tersedia, Akses terhalang, ... |
+| `verification_statuses` | Menunggu Verifikasi, Terverifikasi, Ditolak, ... |
+
+---
+
+## Alur Kerja
+
+**Sebelum mulai kerja**
+
+```bash
+git checkout main
+git pull
+git checkout <nama-branch-anda>
+git merge main
+composer install
+php artisan migrate
+```
