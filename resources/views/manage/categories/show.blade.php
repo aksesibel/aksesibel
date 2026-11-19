@@ -28,4 +28,3 @@
         <a href="{{ route($routePrefix.'.index') }}">Kembali ke daftar kategori</a>
     </div>
 </x-layout>
-

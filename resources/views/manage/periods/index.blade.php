@@ -32,4 +32,3 @@
         <div class="table-footer"><p>{{ $periods->firstItem() ?? 0 }}–{{ $periods->lastItem() ?? 0 }} dari {{ $periods->total() }} periode</p><div>{{ $periods->links() }}</div></div>
     </section>
 </x-layout>
-

@@ -21,4 +21,3 @@
         <a href="{{ route('manage.reporting-periods.index') }}">Kembali ke daftar periode</a>
     </div>
 </x-layout>
-

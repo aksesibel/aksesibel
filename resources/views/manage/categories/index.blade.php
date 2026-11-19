@@ -45,4 +45,3 @@
         <div class="table-footer"><p>{{ $categories->firstItem() ?? 0 }}–{{ $categories->lastItem() ?? 0 }} dari {{ $categories->total() }} kategori</p><div>{{ $categories->links() }}</div></div>
     </section>
 </x-layout>
-
