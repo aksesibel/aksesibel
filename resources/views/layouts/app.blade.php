@@ -1,6 +1,6 @@
-
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -32,14 +32,15 @@
 
             <nav class="side-menu">
                 <a href="{{ route('verifikasi.antrean') }}"
-                   class="{{ request()->routeIs('verifikasi.antrean') ? 'active' : '' }}">
+                    class="{{ request()->routeIs('verifikasi.antrean') ? 'active' : '' }}">
                     <i class="fa-solid fa-border-all"></i>
                     Antrean verifikasi
                 </a>
 
-                <a href="#">
+                <a href="{{ route('verifikasi.riwayat') }}"
+                    class="{{ request()->routeIs('verifikasi.riwayat') ? 'active' : '' }}">
                     <i class="fa-regular fa-clipboard"></i>
-                    Riwayat keputusan
+                    Riwayat verifikasi
                 </a>
 
                 <a href="#">
@@ -84,4 +85,5 @@
 
     @stack('scripts')
 </body>
+
 </html>

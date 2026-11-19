@@ -11,7 +11,7 @@
 @section('content')
 
 <div class="page-heading">
-    <h1>Verifikasi laporan masyarakat</h1>
+    <h1>Verifikasi Laporan Masyarakat</h1>
     <p>Periksa kesesuaian fasilitas, uraian, dan bukti sebelum menetapkan keputusan.</p>
 </div>
 

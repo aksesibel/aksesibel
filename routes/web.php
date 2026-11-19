@@ -10,4 +10,7 @@ Route::get('/', function () {
 Route::prefix('verifikasi')->name('verifikasi.')->group(function () {
     Route::get('/antrean', [VerificationController::class, 'antrean'])
         ->name('antrean');
+        
+    Route::get('/riwayat', [VerificationController::class, 'riwayat'])
+        ->name('riwayat');
 });
