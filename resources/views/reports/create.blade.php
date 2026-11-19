@@ -65,8 +65,13 @@
 
         <div class="mb-3">
             <label class="form-label fw-semibold">Fasilitas Publik *</label>
-            <select name="facility_id" class="form-select" required>
+
+            <select name="facility_id"
+                    id="facility_id"
+                    class="form-select"
+                    required>
                 <option value="">Pilih fasilitas</option>
+
                 @foreach($facilities as $facility)
                     <option value="{{ $facility->facility_id }}"
                         @selected(old('facility_id') == $facility->facility_id)>
