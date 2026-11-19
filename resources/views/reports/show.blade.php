@@ -41,6 +41,19 @@
         </div>
 
         <div class="col-md-6">
+            <small class="text-muted">Item Aksesibilitas</small>
+            <p class="fw-semibold">
+                {{ $report->facilityAccessibility?->accessibilityType?->type_name ?? 'Tidak terkait item aksesibilitas tertentu' }}
+            </p>
+
+            @if($report->facilityAccessibility?->location_description)
+                <small class="text-muted">
+                    {{ $report->facilityAccessibility->location_description }}
+                </small>
+            @endif
+        </div>
+
+        <div class="col-md-6">
             <small class="text-muted">Kategori Kendala</small>
             <p class="fw-semibold">
                 {{ $report->issueCategory->category_name ?? '-' }}

@@ -267,6 +267,7 @@ class ReportController extends Controller
 
         $report->load([
             'facility',
+            'facilityAccessibility.accessibilityType',
             'issueCategory',
             'status',
             'period',
@@ -277,9 +278,14 @@ class ReportController extends Controller
     }
 
     public function getFacilityAccessibilities($facilityId)
-    {
+{
+        // Pastikan fasilitas yang diminta masih aktif.
+        $facility = Facility::where('facility_id', $facilityId)
+            ->where('facility_status', 'active')
+            ->firstOrFail();
+
         $accessibilities = FacilityAccessibility::with('accessibilityType')
-            ->where('facility_id', $facilityId)
+            ->where('facility_id', $facility->facility_id)
             ->get();
 
         return response()->json(
