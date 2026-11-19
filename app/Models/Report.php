@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use App\Models\FacilityAccessibility;
 
 class Report extends Model
 {
@@ -60,5 +61,14 @@ class Report extends Model
             'incident_date' => 'date',
             'is_anonymous' => 'boolean',
         ];
+    }
+
+    public function facilityAccessibility(): BelongsTo
+    {
+        return $this->belongsTo(
+            FacilityAccessibility::class,
+            'facility_accessibility_id',
+            'facility_accessibility_id'
+        );
     }
 }
