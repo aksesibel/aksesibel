@@ -75,6 +75,7 @@
                 class="report-card {{ $index === 0 ? 'active' : '' }}"
                 data-index="{{ $index }}"
                 data-id="{{ $item->report_number }}"
+                data-report-id="{{ $item->report_id }}"
                 data-title="{{ $item->description }}"
                 data-facility="{{ $item->facility->name ?? '-' }}"
                 data-location="{{ $item->facility->address ?? '-' }}"
