@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use App\Models\FacilityAccessibility;
 
 class ReportController extends Controller
 {
@@ -146,7 +147,29 @@ class ReportController extends Controller
                 'mimes:jpg,jpeg,png,webp',
                 'max:2048',
             ],
+            'facility_accessibility_id' => [
+                'nullable',
+                'exists:facility_accessibilities,facility_accessibility_id',
+            ],
         ]);
+
+        if ($request->filled('facility_accessibility_id')) {
+            $accessibilityExists = FacilityAccessibility::where(
+                'facility_accessibility_id',
+                $request->facility_accessibility_id
+            )
+            ->where('facility_id', $request->facility_id)
+            ->exists();
+
+            if (!$accessibilityExists) {
+                return back()
+                    ->withErrors([
+                        'facility_accessibility_id' =>
+                            'Item aksesibilitas tidak sesuai dengan fasilitas yang dipilih.',
+                    ])
+                    ->withInput();
+            }
+        }
 
         // Pastikan fasilitas dan kategori masih aktif.
         $facility = Facility::where(
@@ -186,6 +209,7 @@ class ReportController extends Controller
                     'report_title' => $validated['report_title'],
                     'user_id' => auth()->id(),
                     'facility_id' => $validated['facility_id'],
+                    'facility_accessibility_id' => $validated['facility_accessibility_id'] ?? null,
                     'issue_category_id' => $validated['issue_category_id'],
                     'status_id' => $status->status_id,
                     'period_id' => $activePeriod->period_id,
@@ -250,5 +274,24 @@ class ReportController extends Controller
         ]);
 
         return view('reports.show', compact('report'));
+    }
+
+    public function getFacilityAccessibilities($facilityId)
+    {
+        $accessibilities = FacilityAccessibility::with('accessibilityType')
+            ->where('facility_id', $facilityId)
+            ->get();
+
+        return response()->json(
+            $accessibilities->map(function ($item) {
+                return [
+                    'id' => $item->facility_accessibility_id,
+                    'name' => $item->accessibilityType->type_name ?? 'Item aksesibilitas',
+                    'location' => $item->location_description,
+                    'condition' => $item->condition_status,
+                    'availability' => $item->availability_status,
+                ];
+            })
+        );
     }
 }

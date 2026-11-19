@@ -19,6 +19,11 @@ Route::patch(
     [IssueCategoryController::class, 'toggleStatus']
 )->name('issue-categories.toggle-status');
 
+Route::get(
+    '/reports/facilities/{facility}/accessibilities',
+    [ReportController::class, 'getFacilityAccessibilities']
+)->name('reports.facilities.accessibilities');
+
 // PBI-07 dan PBI-09: Kelola Laporan Masyarakat
 Route::get('/reports', [ReportController::class, 'index'])
     ->name('reports.index');

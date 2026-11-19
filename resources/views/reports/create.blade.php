@@ -77,6 +77,26 @@
         </div>
 
         <div class="mb-3">
+            <label class="form-label fw-semibold">
+                Item Aksesibilitas
+            </label>
+
+            <select name="facility_accessibility_id"
+                    id="facility_accessibility_id"
+                    class="form-select"
+                    disabled>
+                <option value="">
+                    Pilih fasilitas terlebih dahulu
+                </option>
+            </select>
+
+            <div class="form-text">
+                Pilih item aksesibilitas pada fasilitas yang mengalami kendala.
+                Pilihan ini bersifat opsional.
+            </div>
+        </div>
+
+        <div class="mb-3">
             <label class="form-label fw-semibold">Kategori Kendala *</label>
             <select name="issue_category_id" class="form-select" required>
                 <option value="">Pilih kategori kendala</option>
@@ -173,3 +193,95 @@
     </form>
 </div>
 @endsection
+
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const facilitySelect = document.getElementById('facility_id');
+    const accessibilitySelect = document.getElementById('facility_accessibility_id');
+
+    const oldAccessibilityId = @json(old('facility_accessibility_id'));
+
+    const endpointTemplate = @json(
+        route('reports.facilities.accessibilities', ['facility' => '__FACILITY_ID__'])
+    );
+
+    async function loadAccessibilities(facilityId) {
+        accessibilitySelect.innerHTML = '';
+        accessibilitySelect.disabled = true;
+
+        if (!facilityId) {
+            accessibilitySelect.innerHTML =
+                '<option value="">Pilih fasilitas terlebih dahulu</option>';
+            return;
+        }
+
+        accessibilitySelect.innerHTML =
+            '<option value="">Memuat item aksesibilitas...</option>';
+
+        try {
+            const endpoint = endpointTemplate.replace(
+                '__FACILITY_ID__',
+                facilityId
+            );
+
+            const response = await fetch(endpoint);
+
+            if (!response.ok) {
+                throw new Error('Gagal mengambil data');
+            }
+
+            const items = await response.json();
+
+            accessibilitySelect.innerHTML =
+                '<option value="">Pilih item aksesibilitas (opsional)</option>';
+
+            if (items.length === 0) {
+                accessibilitySelect.innerHTML =
+                    '<option value="">Belum ada item aksesibilitas</option>';
+                return;
+            }
+
+            items.forEach(function (item) {
+                const option = document.createElement('option');
+
+                option.value = item.id;
+
+                let label = item.name;
+
+                if (item.location) {
+                    label += ' - ' + item.location;
+                }
+
+                option.textContent = label;
+
+                if (String(item.id) === String(oldAccessibilityId)) {
+                    option.selected = true;
+                }
+
+                accessibilitySelect.appendChild(option);
+            });
+
+            accessibilitySelect.disabled = false;
+
+        } catch (error) {
+            accessibilitySelect.innerHTML =
+                '<option value="">Gagal memuat item aksesibilitas</option>';
+
+            console.error(error);
+        }
+    }
+
+    facilitySelect.addEventListener('change', function () {
+        loadAccessibilities(this.value);
+    });
+
+    // Muat ulang otomatis jika halaman kembali karena validasi.
+    if (facilitySelect.value) {
+        loadAccessibilities(facilitySelect.value);
+    }
+});
+</script>
+@endpush
+
