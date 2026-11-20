@@ -8,6 +8,7 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ReportingPeriodController;
 use App\Http\Controllers\StatisticsController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\VerificationController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AccessibilityTypeController;
 use App\Http\Controllers\FacilityAccessibilityController;
@@ -79,3 +80,11 @@ Route::post('/reports', [ReportController::class, 'store'])
 
 Route::get('/reports/{report}', [ReportController::class, 'show'])
     ->name('reports.show');
+
+Route::prefix('verifikasi')->name('verifikasi.')->group(function () {
+    Route::get('/antrean', [VerificationController::class, 'antrean'])
+        ->name('antrean');
+
+    Route::get('/riwayat', [VerificationController::class, 'riwayat'])
+        ->name('riwayat');
+});
