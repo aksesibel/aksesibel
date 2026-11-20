@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\FacilityCategoryController;
 use App\Http\Controllers\IssueCategoryController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ReportingPeriodController;
 use App\Http\Controllers\StatisticsController;
 use App\Http\Controllers\UserController;
@@ -61,3 +62,20 @@ Route::post(
     'facility-accessibilities/{facility_accessibility}/inspections',
     [AccessibilityInspectionController::class, 'store']
 )->name('facility-accessibilities.inspections.store');
+Route::get(
+    '/reports/facilities/{facility}/accessibilities',
+    [ReportController::class, 'getFacilityAccessibilities']
+)->name('reports.facilities.accessibilities');
+
+// PBI-07 dan PBI-09: Kelola Laporan Masyarakat
+Route::get('/reports', [ReportController::class, 'index'])
+    ->name('reports.index');
+
+Route::get('/reports/create', [ReportController::class, 'create'])
+    ->name('reports.create');
+
+Route::post('/reports', [ReportController::class, 'store'])
+    ->name('reports.store');
+
+Route::get('/reports/{report}', [ReportController::class, 'show'])
+    ->name('reports.show');
