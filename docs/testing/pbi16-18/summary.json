@@ -1,0 +1,84 @@
+{
+  "database": "aksesibel_testing",
+  "server": "MariaDB 10.4.28",
+  "collation": "utf8mb4_unicode_ci",
+  "branch": "rajendra_branch",
+  "phpunit": {
+    "functional": {
+      "tests": 208,
+      "assertions": 917,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "database_safety": {
+      "tests": 6,
+      "assertions": 11,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "concurrency": {
+      "tests": 2,
+      "assertions": 34,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "browser": {
+    "startTime": "2026-11-01T06:24:13.472Z",
+    "duration": 23429.949999999997,
+    "expected": 19,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "mobile_layout": [
+    {
+      "page": "users",
+      "viewport": 390,
+      "documentWidth": 390
+    },
+    {
+      "page": "facility-categories",
+      "viewport": 390,
+      "documentWidth": 390
+    },
+    {
+      "page": "issue-categories",
+      "viewport": 390,
+      "documentWidth": 390
+    },
+    {
+      "page": "reporting-periods",
+      "viewport": 390,
+      "documentWidth": 390
+    },
+    {
+      "page": "statistics",
+      "viewport": 390,
+      "documentWidth": 390
+    }
+  ],
+  "csrf": {
+    "status": 419,
+    "console": "no",
+    "fetchSite": "cross-site"
+  },
+  "diagnostics": {
+    "javascript_errors": 0,
+    "failed_resources": 0,
+    "asset_http_errors": 0
+  },
+  "final_totals": {
+    "phpunit_passed": 216,
+    "phpunit_assertions": 962,
+    "browser_passed": 19,
+    "failures": 0
+  },
+  "screenshots": {
+    "final": 26,
+    "initial_failures": 3
+  }
+}
