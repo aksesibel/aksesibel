@@ -19,6 +19,9 @@ class DatabaseSeeder extends Seeder
         // Data master harus masuk lebih dulu (roles, status, kategori, dll.)
         $this->call(MasterDataSeeder::class);
 
+        // Data contoh fasilitas publik
+        $this->call(FacilitySeeder::class);
+
         // User tes untuk login saat development (password: "password")
         $adminRoleId = DB::table('roles')->where('role_name', 'Admin')->value('role_id');
 

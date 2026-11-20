@@ -4,6 +4,43 @@
 @source '../../storage/framework/views/*.php';
 
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+    /* Font */
+    --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji';
+
+    /* Design tokens Aksesibel */
+    --color-primary:        #1D4ED8;
+    --color-primary-hover:  #1E40AF;
+    --color-hero-bg:        #EFF6FF;
+    --color-page-bg:        #F8FAFC;
+    --color-card-bg:        #FFFFFF;
+    --color-card-border:    #E2E8F0;
+    --color-text-main:      #0F172A;
+    --color-text-secondary: #475569;
+    --color-footer-bg:      #0F2557;
+
+    /* Badge status */
+    --color-badge-akses-penuh-text:        #15803D;
+    --color-badge-akses-penuh-bg:          #DCFCE7;
+    --color-badge-akses-sebagian-text:     #B45309;
+    --color-badge-akses-sebagian-bg:       #FEF3C7;
+    --color-badge-belum-aksesibel-text:    #B91C1C;
+    --color-badge-belum-aksesibel-bg:      #FEE2E2;
+    --color-badge-menunggu-text:           #475569;
+    --color-badge-menunggu-bg:             #F1F5F9;
+}
+
+@layer base {
+    html {
+        font-family: var(--font-sans);
+        background-color: var(--color-page-bg);
+        color: var(--color-text-main);
+        scroll-behavior: smooth;
+    }
+
+    /* Focus ring yang terlihat jelas (WCAG 2.1 AA) */
+    :focus-visible {
+        outline: 3px solid var(--color-primary);
+        outline-offset: 2px;
+        border-radius: 4px;
+    }
 }
