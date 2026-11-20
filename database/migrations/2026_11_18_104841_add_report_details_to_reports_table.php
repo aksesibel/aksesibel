@@ -10,8 +10,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('reports', function (Blueprint $table) {
-            $table->string('report_title')->after('report_number');
-            $table->date('incident_date')->after('description');
+            $table->string('report_title')->nullable()->after('report_number');
+            $table->date('incident_date')->nullable()->after('description');
             $table->text('specific_location')->nullable()->after('incident_date');
             $table->boolean('is_anonymous')->default(false)->after('specific_location');
         });

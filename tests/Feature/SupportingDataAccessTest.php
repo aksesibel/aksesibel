@@ -50,6 +50,8 @@ class SupportingDataAccessTest extends TestCase
             'kategori kendala' => ['manage.issue-categories.index'],
             'periode' => ['manage.reporting-periods.index'],
             'statistik' => ['manage.statistics'],
+            'jenis aksesibilitas' => ['accessibility-types.index'],
+            'fasilitas aksesibilitas' => ['facility-accessibilities.index'],
         ];
     }
 
@@ -76,6 +78,8 @@ class SupportingDataAccessTest extends TestCase
 
         $endpoints['users.status'] = ['PATCH', 'manage.users.status', true];
         $endpoints['statistics'] = ['GET', 'manage.statistics', false];
+        $endpoints['accessibility-types.store'] = ['POST', 'accessibility-types.store', false];
+        $endpoints['facility-accessibilities.store'] = ['POST', 'facility-accessibilities.store', false];
 
         return $endpoints;
     }

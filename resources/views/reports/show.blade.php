@@ -24,7 +24,7 @@
 <div class="content-card mb-4">
     <div class="d-flex justify-content-between align-items-start mb-4">
         <div>
-            <h5 class="fw-bold">{{ $report->report_title }}</h5>
+            <h5 class="fw-bold">{{ $report->report_title ?? $report->report_number }}</h5>
             <p class="text-muted mb-0">
                 Dibuat {{ $report->created_at?->format('d M Y H:i') ?? '-' }}
             </p>

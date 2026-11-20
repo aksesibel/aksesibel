@@ -29,7 +29,11 @@ class AuthController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('account'));
+        $destination = $request->user()->role?->role_name === Role::FOLLOW_UP_OFFICER
+            ? 'follow-up-assignments.index'
+            : 'account';
+
+        return redirect()->intended(route($destination));
     }
 
     public function register(): View

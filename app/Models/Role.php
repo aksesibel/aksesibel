@@ -13,6 +13,8 @@ class Role extends Model
 
     public const ADMIN = 'Admin';
 
+    public const FOLLOW_UP_OFFICER = 'Petugas Tindak Lanjut';
+
     public const PROPOSAL_ROLES = [self::PUBLIC, self::ADMIN, self::FACILITY_MANAGER];
 
     protected $table = 'roles';

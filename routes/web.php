@@ -1,6 +1,9 @@
 <?php
 
+use App\Http\Controllers\AccessibilityInspectionController;
+use App\Http\Controllers\AccessibilityTypeController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\FacilityAccessibilityController;
 use App\Http\Controllers\FacilityCategoryController;
 use App\Http\Controllers\FollowUpAssignmentController;
 use App\Http\Controllers\FollowUpProgressController;
@@ -12,9 +15,6 @@ use App\Http\Controllers\StatisticsController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VerificationController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AccessibilityTypeController;
-use App\Http\Controllers\FacilityAccessibilityController;
-use App\Http\Controllers\AccessibilityInspectionController;
 
 Route::view('/', 'home')->name('home');
 
@@ -41,30 +41,33 @@ Route::prefix('pengelola')->name('manage.')->middleware(['auth', 'can:manage-sup
     Route::resource('reporting-periods', ReportingPeriodController::class);
 });
 
-/*
-|--------------------------------------------------------------------------
-| PBI-04: Kelola Jenis Aksesibilitas
-|--------------------------------------------------------------------------
-*/
-Route::resource('accessibility-types', AccessibilityTypeController::class)
-    ->except(['show']);
+Route::middleware(['auth', 'can:manage-supporting-data'])->group(function (): void {
+    /*
+    |--------------------------------------------------------------------------
+    | PBI-04: Kelola Jenis Aksesibilitas
+    |--------------------------------------------------------------------------
+    */
+    Route::resource('accessibility-types', AccessibilityTypeController::class)
+        ->except(['show']);
 
-/*
-|--------------------------------------------------------------------------
-| PBI-05: Kelola Fasilitas Aksesibilitas
-|--------------------------------------------------------------------------
-*/
-Route::resource('facility-accessibilities', FacilityAccessibilityController::class);
+    /*
+    |--------------------------------------------------------------------------
+    | PBI-05: Kelola Fasilitas Aksesibilitas
+    |--------------------------------------------------------------------------
+    */
+    Route::resource('facility-accessibilities', FacilityAccessibilityController::class);
 
-/*
-|--------------------------------------------------------------------------
-| PBI-06: Kelola Pemeriksaan Aksesibilitas
-|--------------------------------------------------------------------------
-*/
-Route::post(
-    'facility-accessibilities/{facility_accessibility}/inspections',
-    [AccessibilityInspectionController::class, 'store']
-)->name('facility-accessibilities.inspections.store');
+    /*
+    |--------------------------------------------------------------------------
+    | PBI-06: Kelola Pemeriksaan Aksesibilitas
+    |--------------------------------------------------------------------------
+    */
+    Route::post(
+        'facility-accessibilities/{facility_accessibility}/inspections',
+        [AccessibilityInspectionController::class, 'store']
+    )->name('facility-accessibilities.inspections.store');
+});
+
 Route::get(
     '/reports/facilities/{facility}/accessibilities',
     [ReportController::class, 'getFacilityAccessibilities']

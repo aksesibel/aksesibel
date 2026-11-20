@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use App\Models\FacilityAccessibility;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Report extends Model
 {
@@ -53,6 +53,7 @@ class Report extends Model
     {
         return $this->hasMany(FollowUpAssignment::class, 'report_id', 'report_id');
     }
+
     protected function casts(): array
     {
         return [
