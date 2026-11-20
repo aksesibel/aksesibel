@@ -22,5 +22,10 @@ class AppServiceProvider extends ServiceProvider
         Route::bind('category', function ($value) {
             return FacilityCategory::where('category_id', $value)->firstOrFail();
         });
+
+        // Region — primary key region_id
+        Route::bind('region', function ($value) {
+            return \App\Models\Region::where('region_id', $value)->firstOrFail();
+        });
     }
 }

@@ -33,8 +33,12 @@
                     @endforeach
                 </select>
             </div>
+            <label class="flex items-center gap-2 px-3 py-2 rounded-lg border border-[#E2E8F0] text-sm text-[#475569] cursor-pointer hover:bg-[#F8FAFC] min-h-[44px]">
+                <input type="checkbox" name="no_coords" value="1" {{ request('no_coords') ? 'checked' : '' }} class="w-4 h-4 text-[#1D4ED8]">
+                Belum ada koordinat
+            </label>
             <button type="submit" class="px-4 py-2 rounded-lg bg-[#1D4ED8] hover:bg-[#1E40AF] text-white text-sm font-semibold transition-colors min-h-[44px]">Cari</button>
-            @if(request()->hasAny(['q','accessibility_status']))
+            @if(request()->hasAny(['q','accessibility_status','no_coords']))
                 <a href="{{ route('admin.facilities.index') }}" class="px-4 py-2 rounded-lg border border-[#E2E8F0] text-[#475569] text-sm hover:bg-[#F8FAFC] transition-colors min-h-[44px] flex items-center">Reset</a>
             @endif
         </form>
@@ -60,9 +64,10 @@
                             <tr class="bg-[#F8FAFC] border-b border-[#E2E8F0]">
                                 <th scope="col" class="px-4 py-3 text-left font-semibold text-[#475569] text-xs uppercase tracking-wide">Nama</th>
                                 <th scope="col" class="px-4 py-3 text-left font-semibold text-[#475569] text-xs uppercase tracking-wide hidden md:table-cell">Kategori</th>
-                                <th scope="col" class="px-4 py-3 text-left font-semibold text-[#475569] text-xs uppercase tracking-wide hidden sm:table-cell">Kota</th>
+                                <th scope="col" class="px-4 py-3 text-left font-semibold text-[#475569] text-xs uppercase tracking-wide hidden sm:table-cell">Wilayah</th>
                                 <th scope="col" class="px-4 py-3 text-left font-semibold text-[#475569] text-xs uppercase tracking-wide">Status</th>
-                                <th scope="col" class="px-4 py-3 text-left font-semibold text-[#475569] text-xs uppercase tracking-wide hidden lg:table-cell">Diperbarui</th>
+                                <th scope="col" class="px-4 py-3 text-left font-semibold text-[#475569] text-xs uppercase tracking-wide hidden lg:table-cell">Koordinat</th>
+                                <th scope="col" class="px-4 py-3 text-left font-semibold text-[#475569] text-xs uppercase tracking-wide hidden xl:table-cell">Diperbarui</th>
                                 <th scope="col" class="px-4 py-3 text-right font-semibold text-[#475569] text-xs uppercase tracking-wide">Aksi</th>
                             </tr>
                         </thead>
@@ -76,12 +81,38 @@
                                         {{ $facility->category->category_name ?? '–' }}
                                     </td>
                                     <td class="px-4 py-3 text-[#475569] hidden sm:table-cell">
-                                        {{ $facility->city ?? '–' }}
+                                        @php
+                                            $wilayah = array_filter([
+                                                $facility->kelurahan?->name,
+                                                $facility->kotaWilayah?->name ?? $facility->city,
+                                            ]);
+                                        @endphp
+                                        @if($wilayah)
+                                            <span class="block">{{ $wilayah[0] ?? '' }}</span>
+                                            @if(!empty($wilayah[1]))
+                                                <span class="block text-xs text-[#94A3B8]">{{ $wilayah[1] }}</span>
+                                            @endif
+                                        @else
+                                            <span class="text-[#94A3B8]">–</span>
+                                        @endif
                                     </td>
                                     <td class="px-4 py-3">
                                         <x-status-badge :status="$facility->accessibility_status" />
                                     </td>
-                                    <td class="px-4 py-3 text-[#94A3B8] text-xs hidden lg:table-cell">
+                                    <td class="px-4 py-3 text-xs hidden lg:table-cell">
+                                        @if($facility->hasCoordinates())
+                                            <span class="inline-flex items-center gap-1 text-[#15803D]">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                                                Ada
+                                            </span>
+                                        @else
+                                            <span class="inline-flex items-center gap-1 text-[#94A3B8]">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+                                                Belum
+                                            </span>
+                                        @endif
+                                    </td>
+                                    <td class="px-4 py-3 text-[#94A3B8] text-xs hidden xl:table-cell">
                                         {{ $facility->updated_at?->diffForHumans() ?? '–' }}
                                     </td>
                                     <td class="px-4 py-3">

@@ -1,4 +1,13 @@
-@props(['facility'])
+@props(['facility', 'distanceKm' => null])
+
+@php
+    // Tampilkan wilayah berjenjang bila tersedia, jika tidak pakai kolom city lama.
+    $wilayah = array_filter([
+        $facility->kelurahan?->name,
+        $facility->kotaWilayah?->name,
+    ]);
+    $lokasiRingkas = implode(', ', $wilayah) ?: ($facility->city ?? '');
+@endphp
 
 <article class="bg-white rounded-xl border border-[#E2E8F0] overflow-hidden flex flex-col hover:shadow-md transition-shadow">
     {{-- Gambar placeholder --}}
@@ -22,13 +31,35 @@
             {{ $facility->name }}
         </h3>
 
-        {{-- Alamat --}}
+        {{-- Alamat + wilayah --}}
         <p class="text-sm text-[#475569] flex items-start gap-1.5">
             <svg class="w-4 h-4 shrink-0 mt-0.5 text-[#1D4ED8]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/>
             </svg>
-            <span>{{ $facility->address }}{{ $facility->city ? ', ' . $facility->city : '' }}</span>
+            <span>{{ $facility->address }}@if($lokasiRingkas), {{ $lokasiRingkas }}@endif</span>
         </p>
+
+        {{-- Penanda koordinat & jarak --}}
+        <div class="flex items-center gap-3 flex-wrap">
+            @if($facility->hasCoordinates())
+                <span class="inline-flex items-center gap-1 text-xs font-medium text-[#15803D]">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                    Koordinat: Ada
+                </span>
+            @else
+                <span class="inline-flex items-center gap-1 text-xs font-medium text-[#94A3B8]">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+                    Lokasi belum ditentukan
+                </span>
+            @endif
+
+            @if($distanceKm !== null)
+                <span class="inline-flex items-center gap-1 text-xs font-semibold text-[#1D4ED8]">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>
+                    {{ number_format($distanceKm, 1, ',', '.') }} km dari Anda
+                </span>
+            @endif
+        </div>
 
         {{-- Diperbarui --}}
         <p class="text-xs text-[#94A3B8] mt-auto">

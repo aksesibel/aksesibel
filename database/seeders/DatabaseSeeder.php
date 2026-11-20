@@ -19,6 +19,9 @@ class DatabaseSeeder extends Seeder
         // Data master harus masuk lebih dulu (roles, status, kategori, dll.)
         $this->call(MasterDataSeeder::class);
 
+        // Data wilayah — DKI Jakarta
+        $this->call(RegionSeeder::class);
+
         // Data contoh fasilitas publik
         $this->call(FacilitySeeder::class);
 

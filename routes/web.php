@@ -2,17 +2,27 @@
 
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\FacilityController;
+use App\Http\Controllers\GeocodeController;
+use App\Http\Controllers\RegionController;
 use Illuminate\Support\Facades\Route;
 
 // ---------------------------------------------------------------
 // Halaman Publik
 // ---------------------------------------------------------------
 Route::get('/', [FacilityController::class, 'home'])->name('home');
-
 Route::get('/fasilitas', [FacilityController::class, 'index'])->name('facilities.index');
 Route::get('/fasilitas/{facility}', [FacilityController::class, 'show'])->name('facilities.show');
-
 Route::get('/kategori/{slug}', [CategoryController::class, 'show'])->name('categories.show');
+
+// ---------------------------------------------------------------
+// API — data publik (JSON)
+// ---------------------------------------------------------------
+Route::prefix('api')->name('api.')->group(function () {
+    Route::get('/wilayah', [RegionController::class, 'index'])->name('regions.index');
+    Route::get('/wilayah/{region}', [RegionController::class, 'show'])->name('regions.show');
+    Route::get('/fasilitas/peta', [FacilityController::class, 'mapData'])->name('facilities.map');
+    Route::post('/geocode', GeocodeController::class)->name('geocode');
+});
 
 // ---------------------------------------------------------------
 // Panel Admin
