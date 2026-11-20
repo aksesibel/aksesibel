@@ -22,6 +22,90 @@ Aksesibel membantu masyarakat, terutama penyandang disabilitas, lansia, ibu hami
 | **Data Pendukung dan Statistik** | Pengguna dan hak akses, kategori, periode pelaporan, dashboard statistik |
 
 
+## Detail Modul Lokasi (PBI-03)
+
+Modul lokasi menangani alamat, wilayah administratif, dan koordinat untuk tampilan daftar dan peta.
+
+- **Model `Region` hierarkis** (self-relation): `PROVINSI > KOTA_KABUPATEN > KECAMATAN > KELURAHAN` dengan kode Kemendagri.
+- **Perluasan `Facility`**: wilayah berjenjang (`province_id`, `city_region_id`, `district_id`, `region_id`), koordinat (`latitude`, `longitude`), kode pos, catatan lokasi, catatan pintu masuk aksesibel, transportasi terdekat, dan sumber koordinat. Kolom `city` lama tetap dipertahankan sebagai cadangan (kompatibel dengan data terdahulu).
+- **Form admin** dengan dropdown wilayah berjenjang, pemilih titik peta Leaflet (klik/seret penanda), input angka lat/lng, tombol geser arah (alternatif tanpa mouse), geokoding alamat, "Gunakan lokasi saya", serta pratinjau peta.
+- **Halaman publik `/fasilitas`** dengan pengalih **Daftar | Peta**, marker clustering, "Cari di area ini", "Dekat saya", filter wilayah, dan tautan yang dapat dibagikan.
+- **Halaman detail `/fasilitas/{id}`** dengan rantai wilayah lengkap, peta mini, "Salin alamat", dan "Petunjuk arah".
+
+### Seed Wilayah dan Impor CSV
+
+`RegionSeeder` bersifat **idempoten** (upsert berdasarkan `code`). Saat ini memuat provinsi **DKI Jakarta**, 5 kota/kabupaten administrasi, seluruh kecamatan, dan kelurahan untuk Kecamatan **Menteng, Gambir, Tanah Abang, dan Setiabudi**.
+
+Untuk wilayah lain, sediakan CSV dengan format `code,name,level,parent_code`:
+
+```csv
+code,name,level,parent_code
+31,DKI Jakarta,PROVINSI,
+31.71,Kota Jakarta Pusat,KOTA_KABUPATEN,31
+31.71.01,Menteng,KECAMATAN,31.71
+31.71.01.1001,Menteng,KELURAHAN,31.71.01
+```
+
+Level valid: `PROVINSI | KOTA_KABUPATEN | KECAMATAN | KELURAHAN`.
+
+```bash
+php scripts/import-regions.php path/to/wilayah.csv
+php scripts/import-regions.php path/to/wilayah.csv --dry-run   # uji tanpa menyimpan
+```
+
+Skrip memakai upsert berdasarkan `code`. Data wilayah lengkap Indonesia dapat diambil dari <https://github.com/cahyadsn/wilayah> (lisensi MIT).
+
+### Variabel Lingkungan Peta & Geokoding
+
+| Variabel | Default | Keterangan |
+| --- | --- | --- |
+| `OSM_TILE_URL` | `https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png` | URL tile peta. Ganti bila memakai penyedia lain. |
+| `OSM_TILE_ATTRIBUTION` | `© OpenStreetMap contributors` | Atribusi tile; wajib menampilkan atribusi penyedia. |
+| `OSM_TILE_MAX_ZOOM` | `19` | Zoom maksimum tile. |
+| `OSM_DIRECTIONS_URL` | `https://www.openstreetmap.org/directions` | Basis URL "Petunjuk arah". |
+| `GEOCODING_USER_AGENT` | `Aksesibel/1.0 (+https://aksesibel.id; contact@aksesibel.id)` | **Wajib jelas** sesuai kebijakan Nominatim. Ganti dengan kontak nyata. |
+| `GEOCODING_ENDPOINT` | `https://nominatim.openstreetmap.org/search` | Endpoint Nominatim. |
+| `GEOCODING_CACHE_HOURS` | `24` | Lama cache hasil geokoding (jam). |
+| `FACILITIES_PER_PAGE` | `9` | Jumlah fasilitas per halaman. |
+| `MAP_MAX_FEATURES` | `500` | Maksimum fitur GeoJSON per permintaan peta. |
+
+### API Lokasi & Peta
+
+| Metode | Endpoint | Keterangan |
+| --- | --- | --- |
+| GET | `/api/wilayah?level=&parent_id=` | Daftar wilayah (publik) untuk dropdown berjenjang. |
+| GET | `/api/wilayah/{id}` | Detail wilayah + rantai induk (provinsi > kota > kecamatan > kelurahan). |
+| GET | `/api/fasilitas/peta` | GeoJSON `FeatureCollection` untuk peta. Query: `bbox=minLng,minLat,maxLng,maxLat`, `q`, `category`/`category_id`, `status`/`accessibility_status`, `province_id`, `city_id`, `district_id`, `region_id`. Hanya fasilitas berkoordinat; maksimum `MAP_MAX_FEATURES` fitur (ada metadata `truncated`). |
+| POST | `/api/geocode` | Proxy geokoding ke Nominatim (admin). Body: `{ "q": "alamat" }`. |
+
+### Kebijakan OpenStreetMap & Nominatim
+
+- **Atribusi**: setiap peta menampilkan "© OpenStreetMap contributors".
+- **Tile OSM standar** hanya untuk trafik ringan. Untuk produksi berskala besar, ganti ke penyedia tile lain (mis. MapTiler, Stadia Maps) lewat `OSM_TILE_URL` beserta atributinya.
+- **Nominatim**: proxy `/api/geocode` mematuhi kebijakan penggunaan — menyertakan `User-Agent` yang jelas, membatasi **1 permintaan/detik** (per pengguna dan global), serta meng-cache hasil. Lihat <https://operations.osmfoundation.org/policies/nominatim/>.
+
+### Privasi, Performa, dan Aksesibilitas Peta
+
+- Izin lokasi hanya diminta setelah pengguna menekan tombol. **Koordinat pengguna tidak disimpan di server**; `lat`/`lng` hanya dipakai sekali untuk menghitung jarak/urutan.
+- Leaflet dan tile dimuat **dinamis (lazy)** hanya saat tampilan peta dibuka; permintaan bounding box saat peta digeser di-*debounce* dan permintaan sebelumnya dibatalkan.
+- Peta bukan satu-satunya cara mengakses data — semua informasi juga tersedia dalam daftar. Peta memiliki `aria-label` dan tautan "Lewati peta"; penanda/klaster dapat difokuskan dengan keyboard; perubahan hasil diumumkan lewat `aria-live`; kontrol peta berukuran minimal **44×44px** dan menghormati `prefers-reduced-motion`.
+- **Koordinat data contoh perlu diverifikasi** sebelum dipakai untuk keperluan resmi. Fasilitas lama tanpa koordinat tetap valid dan ditandai **"Lokasi belum ditentukan"**.
+
+### Opsi Lanjutan: PostgreSQL + PostGIS
+
+Saat ini koordinat disimpan sebagai kolom biasa dan kueri peta memakai **bounding box** + rumus **Haversine** di PHP (kompatibel dengan SQLite/MySQL). Bila jumlah fasilitas bertambah besar atau butuh kueri spasial lanjutan, pertimbangkan PostgreSQL + PostGIS:
+
+```sql
+ALTER TABLE facilities ADD COLUMN geom geometry(Point, 4326);
+UPDATE facilities
+   SET geom = ST_SetSRID(ST_MakePoint(longitude, latitude), 4326)
+ WHERE latitude IS NOT NULL AND longitude IS NOT NULL;
+CREATE INDEX facilities_geom_idx ON facilities USING GIST (geom);
+```
+
+Lalu ganti filter bounding box dengan `ST_Within`/`ST_MakeEnvelope` dan pengurutan jarak dengan `ST_Distance`/`ST_DWithin`. Langkah ini opsional.
+
+
 ## Peran Pengguna
 
 | Peran | Hak akses |
@@ -131,10 +215,22 @@ Perintah ini menghapus semua data di database **lokal**. Cek kesamaan dengan tim
 | Tabel | Isi contoh |
 |---|---|
 | `roles` | Admin, Masyarakat, Pengelola Fasilitas |
-| `facility_categories` | Taman, Fasilitas Kesehatan, Pendidikan, ... |
+| `facility_categories` | Transportasi, Taman, Rumah Sakit, Gedung Pelayanan Publik |
 | `accessibility_types` | Ramp / Jalur Kursi Roda, Toilet Difabel, Guiding Block, Parkir Difabel, Lift, Handrail |
 | `issue_categories` | Fasilitas rusak, Fasilitas tidak tersedia, Akses terhalang, ... |
 | `verification_statuses` | Menunggu Verifikasi, Terverifikasi, Ditolak, ... |
+
+`DatabaseSeeder` memanggil `MasterDataSeeder`, `RegionSeeder` (wilayah DKI Jakarta), dan `FacilitySeeder` (contoh fasilitas). Instalasi bersih tidak membuat akun pengguna; gunakan `php artisan aksesibel:create-facility-manager` atau menu pendaftaran untuk membuat akun.
+
+---
+
+## Pengujian
+
+```bash
+php artisan test
+```
+
+Pengujian mencakup seluruh modul, termasuk: validasi lokasi (lat/lng di luar rentang, hanya salah satu terisi, kode pos salah, hierarki wilayah tidak konsisten, peringatan koordinat di luar Indonesia), fungsi Haversine & pengurutan jarak, filter bounding box `/api/fasilitas/peta` termasuk pembatasan jumlah fitur, endpoint wilayah berjenjang, dan jaminan bahwa fasilitas lama tanpa koordinat tetap valid serta tampil.
 
 ---
 

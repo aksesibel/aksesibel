@@ -3,12 +3,16 @@
 use App\Http\Controllers\AccessibilityInspectionController;
 use App\Http\Controllers\AccessibilityTypeController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\FacilityAccessibilityController;
 use App\Http\Controllers\FacilityCategoryController;
+use App\Http\Controllers\FacilityController;
 use App\Http\Controllers\FollowUpAssignmentController;
 use App\Http\Controllers\FollowUpProgressController;
+use App\Http\Controllers\GeocodeController;
 use App\Http\Controllers\IssueCategoryController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\RegionController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ReportingPeriodController;
 use App\Http\Controllers\StatisticsController;
@@ -16,8 +20,27 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\VerificationController;
 use Illuminate\Support\Facades\Route;
 
-Route::view('/', 'home')->name('home');
+// ---------------------------------------------------------------
+// Halaman Publik
+// ---------------------------------------------------------------
+Route::get('/', [FacilityController::class, 'home'])->name('home');
+Route::get('/fasilitas', [FacilityController::class, 'index'])->name('facilities.index');
+Route::get('/fasilitas/{facility}', [FacilityController::class, 'show'])->name('facilities.show');
+Route::get('/kategori/{slug}', [CategoryController::class, 'show'])->name('categories.show');
 
+// ---------------------------------------------------------------
+// API — data publik (JSON)
+// ---------------------------------------------------------------
+Route::prefix('api')->name('api.')->group(function () {
+    Route::get('/wilayah', [RegionController::class, 'index'])->name('regions.index');
+    Route::get('/wilayah/{region}', [RegionController::class, 'show'])->name('regions.show');
+    Route::get('/fasilitas/peta', [FacilityController::class, 'mapData'])->name('facilities.map');
+    Route::post('/geocode', GeocodeController::class)->name('geocode');
+});
+
+// ---------------------------------------------------------------
+// Autentikasi
+// ---------------------------------------------------------------
 Route::middleware('guest')->group(function (): void {
     Route::get('/login', [AuthController::class, 'login'])->name('login');
     Route::post('/login', [AuthController::class, 'authenticate'])->middleware('throttle:login')->name('login.store');
@@ -32,6 +55,33 @@ Route::middleware(['auth', 'known-role'])->group(function (): void {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
 });
 
+// ---------------------------------------------------------------
+// Panel Admin — kelola kategori & fasilitas (termasuk lokasi/wilayah)
+// ---------------------------------------------------------------
+Route::prefix('admin')->name('admin.')->group(function () {
+
+    // Kategori
+    Route::get('/kategori', [CategoryController::class, 'adminIndex'])->name('categories.index');
+    Route::get('/kategori/baru', [CategoryController::class, 'create'])->name('categories.create');
+    Route::post('/kategori', [CategoryController::class, 'store'])->name('categories.store');
+    Route::post('/kategori/reorder', [CategoryController::class, 'reorder'])->name('categories.reorder');
+    Route::get('/kategori/{category}/ubah', [CategoryController::class, 'edit'])->name('categories.edit');
+    Route::put('/kategori/{category}', [CategoryController::class, 'update'])->name('categories.update');
+    Route::post('/kategori/{category}/toggle-aktif', [CategoryController::class, 'toggleActive'])->name('categories.toggle-active');
+    Route::delete('/kategori/{category}', [CategoryController::class, 'destroy'])->name('categories.destroy');
+
+    // Fasilitas
+    Route::get('/fasilitas', [FacilityController::class, 'adminIndex'])->name('facilities.index');
+    Route::get('/fasilitas/baru', [FacilityController::class, 'create'])->name('facilities.create');
+    Route::post('/fasilitas', [FacilityController::class, 'store'])->name('facilities.store');
+    Route::get('/fasilitas/{facility}/ubah', [FacilityController::class, 'edit'])->name('facilities.edit');
+    Route::put('/fasilitas/{facility}', [FacilityController::class, 'update'])->name('facilities.update');
+    Route::delete('/fasilitas/{facility}', [FacilityController::class, 'destroy'])->name('facilities.destroy');
+});
+
+// ---------------------------------------------------------------
+// Ruang kerja Pengelola — data pendukung
+// ---------------------------------------------------------------
 Route::prefix('pengelola')->name('manage.')->middleware(['auth', 'can:manage-supporting-data'])->group(function (): void {
     Route::get('/statistics', [StatisticsController::class, 'index'])->name('statistics');
     Route::patch('/users/{user}/status', [UserController::class, 'status'])->name('users.status');

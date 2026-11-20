@@ -27,13 +27,49 @@ class MasterDataSeeder extends Seeder
             ['status_name' => 'Selesai'],
         ]);
 
-        $this->seed('facility_categories', 'category_name', [
-            ['category_name' => 'Taman'],
-            ['category_name' => 'Fasilitas Kesehatan'],
-            ['category_name' => 'Pendidikan'],
-            ['category_name' => 'Transportasi Umum'],
-            ['category_name' => 'Perkantoran Pemerintah'],
-        ]);
+        // Kategori fasilitas — 4 kategori utama yang dapat dikelola admin
+        $categories = [
+            [
+                'category_name' => 'Transportasi',
+                'slug'          => 'transportasi',
+                'description'   => 'Stasiun, terminal, halte, bandara, dan fasilitas transportasi publik lainnya.',
+                'icon'          => 'Train',
+                'is_active'     => true,
+                'sort_order'    => 1,
+            ],
+            [
+                'category_name' => 'Taman',
+                'slug'          => 'taman',
+                'description'   => 'Taman kota, ruang terbuka hijau, dan taman bermain.',
+                'icon'          => 'Trees',
+                'is_active'     => true,
+                'sort_order'    => 2,
+            ],
+            [
+                'category_name' => 'Rumah Sakit',
+                'slug'          => 'rumah-sakit',
+                'description'   => 'Rumah sakit, puskesmas, klinik, dan fasilitas kesehatan lainnya.',
+                'icon'          => 'Hospital',
+                'is_active'     => true,
+                'sort_order'    => 3,
+            ],
+            [
+                'category_name' => 'Gedung Pelayanan Publik',
+                'slug'          => 'gedung-pelayanan-publik',
+                'description'   => 'Kantor kelurahan, kecamatan, Samsat, perpustakaan, dan kantor pelayanan publik lainnya.',
+                'icon'          => 'Landmark',
+                'is_active'     => true,
+                'sort_order'    => 4,
+            ],
+        ];
+
+        // Hanya tambahkan kategori yang belum ada; jangan menimpa
+        // perubahan yang dilakukan admin (deskripsi, status aktif, dll.).
+        foreach ($categories as $cat) {
+            if (! DB::table('facility_categories')->where('category_name', $cat['category_name'])->exists()) {
+                DB::table('facility_categories')->insert($cat);
+            }
+        }
 
         $this->seed('accessibility_types', 'type_name', [
             ['type_name' => 'Ramp / Jalur Kursi Roda'],
