@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\FacilityCategoryController;
+use App\Http\Controllers\FollowUpAssignmentController;
+use App\Http\Controllers\FollowUpProgressController;
 use App\Http\Controllers\IssueCategoryController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportController;
@@ -81,10 +83,36 @@ Route::post('/reports', [ReportController::class, 'store'])
 Route::get('/reports/{report}', [ReportController::class, 'show'])
     ->name('reports.show');
 
-Route::prefix('verifikasi')->name('verifikasi.')->group(function () {
+Route::prefix('verifikasi')->name('verifikasi.')->middleware(['auth', 'role:Admin'])->group(function (): void {
     Route::get('/antrean', [VerificationController::class, 'antrean'])
         ->name('antrean');
 
     Route::get('/riwayat', [VerificationController::class, 'riwayat'])
         ->name('riwayat');
+});
+
+/*
+|--------------------------------------------------------------------------
+| PBI-13 & PBI-14: Penugasan & Progres Tindak Lanjut
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth', 'role:Admin,Petugas Tindak Lanjut'])->group(function (): void {
+    Route::get('follow-up-assignments/ready-reports', [FollowUpAssignmentController::class, 'readyReports'])
+        ->name('follow-up-assignments.ready-reports')
+        ->middleware('role:Admin');
+
+    Route::get('follow-up-assignments/create', [FollowUpAssignmentController::class, 'create'])
+        ->name('follow-up-assignments.create')
+        ->middleware('role:Admin');
+
+    Route::post('follow-up-assignments', [FollowUpAssignmentController::class, 'store'])
+        ->name('follow-up-assignments.store')
+        ->middleware('role:Admin');
+
+    Route::resource('follow-up-assignments', FollowUpAssignmentController::class)
+        ->only(['index', 'show'])
+        ->parameter('follow-up-assignments', 'follow_up_assignment');
+
+    Route::post('follow-up-assignments/{follow_up_assignment}/progress', [FollowUpProgressController::class, 'store'])
+        ->name('follow-up-assignments.progress.store');
 });
