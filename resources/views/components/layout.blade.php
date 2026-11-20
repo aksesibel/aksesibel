@@ -1,17 +1,46 @@
+@props(['title' => 'Aksesibel', 'subtitle' => null])
+@php($workspace = auth()->user()?->can('manage-supporting-data') && (request()->routeIs('manage.*') || request()->routeIs('account')))
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="{{ $metaDesc ?? 'Platform informasi aksesibilitas fasilitas publik di Indonesia.' }}">
-    <title>{{ $title ?? 'Aksesibel' }} – Aksesibel</title>
+    <title>{{ $title }} · Aksesibel</title>
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700,800&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @stack('styles')
 </head>
-<body class="min-h-screen flex flex-col bg-[#F8FAFC] text-[#0F172A] antialiased" x-data>
+<body class="min-h-screen flex flex-col bg-[#F8FAFC] text-[#0F172A] antialiased {{ $workspace ? 'workspace' : '' }}" x-data @if($workspace) data-workspace @endif>
 
-    {{-- Header --}}
+<a href="#main-content" class="skip-link">Lewati ke konten</a>
+
+@if ($workspace)
+    {{-- Ruang kerja pengelola --}}
+    <x-workspace-navigation />
+    <button class="sidebar-backdrop" type="button" data-menu-close hidden aria-label="Tutup menu navigasi" tabindex="-1"></button>
+    <div class="workspace-content" id="workspace-content">
+        <header class="workspace-topbar">
+            <div class="topbar-location"><button class="icon-button menu-toggle" type="button" data-menu-toggle aria-controls="workspace-navigation" aria-expanded="false" aria-label="Buka navigasi"><x-icon name="menu" /></button><span>Aksesibel <span class="breadcrumb-divider">/</span> <span class="breadcrumb-current">{{ request()->routeIs('manage.statistics') ? 'Statistik' : (request()->routeIs('account') ? 'Akun saya' : 'Kelola data') }}</span></span></div>
+            <div class="topbar-account"><span class="data-label">Data aplikasi</span><a href="{{ route('account') }}" class="role-label"><x-icon name="users" :size="18" /><span>Pengelola Fasilitas</span></a><a class="account-name" href="{{ route('account') }}">{{ auth()->user()->name }}</a></div>
+        </header>
+        <main id="main-content" class="workspace-main" tabindex="-1">
+            <div class="page-heading"><div><h1>{{ $title }}</h1>@if($subtitle)<p>{{ $subtitle }}</p>@endif</div>@isset($actions)<div class="page-actions">{{ $actions }}</div>@endisset</div>
+            @if (request()->routeIs('manage.*') && ! request()->routeIs('manage.statistics'))<x-workspace-tabs />@endif
+
+            @if(session('success'))<div role="status" class="rounded-lg border border-blue-200 bg-blue-50 p-4 text-blue-900">{{ session('success') }}</div>@endif
+            @if(session('error'))<div role="alert" class="rounded-lg border border-red-300 bg-red-50 p-4 text-red-900">{{ session('error') }}</div>@endif
+            @if($errors->any())
+                <div role="alert" class="rounded-lg border border-red-300 bg-red-50 p-4 text-red-900"><h2 class="font-semibold">Periksa kembali data berikut:</h2><ul class="mt-2 list-disc pl-5">@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>
+            @endif
+
+            {{ $slot }}
+        </main>
+        <footer class="workspace-footer">Aksesibel · Ruang publik untuk semua<span>Data Pendukung dan Statistik</span></footer>
+    </div>
+@else
+    {{-- Header publik --}}
     <header class="bg-white border-b border-[#E2E8F0] sticky top-0 z-50">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-4">
             {{-- Logo --}}
@@ -29,6 +58,9 @@
                 <a href="{{ route('home') }}" class="text-sm font-medium text-[#475569] hover:text-[#1D4ED8] transition-colors {{ request()->routeIs('home') ? 'text-[#1D4ED8]' : '' }}">Beranda</a>
                 <a href="{{ route('facilities.index') }}" class="text-sm font-medium text-[#475569] hover:text-[#1D4ED8] transition-colors {{ request()->routeIs('facilities.*') ? 'text-[#1D4ED8]' : '' }}">Cari Fasilitas</a>
                 <a href="{{ route('admin.facilities.index') }}" class="text-sm font-medium text-[#475569] hover:text-[#1D4ED8] transition-colors {{ request()->routeIs('admin.*') ? 'text-[#1D4ED8]' : '' }}">Panel Admin</a>
+                @can('manage-supporting-data')
+                    <a href="{{ route('manage.statistics') }}" class="text-sm font-medium text-[#475569] hover:text-[#1D4ED8] transition-colors">Rekap &amp; Statistik</a>
+                @endcan
             </nav>
 
             {{-- Tombol aksi --}}
@@ -38,6 +70,17 @@
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
                     Tambah Fasilitas
                 </a>
+
+                @auth
+                    <a href="{{ route('account') }}" class="hidden sm:inline-flex items-center text-sm font-medium text-[#475569] hover:text-[#1D4ED8] transition-colors">{{ auth()->user()->name }}</a>
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit" class="inline-flex items-center px-3 py-2 rounded-lg border border-[#E2E8F0] bg-white text-sm font-semibold text-[#1D4ED8] hover:bg-[#EFF6FF] transition-colors min-h-[44px]">Keluar</button>
+                    </form>
+                @else
+                    <a href="{{ route('login') }}" class="hidden sm:inline-flex items-center text-sm font-medium text-[#475569] hover:text-[#1D4ED8] transition-colors">Masuk</a>
+                    <a href="{{ route('register') }}" class="inline-flex items-center px-4 py-2 rounded-lg border border-[#E2E8F0] bg-white text-sm font-semibold text-[#1D4ED8] hover:bg-[#EFF6FF] transition-colors min-h-[44px]">Daftar</a>
+                @endauth
 
                 {{-- Mobile menu toggle --}}
                 <button class="md:hidden p-2 rounded-lg text-[#475569] hover:bg-[#F1F5F9] transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
@@ -93,7 +136,13 @@
     @endif
 
     {{-- Konten utama --}}
-    <main id="main-content" class="flex-1">
+    <main id="main-content" class="flex-1 mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 space-y-6" tabindex="-1">
+        @if(session('success'))<div role="status" class="rounded-lg border border-blue-200 bg-blue-50 p-4 text-blue-900">{{ session('success') }}</div>@endif
+        @if(session('error'))<div role="alert" class="rounded-lg border border-red-300 bg-red-50 p-4 text-red-900">{{ session('error') }}</div>@endif
+        @if($errors->any())
+            <div role="alert" class="rounded-lg border border-red-300 bg-red-50 p-4 text-red-900"><h2 class="font-semibold">Periksa kembali data berikut:</h2><ul class="mt-2 list-disc pl-5">@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>
+        @endif
+
         {{ $slot }}
     </main>
 
@@ -122,6 +171,8 @@
             </div>
         </div>
     </footer>
+@endif
 
+@stack('scripts')
 </body>
 </html>

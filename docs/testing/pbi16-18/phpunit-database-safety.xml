@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\TestingDatabaseSafetyTest" file="/Users/haimac/Documents/GitHub/aksesibel/tests/Feature/TestingDatabaseSafetyTest.php" tests="6" assertions="11" errors="0" failures="0" skipped="0" time="0.279287">
+    <testcase name="test_accepts_only_the_current_verified_testing_connection" file="/Users/haimac/Documents/GitHub/aksesibel/tests/Feature/TestingDatabaseSafetyTest.php" line="12" class="Tests\Feature\TestingDatabaseSafetyTest" classname="Tests.Feature.TestingDatabaseSafetyTest" assertions="1" time="0.215791"/>
+    <testcase name="test_rejects_a_non_testing_application_before_any_reset" file="/Users/haimac/Documents/GitHub/aksesibel/tests/Feature/TestingDatabaseSafetyTest.php" line="23" class="Tests\Feature\TestingDatabaseSafetyTest" classname="Tests.Feature.TestingDatabaseSafetyTest" assertions="2" time="0.011087"/>
+    <testcase name="test_rejects_the_work_database_name_without_connecting_to_it" file="/Users/haimac/Documents/GitHub/aksesibel/tests/Feature/TestingDatabaseSafetyTest.php" line="32" class="Tests\Feature\TestingDatabaseSafetyTest" classname="Tests.Feature.TestingDatabaseSafetyTest" assertions="2" time="0.018134"/>
+    <testcase name="test_rejects_a_database_url_even_if_the_declared_database_looks_safe" file="/Users/haimac/Documents/GitHub/aksesibel/tests/Feature/TestingDatabaseSafetyTest.php" line="44" class="Tests\Feature\TestingDatabaseSafetyTest" classname="Tests.Feature.TestingDatabaseSafetyTest" assertions="2" time="0.011592"/>
+    <testcase name="test_rejects_a_file_based_sqlite_database_without_creating_the_file" file="/Users/haimac/Documents/GitHub/aksesibel/tests/Feature/TestingDatabaseSafetyTest.php" line="56" class="Tests\Feature\TestingDatabaseSafetyTest" classname="Tests.Feature.TestingDatabaseSafetyTest" assertions="2" time="0.012787"/>
+    <testcase name="test_rejects_a_different_effective_database_even_if_configuration_says_testing" file="/Users/haimac/Documents/GitHub/aksesibel/tests/Feature/TestingDatabaseSafetyTest.php" line="73" class="Tests\Feature\TestingDatabaseSafetyTest" classname="Tests.Feature.TestingDatabaseSafetyTest" assertions="2" time="0.009894"/>
+  </testsuite>
+</testsuites>

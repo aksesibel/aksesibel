@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
@@ -22,6 +24,29 @@ class FacilityCategory extends Model
         'is_active',
         'sort_order',
     ];
+
+    protected static function booted(): void
+    {
+        static::saving(function (self $category): void {
+            // Skema dapat diuji tanpa kolom slug (mis. fixture CategorySchemaTest).
+            if (! $category->getConnection()->getSchemaBuilder()->hasColumn($category->getTable(), 'slug')) {
+                return;
+            }
+
+            if (blank($category->slug)) {
+                $category->slug = self::generateSlug(
+                    (string) $category->category_name,
+                    $category->category_id
+                );
+            }
+        });
+    }
+
+    #[Scope]
+    protected function active(Builder $query): Builder
+    {
+        return $query->where('is_active', true);
+    }
 
     protected function casts(): array
     {

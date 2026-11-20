@@ -13,9 +13,11 @@ trait CreatesTestData
 {
     protected function makeCategory(array $attributes = []): FacilityCategory
     {
+        $suffix = uniqid();
+
         return FacilityCategory::create(array_merge([
-            'category_name' => 'Transportasi Umum',
-            'slug'          => 'kategori-uji-' . uniqid(),
+            'category_name' => 'Transportasi Umum ' . $suffix,
+            'slug'          => 'kategori-uji-' . $suffix,
             'icon'          => 'Bus',
             'is_active'     => true,
             'sort_order'    => 1,

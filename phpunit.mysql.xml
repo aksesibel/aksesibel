@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+         bootstrap="vendor/autoload.php"
+         colors="true"
+>
+    <testsuites>
+        <testsuite name="Unit">
+            <directory>tests/Unit</directory>
+        </testsuite>
+        <testsuite name="Feature">
+            <directory>tests/Feature</directory>
+        </testsuite>
+        <testsuite name="MysqlConcurrency">
+            <directory>tests/Concurrency</directory>
+        </testsuite>
+    </testsuites>
+    <source>
+        <include>
+            <directory>app</directory>
+        </include>
+    </source>
+    <php>
+        <env force="true" name="APP_ENV" value="testing"/>
+        <env force="true" name="APP_KEY" value="base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="/>
+        <env force="true" name="APP_CONFIG_CACHE" value="bootstrap/cache/config.pbi-testing.php"/>
+        <env name="APP_MAINTENANCE_DRIVER" value="file"/>
+        <env name="BCRYPT_ROUNDS" value="4"/>
+        <env force="true" name="BROADCAST_CONNECTION" value="null"/>
+        <env force="true" name="CACHE_STORE" value="array"/>
+        <env force="true" name="DB_CONNECTION" value="mysql"/>
+        <env force="true" name="DB_DATABASE" value="aksesibel_testing"/>
+        <env force="true" name="DB_URL" value=""/>
+        <env force="true" name="MAIL_MAILER" value="array"/>
+        <env force="true" name="QUEUE_CONNECTION" value="sync"/>
+        <env force="true" name="SESSION_DRIVER" value="array"/>
+        <env name="PULSE_ENABLED" value="false"/>
+        <env name="TELESCOPE_ENABLED" value="false"/>
+        <env name="NIGHTWATCH_ENABLED" value="false"/>
+    </php>
+</phpunit>

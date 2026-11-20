@@ -82,16 +82,39 @@
         @endif
     </section>
 
-    {{-- CTA admin --}}
+    {{-- CTA: kelola data & akun --}}
     <section class="bg-[#EFF6FF] py-12 px-4 sm:px-6" aria-labelledby="cta-heading">
         <div class="max-w-2xl mx-auto text-center">
-            <h2 id="cta-heading" class="text-xl font-bold text-[#0F172A] mb-2">Kelola Data Fasilitas</h2>
-            <p class="text-[#475569] text-sm mb-6">Tambah, perbarui, atau hapus data fasilitas publik melalui panel admin.</p>
-            <a href="{{ route('admin.facilities.index') }}"
-               class="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-[#1D4ED8] hover:bg-[#1E40AF] text-white font-semibold text-sm transition-colors min-h-[44px]">
-                Buka Panel Admin
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-            </a>
+            <h2 id="cta-heading" class="text-xl font-bold text-[#0F172A] mb-2">Bersama membangun lingkungan yang inklusif</h2>
+            <p class="text-[#475569] text-sm mb-6">Kelola data pendukung dan pantau rekap laporan aksesibilitas fasilitas publik.</p>
+            <div class="flex flex-wrap gap-3 justify-center">
+                @auth
+                    <a href="{{ route('account') }}"
+                       class="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-[#1D4ED8] hover:bg-[#1E40AF] text-white font-semibold text-sm transition-colors min-h-[44px]">
+                        Buka akun saya
+                    </a>
+                    @can('manage-supporting-data')
+                        <a href="{{ route('manage.statistics') }}"
+                           class="inline-flex items-center gap-2 px-6 py-3 rounded-lg border border-[#E2E8F0] bg-white text-[#1D4ED8] font-semibold text-sm hover:bg-[#DBEAFE] transition-colors min-h-[44px]">
+                            Rekap dan Statistik
+                        </a>
+                    @endcan
+                @else
+                    <a href="{{ route('login') }}"
+                       class="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-[#1D4ED8] hover:bg-[#1E40AF] text-white font-semibold text-sm transition-colors min-h-[44px]">
+                        Masuk ke akun
+                    </a>
+                    <a href="{{ route('register') }}"
+                       class="inline-flex items-center gap-2 px-6 py-3 rounded-lg border border-[#E2E8F0] bg-white text-[#1D4ED8] font-semibold text-sm hover:bg-[#DBEAFE] transition-colors min-h-[44px]">
+                        Daftar sebagai masyarakat
+                    </a>
+                @endauth
+                <a href="{{ route('admin.facilities.index') }}"
+                   class="inline-flex items-center gap-2 px-6 py-3 rounded-lg border border-[#E2E8F0] bg-white text-[#1D4ED8] font-semibold text-sm hover:bg-[#DBEAFE] transition-colors min-h-[44px]">
+                    Buka Panel Admin
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </a>
+            </div>
         </div>
     </section>
 
