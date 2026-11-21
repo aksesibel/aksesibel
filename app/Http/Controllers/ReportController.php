@@ -28,6 +28,14 @@ class ReportController extends Controller
         }
 
         $search = trim($request->input('search', ''));
+        $statusId = $request->input('status_id');
+        $sort = $request->input('sort', 'latest');
+
+        if (!in_array($sort, ['latest', 'oldest'], true)) {
+            $sort = 'latest';
+        }
+
+        $statuses = VerificationStatus::orderBy('status_name')->get();
 
         $reports = Report::with([
             'facility',
@@ -45,11 +53,24 @@ class ReportController extends Controller
                         });
                 });
             })
-            ->latest()
+            ->when($statusId !== null && $statusId !== '', function ($query) use ($statusId) {
+                $query->where('status_id', $statusId);
+            })
+            ->when($sort === 'oldest', function ($query) {
+                $query->orderBy('created_at', 'asc');
+            }, function ($query) {
+                $query->orderBy('created_at', 'desc');
+            })
             ->paginate(10)
-            ->appends($request->only('search'));
+            ->appends($request->only('search', 'status_id', 'sort'));
 
-        return view('reports.index', compact('reports', 'search'));
+        return view('reports.index', compact(
+            'reports',
+            'search',
+            'statuses',
+            'statusId',
+            'sort'
+        ));
     }
 
     /**

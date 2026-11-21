@@ -29,22 +29,47 @@
 <div class="content-card">
     <form action="{{ route('reports.index') }}" method="GET" class="mb-4">
         <div class="row g-2">
-            <div class="col-md-9">
+            <div class="col-md-5">
                 <input
                     type="text"
                     name="search"
                     class="form-control"
-                    placeholder="Cari nomor laporan, judul, atau nama fasilitas..."
+                    placeholder="Cari nomor, judul, atau fasilitas..."
                     value="{{ $search }}"
                 >
             </div>
 
+            <div class="col-md-4">
+                <select name="status_id" class="form-select">
+                    <option value="">Semua Status</option>
+
+                    @foreach($statuses as $status)
+                        <option value="{{ $status->status_id }}"
+                            {{ (string) $statusId === (string) $status->status_id ? 'selected' : '' }}>
+                            {{ $status->status_name }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div class="col-md-3">
+                <select name="sort" class="form-select">
+                    <option value="latest" {{ $sort === 'latest' ? 'selected' : '' }}>
+                        Terbaru
+                    </option>
+
+                    <option value="oldest" {{ $sort === 'oldest' ? 'selected' : '' }}>
+                        Terlama
+                    </option>
+                </select>
+            </div>
+
             <div class="col-md-3 d-flex gap-2">
                 <button type="submit" class="btn btn-primary flex-fill">
-                    Cari
+                    Filter
                 </button>
 
-                @if($search !== '')
+                @if($search !== '' || ($statusId !== null && $statusId !== ''))
                     <a href="{{ route('reports.index') }}"
                     class="btn btn-outline-secondary">
                         Reset
@@ -55,11 +80,10 @@
     </form>
     @if($reports->isEmpty())
         <div class="text-center py-5">
-            @if($search !== '')
+            @if($search !== '' || ($statusId !== null && $statusId !== ''))
                 <h5 class="fw-semibold">Laporan Tidak Ditemukan</h5>
                 <p class="text-muted">
-                    Tidak ada laporan yang sesuai dengan kata kunci
-                    "{{ $search }}".
+                    Tidak ada laporan yang sesuai dengan pencarian atau status yang dipilih.
                 </p>
 
                 <a href="{{ route('reports.index') }}"
