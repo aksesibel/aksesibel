@@ -58,7 +58,8 @@
 
     <form action="{{ route('reports.store') }}"
           method="POST"
-          enctype="multipart/form-data">
+          enctype="multipart/form-data"
+          id="report-form">
         @csrf
 
         <h6 class="fw-bold mb-3">Informasi Kendala</h6>
@@ -208,9 +209,14 @@
                 Batal
             </a>
             <button type="submit"
+                    id="submit-report"
                     class="btn btn-primary"
                     @disabled(!$activePeriod || $facilities->isEmpty() || $categories->isEmpty())>
-                Kirim Laporan
+                <span id="submit-text">Kirim Laporan</span>
+                <span id="submit-loading" class="d-none">
+                    <span class="spinner-border spinner-border-sm me-1" role="status"></span>
+                    Mengirim Laporan...
+                </span>
             </button>
         </div>
     </form>
@@ -228,6 +234,22 @@ document.addEventListener('DOMContentLoaded', function () {
     const evidencePreview = document.getElementById('evidence-preview');
     const evidenceCount = document.getElementById('evidence-count');
     const evidenceError = document.getElementById('evidence-error');
+
+    // Loading state saat laporan dikirim.
+    const reportForm = document.getElementById('report-form');
+    const submitButton = document.getElementById('submit-report');
+    const submitText = document.getElementById('submit-text');
+    const submitLoading = document.getElementById('submit-loading');
+
+    reportForm.addEventListener('submit', function () {
+        if (!reportForm.checkValidity()) {
+            return;
+        }
+
+        submitButton.disabled = true;
+        submitText.classList.add('d-none');
+        submitLoading.classList.remove('d-none');
+    });
 
     // Counter karakter deskripsi laporan.
     const descriptionInput = document.getElementById('description');
