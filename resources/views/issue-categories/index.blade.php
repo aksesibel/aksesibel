@@ -51,7 +51,7 @@
             class="mb-4">
 
             <div class="row g-2">
-                <div class="col-md-9">
+                <div class="col-md-6">
                     <input
                         type="text"
                         name="search"
@@ -61,12 +61,28 @@
                     >
                 </div>
 
+                <div class="col-md-3">
+                    <select name="status" class="form-select">
+                        <option value="" {{ $status === '' ? 'selected' : '' }}>
+                            Semua Status
+                        </option>
+
+                        <option value="active" {{ $status === 'active' ? 'selected' : '' }}>
+                            Aktif
+                        </option>
+
+                        <option value="inactive" {{ $status === 'inactive' ? 'selected' : '' }}>
+                            Nonaktif
+                        </option>
+                    </select>
+                </div>
+
                 <div class="col-md-3 d-flex gap-2">
                     <button type="submit" class="btn btn-primary flex-fill">
-                        Cari
+                        Filter
                     </button>
 
-                    @if($search !== '')
+                    @if($search !== '' || $status !== '')
                         <a href="{{ route('issue-categories.index') }}"
                         class="btn btn-outline-secondary">
                             Reset
