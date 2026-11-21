@@ -122,8 +122,21 @@
                             <td>{{ $report->facility->name ?? '-' }}</td>
                             <td>{{ $report->issueCategory->category_name ?? '-' }}</td>
                             <td>
-                                <span class="badge bg-warning text-dark">
-                                    {{ $report->status->status_name ?? '-' }}
+                                @php
+                                    $statusName = $report->status->status_name ?? '-';
+
+                                    $statusClass = match ($statusName) {
+                                        'Menunggu Verifikasi' => 'bg-warning text-dark',
+                                        'Terverifikasi' => 'bg-success',
+                                        'Ditolak' => 'bg-danger',
+                                        'Dalam Tindak Lanjut' => 'bg-info text-dark',
+                                        'Selesai' => 'bg-primary',
+                                        default => 'bg-secondary',
+                                    };
+                                @endphp
+
+                                <span class="badge {{ $statusClass }}">
+                                    {{ $statusName }}
                                 </span>
                             </td>
                             <td>
