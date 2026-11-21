@@ -174,6 +174,10 @@
 
             <!-- Preview foto yang dipilih -->
             <div id="evidence-preview" class="row g-3 mt-2"></div>
+
+            <div id="evidence-count" class="form-text mt-2">
+                0 dari 5 foto dipilih
+            </div>
         </div>
 
         <hr class="my-4">
@@ -214,6 +218,7 @@ document.addEventListener('DOMContentLoaded', function () {
         // Preview foto bukti laporan sebelum diunggah.
     const evidenceInput = document.getElementById('evidences');
     const evidencePreview = document.getElementById('evidence-preview');
+    const evidenceCount = document.getElementById('evidence-count');
 
     let previewUrls = [];
 
@@ -227,6 +232,7 @@ document.addEventListener('DOMContentLoaded', function () {
         evidencePreview.innerHTML = '';
 
         const files = Array.from(this.files);
+        evidenceCount.textContent = files.length + ' dari 5 foto dipilih';
 
         files.forEach(function (file) {
             const previewUrl = URL.createObjectURL(file);
