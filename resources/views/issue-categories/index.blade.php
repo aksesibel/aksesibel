@@ -46,6 +46,36 @@
             </div>
         </div>
 
+        <form action="{{ route('issue-categories.index') }}"
+            method="GET"
+            class="mb-4">
+
+            <div class="row g-2">
+                <div class="col-md-9">
+                    <input
+                        type="text"
+                        name="search"
+                        class="form-control"
+                        placeholder="Cari nama kategori kendala..."
+                        value="{{ $search }}"
+                    >
+                </div>
+
+                <div class="col-md-3 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary flex-fill">
+                        Cari
+                    </button>
+
+                    @if($search !== '')
+                        <a href="{{ route('issue-categories.index') }}"
+                        class="btn btn-outline-secondary">
+                            Reset
+                        </a>
+                    @endif
+                </div>
+            </div>
+        </form>
+
         <div class="table-responsive">
             <table class="table align-middle">
                 <thead class="table-light">
