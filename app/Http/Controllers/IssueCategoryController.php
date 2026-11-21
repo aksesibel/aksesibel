@@ -11,13 +11,21 @@ class IssueCategoryController extends Controller
     /**
      * Menampilkan seluruh kategori kendala.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $categories = IssueCategory::orderBy(
-            'category_name'
-        )->paginate(10);
+        $search = trim($request->input('search', ''));
 
-        return view('issue-categories.index', compact('categories'));
+        $categories = IssueCategory::when($search !== '', function ($query) use ($search) {
+            $query->where('category_name', 'like', "%{$search}%");
+        })
+            ->orderBy('category_name')
+            ->paginate(10)
+            ->appends($request->only('search'));
+
+        return view('issue-categories.index', compact(
+            'categories',
+            'search'
+        ));
     }
 
     /**
