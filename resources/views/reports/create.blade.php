@@ -146,11 +146,18 @@
         <div class="mb-3">
             <label class="form-label fw-semibold">Deskripsi Kendala *</label>
             <textarea name="description"
-                      class="form-control"
-                      rows="5"
-                      maxlength="5000"
-                      placeholder="Jelaskan kendala yang ditemukan secara terperinci..."
-                      required>{{ old('description') }}</textarea>
+                    id="description"
+                    class="form-control"
+                    rows="5"
+                    maxlength="5000"
+                    placeholder="Jelaskan kendala yang ditemukan secara terperinci..."
+                    required>{{ old('description') }}</textarea>
+
+            <div class="d-flex justify-content-end mt-1">
+                <small id="description-count" class="text-muted">
+                    0/5000 karakter
+                </small>
+            </div>
         </div>
 
         <hr class="my-4">
@@ -219,6 +226,31 @@ document.addEventListener('DOMContentLoaded', function () {
     const evidenceInput = document.getElementById('evidences');
     const evidencePreview = document.getElementById('evidence-preview');
     const evidenceCount = document.getElementById('evidence-count');
+
+    // Counter karakter deskripsi laporan.
+    const descriptionInput = document.getElementById('description');
+    const descriptionCount = document.getElementById('description-count');
+
+    function updateDescriptionCount() {
+        const currentLength = descriptionInput.value.length;
+
+        descriptionCount.textContent =
+            currentLength + '/5000 karakter';
+
+        if (currentLength >= 5000) {
+            descriptionCount.classList.add('text-danger');
+            descriptionCount.classList.remove('text-muted');
+        } else {
+            descriptionCount.classList.remove('text-danger');
+            descriptionCount.classList.add('text-muted');
+        }
+    }
+
+    // Perbarui counter ketika pengguna mengetik.
+    descriptionInput.addEventListener('input', updateDescriptionCount);
+
+    // Tampilkan jumlah karakter awal, termasuk old input.
+    updateDescriptionCount();
 
     let previewUrls = [];
 
