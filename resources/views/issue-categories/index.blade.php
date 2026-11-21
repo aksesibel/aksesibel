@@ -139,8 +139,25 @@
                     @empty
                         <tr>
                             <td colspan="5" class="text-center py-5 text-muted">
-                                Belum ada kategori kendala.
-                                Silakan tambahkan kategori baru.
+                                @if($search !== '')
+                                    <div class="fw-semibold mb-1">
+                                        Kategori tidak ditemukan.
+                                    </div>
+                                    <div>
+                                        Tidak ada kategori dengan nama "{{ $search }}".
+                                    </div>
+                                    <a href="{{ route('issue-categories.index') }}"
+                                    class="btn btn-sm btn-outline-primary mt-3">
+                                        Reset Pencarian
+                                    </a>
+                                @else
+                                    <div class="fw-semibold mb-1">
+                                        Belum ada kategori kendala.
+                                    </div>
+                                    <div>
+                                        Silakan tambahkan kategori baru.
+                                    </div>
+                                @endif
                             </td>
                         </tr>
                     @endforelse
