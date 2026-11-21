@@ -185,6 +185,7 @@
             <div id="evidence-count" class="form-text mt-2">
                 0 dari 5 foto dipilih
             </div>
+            <div id="evidence-error" class="text-danger small mt-2"></div>
         </div>
 
         <hr class="my-4">
@@ -226,6 +227,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const evidenceInput = document.getElementById('evidences');
     const evidencePreview = document.getElementById('evidence-preview');
     const evidenceCount = document.getElementById('evidence-count');
+    const evidenceError = document.getElementById('evidence-error');
 
     // Counter karakter deskripsi laporan.
     const descriptionInput = document.getElementById('description');
@@ -254,18 +256,63 @@ document.addEventListener('DOMContentLoaded', function () {
 
     let previewUrls = [];
 
-    evidenceInput.addEventListener('change', function () {
-        // Hapus preview sebelumnya.
+   evidenceInput.addEventListener('change', function () {
+        // Bersihkan preview sebelumnya.
         previewUrls.forEach(function (url) {
             URL.revokeObjectURL(url);
         });
 
         previewUrls = [];
         evidencePreview.innerHTML = '';
+        evidenceError.innerHTML = '';
 
         const files = Array.from(this.files);
+
+        // Perbarui counter jumlah foto.
         evidenceCount.textContent = files.length + ' dari 5 foto dipilih';
 
+        const allowedTypes = [
+            'image/jpeg',
+            'image/png',
+            'image/webp'
+        ];
+
+        const maxSize = 2 * 1024 * 1024;
+        const errors = [];
+
+        if (files.length > 5) {
+            errors.push('Maksimal hanya 5 foto yang dapat diunggah.');
+        }
+
+        files.forEach(function (file) {
+            if (!allowedTypes.includes(file.type)) {
+                errors.push(file.name + ': Format file tidak didukung.');
+            }
+
+            if (file.size > maxSize) {
+                errors.push(file.name + ': Ukuran file melebihi 2 MB.');
+            }
+        });
+
+        // Tampilkan pesan jika terdapat kesalahan.
+        if (errors.length > 0) {
+            evidenceError.innerHTML = errors
+                .map(function (message) {
+                    const item = document.createElement('div');
+                    item.textContent = message;
+                    return item;
+                })
+                .map(function (item) {
+                    return item.outerHTML;
+                })
+                .join('');
+
+            this.value = '';
+            evidenceCount.textContent = '0 dari 5 foto dipilih';
+            return;
+        }
+
+        // Tampilkan preview foto jika semua valid.
         files.forEach(function (file) {
             const previewUrl = URL.createObjectURL(file);
             previewUrls.push(previewUrl);
