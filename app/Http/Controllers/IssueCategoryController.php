@@ -14,17 +14,38 @@ class IssueCategoryController extends Controller
     public function index(Request $request)
     {
         $search = trim($request->input('search', ''));
+        $status = $request->input('status', '');
 
-        $categories = IssueCategory::when($search !== '', function ($query) use ($search) {
-            $query->where('category_name', 'like', "%{$search}%");
-        })
+        // Validasi pilihan filter status.
+        if (!in_array($status, ['active', 'inactive', ''], true)) {
+            $status = '';
+        }
+
+        $categories = IssueCategory::query()
+            ->when($search !== '', function ($query) use ($search) {
+                $query->where(
+                    'category_name',
+                    'like',
+                    "%{$search}%"
+                );
+            })
+            ->when($status === 'active', function ($query) {
+                $query->where('is_active', true);
+            })
+            ->when($status === 'inactive', function ($query) {
+                $query->where('is_active', false);
+            })
             ->orderBy('category_name')
             ->paginate(10)
-            ->appends($request->only('search'));
+            ->appends([
+                'search' => $search,
+                'status' => $status,
+            ]);
 
         return view('issue-categories.index', compact(
             'categories',
-            'search'
+            'search',
+            'status'
         ));
     }
 
