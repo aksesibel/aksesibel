@@ -19,13 +19,15 @@ class ReportController extends Controller
     /**
      * Menampilkan daftar laporan milik pengguna yang login.
      */
-    public function index()
+    public function index(Request $request)
     {
         if (!auth()->check()) {
             return redirect()
                 ->route('reports.create')
                 ->with('info', 'Silakan login untuk melihat laporan Anda.');
         }
+
+        $search = trim($request->input('search', ''));
 
         $reports = Report::with([
             'facility',
@@ -34,10 +36,20 @@ class ReportController extends Controller
             'evidences',
         ])
             ->where('user_id', auth()->id())
+            ->when($search !== '', function ($query) use ($search) {
+                $query->where(function ($subQuery) use ($search) {
+                    $subQuery->where('report_number', 'like', "%{$search}%")
+                        ->orWhere('report_title', 'like', "%{$search}%")
+                        ->orWhereHas('facility', function ($facilityQuery) use ($search) {
+                            $facilityQuery->where('name', 'like', "%{$search}%");
+                        });
+                });
+            })
             ->latest()
-            ->paginate(10);
+            ->paginate(10)
+            ->appends($request->only('search'));
 
-        return view('reports.index', compact('reports'));
+        return view('reports.index', compact('reports', 'search'));
     }
 
     /**
