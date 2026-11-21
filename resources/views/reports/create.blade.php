@@ -159,15 +159,21 @@
 
         <div class="mb-3">
             <label class="form-label fw-semibold">Unggah Foto</label>
+
             <input type="file"
-                   name="evidences[]"
-                   class="form-control"
-                   accept=".jpg,.jpeg,.png,.webp"
-                   multiple>
+                name="evidences[]"
+                id="evidences"
+                class="form-control"
+                accept=".jpg,.jpeg,.png,.webp"
+                multiple>
+
             <div class="form-text">
                 Maksimal 5 foto, format JPG, JPEG, PNG, atau WEBP.
                 Maksimal 2 MB per foto.
             </div>
+
+            <!-- Preview foto yang dipilih -->
+            <div id="evidence-preview" class="row g-3 mt-2"></div>
         </div>
 
         <hr class="my-4">
@@ -205,6 +211,55 @@
 document.addEventListener('DOMContentLoaded', function () {
     const facilitySelect = document.getElementById('facility_id');
     const accessibilitySelect = document.getElementById('facility_accessibility_id');
+        // Preview foto bukti laporan sebelum diunggah.
+    const evidenceInput = document.getElementById('evidences');
+    const evidencePreview = document.getElementById('evidence-preview');
+
+    let previewUrls = [];
+
+    evidenceInput.addEventListener('change', function () {
+        // Hapus preview sebelumnya.
+        previewUrls.forEach(function (url) {
+            URL.revokeObjectURL(url);
+        });
+
+        previewUrls = [];
+        evidencePreview.innerHTML = '';
+
+        const files = Array.from(this.files);
+
+        files.forEach(function (file) {
+            const previewUrl = URL.createObjectURL(file);
+            previewUrls.push(previewUrl);
+
+            const column = document.createElement('div');
+            column.className = 'col-6 col-md-4 col-lg-3';
+
+            const card = document.createElement('div');
+            card.className = 'card h-100';
+
+            const image = document.createElement('img');
+            image.src = previewUrl;
+            image.alt = 'Preview ' + file.name;
+            image.className = 'card-img-top';
+            image.style.height = '150px';
+            image.style.objectFit = 'cover';
+
+            const cardBody = document.createElement('div');
+            cardBody.className = 'card-body p-2';
+
+            const fileName = document.createElement('p');
+            fileName.className = 'small text-muted mb-0 text-break';
+            fileName.textContent = file.name;
+
+            cardBody.appendChild(fileName);
+            card.appendChild(image);
+            card.appendChild(cardBody);
+            column.appendChild(card);
+
+            evidencePreview.appendChild(column);
+        });
+    });
 
     const oldAccessibilityId = @json(old('facility_accessibility_id'));
 
