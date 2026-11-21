@@ -36,6 +36,64 @@
         </div>
     @endif
 
+    <div class="row g-3 mb-4">
+
+        {{-- Total Kategori --}}
+        <div class="col-md-4">
+            <div class="content-card h-100">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="text-muted mb-1">Total Kategori</p>
+                        <h3 class="fw-bold mb-0">
+                            {{ $totalCategories }}
+                        </h3>
+                    </div>
+
+                    <div class="rounded-3 bg-primary bg-opacity-10 p-3">
+                        <i class="bi bi-list-ul text-primary fs-4"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{-- Kategori Aktif --}}
+        <div class="col-md-4">
+            <div class="content-card h-100">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="text-muted mb-1">Kategori Aktif</p>
+                        <h3 class="fw-bold text-success mb-0">
+                            {{ $activeCategories }}
+                        </h3>
+                    </div>
+
+                    <div class="rounded-3 bg-success bg-opacity-10 p-3">
+                        <i class="bi bi-check-circle text-success fs-4"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{-- Kategori Nonaktif --}}
+        <div class="col-md-4">
+            <div class="content-card h-100">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="text-muted mb-1">Kategori Nonaktif</p>
+                        <h3 class="fw-bold text-secondary mb-0">
+                            {{ $inactiveCategories }}
+                        </h3>
+                    </div>
+
+                    <div class="rounded-3 bg-secondary bg-opacity-10 p-3">
+                        <i class="bi bi-pause-circle text-secondary fs-4"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
     <div class="content-card">
         <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
             <div>
