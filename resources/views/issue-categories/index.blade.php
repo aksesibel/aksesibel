@@ -139,8 +139,12 @@
                                     </a>
 
                                     <form action="{{ route('issue-categories.toggle-status', $category->issue_category_id) }}"
-                                          method="POST"
-                                          onsubmit="return confirm('Apakah kamu yakin ingin mengubah status kategori ini?')">
+                                            method="POST"
+                                            onsubmit="return confirm(@js(
+                                                'Apakah Anda yakin ingin ' .
+                                                ($category->is_active ? 'menonaktifkan' : 'mengaktifkan') .
+                                                ' kategori ' . $category->category_name . '?'
+                                            ))">
                                         @csrf
                                         @method('PATCH')
 
