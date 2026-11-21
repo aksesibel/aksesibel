@@ -21,6 +21,18 @@ class IssueCategoryController extends Controller
             $status = '';
         }
 
+        $totalCategories = IssueCategory::count();
+
+        $activeCategories = IssueCategory::where(
+            'is_active',
+            true
+        )->count();
+
+        $inactiveCategories = IssueCategory::where(
+            'is_active',
+            false
+        )->count();
+
         $categories = IssueCategory::query()
             ->when($search !== '', function ($query) use ($search) {
                 $query->where(
@@ -45,7 +57,10 @@ class IssueCategoryController extends Controller
         return view('issue-categories.index', compact(
             'categories',
             'search',
-            'status'
+            'status',
+            'totalCategories',
+            'activeCategories',
+            'inactiveCategories'
         ));
     }
 
