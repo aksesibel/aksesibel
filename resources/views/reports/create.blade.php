@@ -236,13 +236,19 @@ document.addEventListener('DOMContentLoaded', function () {
     const evidenceError = document.getElementById('evidence-error');
 
     // Loading state saat laporan dikirim.
+    // Konfirmasi sebelum laporan dikirim dan tampilkan loading state.
     const reportForm = document.getElementById('report-form');
     const submitButton = document.getElementById('submit-report');
     const submitText = document.getElementById('submit-text');
     const submitLoading = document.getElementById('submit-loading');
 
-    reportForm.addEventListener('submit', function () {
-        if (!reportForm.checkValidity()) {
+    reportForm.addEventListener('submit', function (event) {
+        const confirmed = window.confirm(
+            'Apakah Anda yakin ingin mengirim laporan ini? Pastikan informasi dan bukti foto sudah benar.'
+        );
+
+        if (!confirmed) {
+            event.preventDefault();
             return;
         }
 
@@ -250,7 +256,6 @@ document.addEventListener('DOMContentLoaded', function () {
         submitText.classList.add('d-none');
         submitLoading.classList.remove('d-none');
     });
-
     // Counter karakter deskripsi laporan.
     const descriptionInput = document.getElementById('description');
     const descriptionCount = document.getElementById('description-count');
