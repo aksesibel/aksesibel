@@ -81,23 +81,38 @@
     @if($reports->isEmpty())
         <div class="text-center py-5">
             @if($search !== '' || ($statusId !== null && $statusId !== ''))
+                <div class="mb-3">
+                    <i class="bi bi-search text-muted" style="font-size: 3rem;"></i>
+                </div>
+
                 <h5 class="fw-semibold">Laporan Tidak Ditemukan</h5>
-                <p class="text-muted">
-                    Tidak ada laporan yang sesuai dengan pencarian atau status yang dipilih.
+
+                <p class="text-muted mb-3">
+                    Tidak ada laporan yang sesuai dengan kata kunci
+                    atau status yang dipilih.
+                    Coba gunakan kata kunci atau filter lainnya.
                 </p>
 
                 <a href="{{ route('reports.index') }}"
                 class="btn btn-outline-primary">
-                    Tampilkan Semua Laporan
+                    Reset Pencarian dan Filter
                 </a>
             @else
+                <div class="mb-3">
+                    <i class="bi bi-clipboard-x text-muted"
+                    style="font-size: 3rem;"></i>
+                </div>
+
                 <h5 class="fw-semibold">Belum Ada Laporan</h5>
-                <p class="text-muted">
-                    Anda belum memiliki laporan kendala.
+
+                <p class="text-muted mb-3">
+                    Anda belum memiliki laporan kendala fasilitas publik.
+                    Silakan buat laporan jika menemukan kendala.
                 </p>
 
-                <a href="{{ route('reports.create') }}" class="btn btn-primary">
-                    Buat Laporan Pertama
+                <a href="{{ route('reports.create') }}"
+                class="btn btn-primary">
+                    + Buat Laporan Pertama
                 </a>
             @endif
         </div>
