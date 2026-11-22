@@ -21,6 +21,10 @@ class FollowUpAssignmentController extends Controller
     public function index(Request $request)
     {
         $user = $request->user();
+        if ($user && $user->account_status !== 'active') {
+            abort(403, 'Akun Anda tidak aktif atau dinonaktifkan.');
+        }
+
         $roleName = $user->role?->role_name;
 
         $query = FollowUpAssignment::with(['report.facility', 'assignee', 'assigner']);
@@ -42,6 +46,11 @@ class FollowUpAssignmentController extends Controller
      */
     public function readyReports(Request $request)
     {
+        $user = $request->user();
+        if ($user && $user->account_status !== 'active') {
+            abort(403, 'Akun Anda tidak aktif atau dinonaktifkan.');
+        }
+
         $statusDalamTindakLanjut = VerificationStatus::where('status_name', 'Dalam Tindak Lanjut')->first();
 
         // Statistik aktual
@@ -58,7 +67,19 @@ class FollowUpAssignmentController extends Controller
             }, function ($q) {
                 $q->whereRaw('1 = 0');
             })
-            ->with(['facility.category', 'issueCategory', 'status', 'verifications.verifier'])
+            ->with([
+                'facility.category',
+                'issueCategory',
+                'status',
+                'verifications' => function ($q) {
+                    $q->with('verifier')
+                        ->orderByRaw('CASE WHEN verified_at IS NOT NULL THEN 0 ELSE 1 END')
+                        ->orderByDesc('verified_at')
+                        ->orderByDesc('verification_id');
+                },
+                'user',
+                'evidences',
+            ])
             ->orderByDesc('report_id');
 
         if ($search = trim((string) $request->query('search'))) {
@@ -98,6 +119,11 @@ class FollowUpAssignmentController extends Controller
      */
     public function create(Request $request)
     {
+        $user = $request->user();
+        if ($user && $user->account_status !== 'active') {
+            abort(403, 'Akun Anda tidak aktif atau dinonaktifkan.');
+        }
+
         $statusDalamTindakLanjut = VerificationStatus::where('status_name', 'Dalam Tindak Lanjut')->first();
 
         $reports = collect();
@@ -151,6 +177,10 @@ class FollowUpAssignmentController extends Controller
     public function show(Request $request, FollowUpAssignment $follow_up_assignment)
     {
         $user = $request->user();
+        if ($user && $user->account_status !== 'active') {
+            abort(403, 'Akun Anda tidak aktif atau dinonaktifkan.');
+        }
+
         $roleName = $user->role?->role_name;
 
         // Petugas Tindak Lanjut hanya boleh lihat miliknya

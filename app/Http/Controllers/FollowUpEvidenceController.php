@@ -7,6 +7,7 @@ use App\Models\FollowUpAssignment;
 use App\Models\FollowUpEvidence;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -31,6 +32,12 @@ class FollowUpEvidenceController extends Controller
                     $directory = "evidence/{$follow_up_assignment->assignment_id}/{$progressId}";
 
                     $path = $photo->storeAs($directory, $systemName, 'local');
+
+                    // Pastikan storeAs() berhasil sebelum membuat record database
+                    if ($path === false || ! $path) {
+                        throw new \RuntimeException("Gagal menyimpan file {$systemName} ke penyimpanan lokal.");
+                    }
+
                     $storedPaths[] = $path;
 
                     FollowUpEvidence::create([
@@ -43,15 +50,59 @@ class FollowUpEvidenceController extends Controller
                 }
             });
         } catch (\Throwable $e) {
-            // Rollback: hapus file yang sudah tersimpan
+            // 1. Catat log kegagalan awal terlebih dahulu sebelum proses pembersihan
+            Log::error('Gagal mengunggah bukti tindak lanjut', [
+                'assignment_id' => $follow_up_assignment->assignment_id,
+                'progress_id'   => $progressId,
+                'user_id'       => $request->user()?->id,
+                'error_message' => $e->getMessage(),
+                'exception'     => $e,
+            ]);
+
+            // 2. Tangani pembersihan setiap file secara terpisah agar kegagalan satu file tidak menghentikan yang lain
+            $failedCleanupPaths = [];
+            $cleanedPaths = [];
+
             foreach ($storedPaths as $path) {
-                Storage::disk('local')->delete($path);
+                if (! $path) {
+                    continue;
+                }
+
+                try {
+                    $disk = Storage::disk('local');
+                    if ($disk->exists($path)) {
+                        $deleted = $disk->delete($path);
+                        if ($deleted) {
+                            $cleanedPaths[] = $path;
+                        } else {
+                            $failedCleanupPaths[] = [
+                                'path'   => $path,
+                                'reason' => 'Storage delete returned false',
+                            ];
+                        }
+                    }
+                } catch (\Throwable $cleanupException) {
+                    $failedCleanupPaths[] = [
+                        'path'   => $path,
+                        'reason' => $cleanupException->getMessage(),
+                    ];
+                }
+            }
+
+            // 3. Catat path yang gagal dibersihkan untuk penelusuran developer
+            if (! empty($failedCleanupPaths)) {
+                Log::warning('Pembersihan file bukti tindak lanjut sebagian atau seluruhnya gagal', [
+                    'assignment_id'        => $follow_up_assignment->assignment_id,
+                    'progress_id'          => $progressId,
+                    'failed_cleanup_paths' => $failedCleanupPaths,
+                    'cleaned_paths'        => $cleanedPaths,
+                ]);
             }
 
             return redirect()
                 ->back()
                 ->withInput()
-                ->with('error', 'Gagal mengunggah bukti. Silakan coba lagi.');
+                ->with('error', 'Gagal mengunggah bukti foto. Silakan coba beberapa saat lagi.');
         }
 
         return redirect()
@@ -67,6 +118,10 @@ class FollowUpEvidenceController extends Controller
         $user = $request->user();
         if (! $user) {
             abort(401);
+        }
+
+        if ($user->account_status !== 'active') {
+            abort(403, 'Akun Anda tidak aktif atau dinonaktifkan.');
         }
 
         $user->loadMissing('role');

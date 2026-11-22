@@ -15,6 +15,7 @@ use App\Models\User;
 use App\Models\VerificationStatus;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
@@ -372,5 +373,223 @@ class FollowUpEvidenceTest extends TestCase
         foreach ($evidences as $e) {
             Storage::disk('local')->assertExists($e->file_path);
         }
+    }
+
+    /** @test */
+    public function test_inactive_user_cannot_upload_evidence()
+    {
+        $data = $this->createAssignmentWithProgress();
+        $data['user']->update(['account_status' => 'inactive']);
+
+        $response = $this->actingAs($data['user'])->post(
+            route('follow-up-assignments.evidence.store', $data['assignment']->assignment_id),
+            [
+                'progress_id' => $data['progress']->progress_id,
+                'photos'      => [
+                    UploadedFile::fake()->create('foto1.jpg', 500, 'image/jpeg'),
+                ],
+            ]
+        );
+
+        $response->assertForbidden();
+        $this->assertDatabaseCount('follow_up_evidences', 0);
+    }
+
+    /** @test */
+    public function test_authorized_officer_can_view_evidence()
+    {
+        $data = $this->createAssignmentWithProgress();
+
+        $path = "evidence/{$data['assignment']->assignment_id}/{$data['progress']->progress_id}/test.jpg";
+        Storage::disk('local')->put($path, 'dummy image content');
+
+        $evidence = FollowUpEvidence::create([
+            'progress_id'  => $data['progress']->progress_id,
+            'file_path'    => $path,
+            'file_type'    => 'image/jpeg',
+            'uploaded_at'  => now(),
+            'description'  => 'Foto bukti lapangan',
+        ]);
+
+        $response = $this->actingAs($data['user'])->get(
+            route('evidence.show', $evidence->follow_up_evidence_id)
+        );
+
+        $response->assertOk();
+    }
+
+    /** @test */
+    public function test_unrelated_officer_cannot_view_evidence()
+    {
+        $data = $this->createAssignmentWithProgress();
+
+        $path = "evidence/{$data['assignment']->assignment_id}/{$data['progress']->progress_id}/test.jpg";
+        Storage::disk('local')->put($path, 'dummy image content');
+
+        $evidence = FollowUpEvidence::create([
+            'progress_id'  => $data['progress']->progress_id,
+            'file_path'    => $path,
+            'file_type'    => 'image/jpeg',
+            'uploaded_at'  => now(),
+        ]);
+
+        $otherRole = Role::where('role_name', 'Petugas Tindak Lanjut')->firstOrFail();
+        $otherOfficer = User::factory()->create([
+            'role_id'        => $otherRole->role_id,
+            'account_status' => 'active',
+        ]);
+
+        $response = $this->actingAs($otherOfficer)->get(
+            route('evidence.show', $evidence->follow_up_evidence_id)
+        );
+
+        $response->assertForbidden();
+    }
+
+    /** @test */
+    public function test_inactive_user_cannot_view_evidence()
+    {
+        $data = $this->createAssignmentWithProgress();
+
+        $path = "evidence/{$data['assignment']->assignment_id}/{$data['progress']->progress_id}/test.jpg";
+        Storage::disk('local')->put($path, 'dummy image content');
+
+        $evidence = FollowUpEvidence::create([
+            'progress_id'  => $data['progress']->progress_id,
+            'file_path'    => $path,
+            'file_type'    => 'image/jpeg',
+            'uploaded_at'  => now(),
+        ]);
+
+        $data['user']->update(['account_status' => 'inactive']);
+
+        $response = $this->actingAs($data['user'])->get(
+            route('evidence.show', $evidence->follow_up_evidence_id)
+        );
+
+        $response->assertForbidden();
+    }
+
+    /** @test */
+    public function test_view_evidence_returns_404_when_file_not_found()
+    {
+        $data = $this->createAssignmentWithProgress();
+
+        $evidence = FollowUpEvidence::create([
+            'progress_id'  => $data['progress']->progress_id,
+            'file_path'    => "evidence/{$data['assignment']->assignment_id}/{$data['progress']->progress_id}/missing.jpg",
+            'file_type'    => 'image/jpeg',
+            'uploaded_at'  => now(),
+        ]);
+
+        $response = $this->actingAs($data['user'])->get(
+            route('evidence.show', $evidence->follow_up_evidence_id)
+        );
+
+        $response->assertNotFound();
+    }
+
+    /** @test */
+    public function test_failed_storage_rolls_back_database_and_cleans_files()
+    {
+        $data = $this->createAssignmentWithProgress();
+
+        // Buat file JPEG valid minimal (1x1 px), lalu override storeAs agar mengembalikan false
+        $tempPath = tempnam(sys_get_temp_dir(), 'test_fail');
+        file_put_contents($tempPath, base64_decode('/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAP//////////////////////////////////////////////////////////////////////////////////////wgALCAABAAEBAREA/8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQABPxA='));
+        
+        $failingFile = new class($tempPath, 'gagal.jpg', 'image/jpeg', null, true) extends UploadedFile {
+            public function storeAs($path, $name = null, $options = [])
+            {
+                return false; // Mensimulasikan kegagalan disk / storeAs
+            }
+        };
+
+        $response = $this->actingAs($data['user'])->post(
+            route('follow-up-assignments.evidence.store', $data['assignment']->assignment_id),
+            [
+                'progress_id' => $data['progress']->progress_id,
+                'photos'      => [$failingFile],
+            ]
+        );
+
+        $response->assertRedirect();
+        $response->assertSessionHas('error');
+        $response->assertSessionMissing('success');
+        $this->assertDatabaseCount('follow_up_evidences', 0);
+    }
+
+    /** @test */
+    public function test_first_photo_cleaned_up_when_second_photo_fails_storage()
+    {
+        $data = $this->createAssignmentWithProgress();
+
+        $photo1 = UploadedFile::fake()->create('foto1.jpg', 100, 'image/jpeg');
+
+        $tempPath = tempnam(sys_get_temp_dir(), 'test_fail2');
+        file_put_contents($tempPath, base64_decode('/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAP//////////////////////////////////////////////////////////////////////////////////////wgALCAABAAEBAREA/8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQABPxA='));
+
+        $failingFile = new class($tempPath, 'gagal2.jpg', 'image/jpeg', null, true) extends UploadedFile {
+            public function storeAs($path, $name = null, $options = [])
+            {
+                return false;
+            }
+        };
+
+        $response = $this->actingAs($data['user'])->post(
+            route('follow-up-assignments.evidence.store', $data['assignment']->assignment_id),
+            [
+                'progress_id' => $data['progress']->progress_id,
+                'photos'      => [$photo1, $failingFile],
+            ]
+        );
+
+        $response->assertRedirect();
+        $response->assertSessionHas('error');
+        $response->assertSessionMissing('success');
+        $this->assertDatabaseCount('follow_up_evidences', 0);
+
+        // Pastikan tidak ada file yang tertinggal di folder evidence penugasan
+        $files = Storage::disk('local')->allFiles("evidence/{$data['assignment']->assignment_id}");
+        $this->assertEmpty($files);
+    }
+
+    /** @test */
+    public function test_cleanup_exception_does_not_cause_500_and_logs_warning()
+    {
+        $data = $this->createAssignmentWithProgress();
+
+        Log::spy();
+
+        $diskMock = \Mockery::mock(Storage::disk('local'))->makePartial();
+        $diskMock->shouldReceive('delete')->andThrow(new \RuntimeException('Disk I/O error during cleanup'));
+        Storage::set('local', $diskMock);
+
+        $photo1 = UploadedFile::fake()->create('foto1.jpg', 100, 'image/jpeg');
+
+        $tempPath = tempnam(sys_get_temp_dir(), 'test_fail3');
+        file_put_contents($tempPath, base64_decode('/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAP//////////////////////////////////////////////////////////////////////////////////////wgALCAABAAEBAREA/8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQABPxA='));
+
+        $failingFile = new class($tempPath, 'gagal3.jpg', 'image/jpeg', null, true) extends UploadedFile {
+            public function storeAs($path, $name = null, $options = [])
+            {
+                return false;
+            }
+        };
+
+        $response = $this->actingAs($data['user'])->post(
+            route('follow-up-assignments.evidence.store', $data['assignment']->assignment_id),
+            [
+                'progress_id' => $data['progress']->progress_id,
+                'photos'      => [$photo1, $failingFile],
+            ]
+        );
+
+        $response->assertRedirect();
+        $response->assertSessionHas('error');
+        $this->assertDatabaseCount('follow_up_evidences', 0);
+
+        Log::shouldHaveReceived('error')->once();
+        Log::shouldHaveReceived('warning')->once();
     }
 }
