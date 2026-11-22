@@ -2,7 +2,7 @@
 
 @section('title', 'Antrean Verifikasi | Aksesibel')
 
-@section('breadcrumb', 'Aksesibel / Antrean verifikasi')
+@section('breadcrumb', 'Aksesibel / Antrean Verifikasi')
 
 @push('styles')
 <link rel="stylesheet" href="{{ asset('css/verifikasi.css') }}">
@@ -31,7 +31,7 @@
     <div class="stat-card">
         <div class="stat-top">
             Diverifikasi hari ini
-            <i class="fa-regular fa-shield-check"></i>
+            <i class="fa-regular fa-circle-check"></i>
         </div>
         <h2>{{ $statistik['terverifikasi'] }}</h2>
         <small>Siap diteruskan ke pengelola</small>

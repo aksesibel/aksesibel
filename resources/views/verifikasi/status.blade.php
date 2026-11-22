@@ -2,7 +2,7 @@
 
 @section('title', 'Kelola Status Verifikasi')
 
-@section('breadcrumb', 'Aksesibel / Kelola status')
+@section('breadcrumb', 'Aksesibel / Kelola Status')
 
 @section('content')
 <div class="status-page">

@@ -34,19 +34,19 @@
                 <a href="{{ route('verifikasi.antrean') }}"
                     class="{{ request()->routeIs('verifikasi.antrean') ? 'active' : '' }}">
                     <i class="fa-solid fa-border-all"></i>
-                    Antrean verifikasi
+                    Antrean Verifikasi
                 </a>
 
                 <a href="{{ route('verifikasi.riwayat') }}"
                     class="{{ request()->routeIs('verifikasi.riwayat') ? 'active' : '' }}">
                     <i class="fa-regular fa-clipboard"></i>
-                    Riwayat verifikasi
+                    Riwayat Verifikasi
                 </a>
 
                 <a href="{{ route('verifikasi.status') }}"
                     class="sidebar-link {{ request()->routeIs('verifikasi.status*') ? 'active' : '' }}">
                     <i class="fa-regular fa-folder-open"></i>
-                    <span>Kelola status</span>
+                    <span>Kelola Status</span>
                 </a>
             </nav>
 
