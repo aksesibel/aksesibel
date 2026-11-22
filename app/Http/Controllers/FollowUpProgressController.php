@@ -18,20 +18,25 @@ class FollowUpProgressController extends Controller
         $validated = $request->validated();
 
         DB::transaction(function () use ($validated, $request, $follow_up_assignment) {
+            // Kunci baris penugasan untuk mencegah race condition pembaruan bersamaan
+            $assignment = FollowUpAssignment::where('assignment_id', $follow_up_assignment->assignment_id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
             FollowUpProgress::create([
-                'assignment_id'      => $follow_up_assignment->assignment_id,
+                'assignment_id'      => $assignment->assignment_id,
                 'actor_id'           => $request->user()->id,
                 'progress_status'    => $validated['progress_status'],
                 'action_description' => $validated['action_description'],
                 'recorded_at'        => now(),
             ]);
 
-            // Update assignment_status jika penugasan masih berstatus default 'assigned'
+            // Transisi status penugasan secara konsisten berdasarkan progres terbaru
             $statusLower = strtolower(trim($validated['progress_status']));
-            if (in_array($statusLower, ['selesai', 'completed', 'tuntas'])) {
-                $follow_up_assignment->update(['assignment_status' => 'completed']);
-            } elseif ($follow_up_assignment->assignment_status === 'assigned') {
-                $follow_up_assignment->update(['assignment_status' => 'in_progress']);
+            if (in_array($statusLower, ['selesai', 'completed', 'tuntas'], true)) {
+                $assignment->update(['assignment_status' => 'completed']);
+            } elseif ($assignment->assignment_status === 'assigned') {
+                $assignment->update(['assignment_status' => 'in_progress']);
             }
         });
 

@@ -15,6 +15,7 @@ class MasterDataSeeder extends Seeder
     {
         $this->seed('roles', 'role_name', [
             ['role_name' => 'Admin'],
+            ['role_name' => 'Pengelola Fasilitas'],
             ['role_name' => 'Masyarakat'],
             ['role_name' => 'Verifikator'],
             ['role_name' => 'Petugas Tindak Lanjut'],

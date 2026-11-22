@@ -136,6 +136,34 @@ class FollowUpAssignmentTest extends TestCase
             ->assertForbidden();
     }
 
+    public function test_facility_manager_can_access_and_create_assignment(): void
+    {
+        $roleManager = Role::firstOrCreate(['role_name' => 'Pengelola Fasilitas']);
+        $manager = User::factory()->create([
+            'role_id'        => $roleManager->role_id,
+            'account_status' => 'active',
+        ]);
+
+        $this->actingAs($manager)
+            ->get(route('follow-up-assignments.ready-reports'))
+            ->assertOk();
+
+        $this->actingAs($manager)
+            ->post(route('follow-up-assignments.store'), [
+                'report_id'        => $this->reportInFollowUp->report_id,
+                'assigned_to'      => $this->officer->id,
+                'assignment_notes' => 'Instruksi pengelola fasilitas.',
+                'due_date'         => now()->addDays(5)->toDateString(),
+            ])
+            ->assertRedirect();
+
+        $this->assertDatabaseHas('follow_up_assignments', [
+            'report_id'   => $this->reportInFollowUp->report_id,
+            'assigned_by' => $manager->id,
+            'assigned_to' => $this->officer->id,
+        ]);
+    }
+
     // ── Validasi ────────────────────────────────────────────────
 
     public function test_cannot_assign_report_not_in_follow_up_status(): void

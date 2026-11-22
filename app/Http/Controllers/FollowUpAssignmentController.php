@@ -154,7 +154,12 @@ class FollowUpAssignmentController extends Controller
         $roleName = $user->role?->role_name;
 
         // Petugas Tindak Lanjut hanya boleh lihat miliknya
-        if ($roleName === 'Petugas Tindak Lanjut' && $follow_up_assignment->assigned_to !== $user->id) {
+        if ($roleName === 'Petugas Tindak Lanjut' && (int) $follow_up_assignment->assigned_to !== (int) $user->id) {
+            abort(403, 'Anda tidak memiliki akses ke penugasan ini.');
+        }
+
+        // Masyarakat atau role lain yang tidak berwenang dilarang mengakses
+        if (! in_array($roleName, ['Admin', 'Pengelola Fasilitas', 'Petugas Tindak Lanjut'], true)) {
             abort(403, 'Anda tidak memiliki akses ke penugasan ini.');
         }
 
@@ -166,7 +171,7 @@ class FollowUpAssignmentController extends Controller
             'assignee',
             'assigner',
             'progress' => function ($q) {
-                $q->with('actor')->orderByDesc('recorded_at');
+                $q->with(['actor', 'evidences'])->orderByDesc('recorded_at');
             },
         ]);
 

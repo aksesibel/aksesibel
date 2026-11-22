@@ -19,8 +19,14 @@ class DatabaseSeeder extends Seeder
         // Data master harus masuk lebih dulu (roles, status, kategori, dll.)
         $this->call(MasterDataSeeder::class);
 
+        // Akun dan data demo hanya di-seed pada lingkungan lokal/testing
+        if (! app()->environment(['local', 'testing'])) {
+            return;
+        }
+
         // Ambil role IDs
         $adminRoleId = DB::table('roles')->where('role_name', 'Admin')->value('role_id');
+        $managerRoleId = DB::table('roles')->where('role_name', 'Pengelola Fasilitas')->value('role_id');
         $officerRoleId = DB::table('roles')->where('role_name', 'Petugas Tindak Lanjut')->value('role_id');
         $citizenRoleId = DB::table('roles')->where('role_name', 'Masyarakat')->value('role_id');
 
@@ -34,6 +40,19 @@ class DatabaseSeeder extends Seeder
                 'account_status' => 'active',
             ]
         );
+
+        // 1b. Akun Pengelola Fasilitas (Sesuai Proposal Modul Tindak Lanjut)
+        if ($managerRoleId) {
+            User::updateOrCreate(
+                ['email' => 'pengelola@aksesibel.test'],
+                [
+                    'name' => 'Pengelola Fasilitas (Demo)',
+                    'password' => bcrypt('password'),
+                    'role_id' => $managerRoleId,
+                    'account_status' => 'active',
+                ]
+            );
+        }
 
         // 2. Akun Petugas Tindak Lanjut
         $officer = User::updateOrCreate(

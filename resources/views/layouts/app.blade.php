@@ -56,7 +56,7 @@
                         </span>
                         <nav class="space-y-1.5" aria-label="Navigasi Utama">
                             <!-- Antrean Penugasan (Ready Reports) -->
-                            @if (Auth::user()?->role?->role_name === 'Admin')
+                            @if (in_array(Auth::user()?->role?->role_name, ['Admin', 'Pengelola Fasilitas'], true))
                                 <a href="{{ route('follow-up-assignments.ready-reports') }}"
                                    class="flex items-center space-x-3 px-3.5 py-2.5 rounded-lg text-xs font-semibold transition-colors {{ request()->routeIs('follow-up-assignments.ready-reports') ? 'bg-[#1D4ED8] text-white shadow-sm' : 'text-slate-300 hover:text-white hover:bg-white/10' }}">
                                     <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -75,8 +75,8 @@
                                 <span>Daftar Penugasan</span>
                             </a>
 
-                            <!-- Buat Penugasan Baru (Admin) -->
-                            @if (Auth::user()?->role?->role_name === 'Admin')
+                            <!-- Buat Penugasan Baru (Admin / Pengelola Fasilitas) -->
+                            @if (in_array(Auth::user()?->role?->role_name, ['Admin', 'Pengelola Fasilitas'], true))
                                 <a href="{{ route('follow-up-assignments.create') }}"
                                    class="flex items-center space-x-3 px-3.5 py-2.5 rounded-lg text-xs font-semibold transition-colors {{ request()->routeIs('follow-up-assignments.create') ? 'bg-[#1D4ED8] text-white shadow-sm' : 'text-slate-300 hover:text-white hover:bg-white/10' }}">
                                     <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -105,18 +105,20 @@
                     </p>
                 </div>
 
-                <!-- Pengalih Akun Cepat (Quick Switcher Pengujian) -->
-                <div class="flex items-center justify-between text-[11px] text-slate-300 pt-2 border-t border-white/10">
-                    <span>Ganti Akun:</span>
-                    <div class="flex items-center space-x-1">
-                        <a href="/login-as/admin" title="Login sebagai Admin" class="px-2 py-0.5 rounded text-[10px] font-bold {{ Auth::user()?->role?->role_name === 'Admin' ? 'bg-blue-600 text-white' : 'bg-white/10 text-slate-300 hover:bg-white/20' }}">
-                            Admin
-                        </a>
-                        <a href="/login-as/petugas" title="Login sebagai Petugas" class="px-2 py-0.5 rounded text-[10px] font-bold {{ Auth::user()?->role?->role_name === 'Petugas Tindak Lanjut' ? 'bg-emerald-600 text-white' : 'bg-white/10 text-slate-300 hover:bg-white/20' }}">
-                            Petugas
-                        </a>
+                <!-- Pengalih Akun Cepat (Quick Switcher Pengujian - Khusus Lokal) -->
+                @if (app()->environment('local'))
+                    <div class="flex items-center justify-between text-[11px] text-slate-300 pt-2 border-t border-white/10">
+                        <span>Ganti Akun:</span>
+                        <div class="flex items-center space-x-1">
+                            <a href="/login-as/admin" title="Login sebagai Admin" class="px-2 py-0.5 rounded text-[10px] font-bold {{ Auth::user()?->role?->role_name === 'Admin' ? 'bg-blue-600 text-white' : 'bg-white/10 text-slate-300 hover:bg-white/20' }}">
+                                Admin
+                            </a>
+                            <a href="/login-as/petugas" title="Login sebagai Petugas" class="px-2 py-0.5 rounded text-[10px] font-bold {{ Auth::user()?->role?->role_name === 'Petugas Tindak Lanjut' ? 'bg-emerald-600 text-white' : 'bg-white/10 text-slate-300 hover:bg-white/20' }}">
+                                Petugas
+                            </a>
+                        </div>
                     </div>
-                </div>
+                @endif
 
                 <!-- Footer Sidebar (Persis Gambar 1) -->
                 <div class="text-[11px] text-slate-400 flex items-center justify-between pt-1">
@@ -175,5 +177,6 @@
             </main>
         </div>
     </div>
+    @stack('scripts')
 </body>
 </html>

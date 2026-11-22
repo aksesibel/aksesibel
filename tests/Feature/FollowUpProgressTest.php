@@ -165,5 +165,75 @@ class FollowUpProgressTest extends TestCase
             ])
             ->assertSessionHasErrors(['progress_status', 'action_description']);
     }
+
+    public function test_progress_status_outside_allowed_list_is_rejected(): void
+    {
+        $this->actingAs($this->assignedOfficer)
+            ->post(route('follow-up-assignments.progress.store', $this->assignment->assignment_id), [
+                'progress_status'    => 'Status Tidak Ada Di Daftar',
+                'action_description' => 'Mencoba status acak.',
+            ])
+            ->assertSessionHasErrors(['progress_status']);
+    }
+
+    public function test_inactive_officer_cannot_store_progress(): void
+    {
+        $this->assignedOfficer->update(['account_status' => 'inactive']);
+
+        $this->actingAs($this->assignedOfficer)
+            ->post(route('follow-up-assignments.progress.store', $this->assignment->assignment_id), [
+                'progress_status'    => 'Sedang Dikerjakan',
+                'action_description' => 'Akun dinonaktifkan.',
+            ])
+            ->assertForbidden();
+    }
+
+    public function test_facility_manager_can_store_progress(): void
+    {
+        $roleManager = Role::firstOrCreate(['role_name' => 'Pengelola Fasilitas']);
+        $manager = User::factory()->create([
+            'role_id'        => $roleManager->role_id,
+            'account_status' => 'active',
+        ]);
+
+        $this->actingAs($manager)
+            ->post(route('follow-up-assignments.progress.store', $this->assignment->assignment_id), [
+                'progress_status'    => 'Dalam Koordinasi Lapangan',
+                'action_description' => 'Koordinasi pengelola dengan dinas terkait.',
+            ])
+            ->assertRedirect(route('follow-up-assignments.show', $this->assignment->assignment_id))
+            ->assertSessionHas('success');
+
+        $this->assertDatabaseHas('follow_up_progress', [
+            'assignment_id'   => $this->assignment->assignment_id,
+            'actor_id'        => $manager->id,
+            'progress_status' => 'Dalam Koordinasi Lapangan',
+        ]);
+    }
+
+    public function test_progress_cannot_be_stored_for_cancelled_assignment(): void
+    {
+        $this->assignment->update(['assignment_status' => 'cancelled']);
+
+        $this->actingAs($this->assignedOfficer)
+            ->post(route('follow-up-assignments.progress.store', $this->assignment->assignment_id), [
+                'progress_status'    => 'Sedang Dikerjakan',
+                'action_description' => 'Mencoba update penugasan yang sudah dibatalkan.',
+            ])
+            ->assertSessionHasErrors(['assignment_status']);
+    }
+
+    public function test_progress_cannot_be_stored_for_unforwarded_report(): void
+    {
+        $statusPending = VerificationStatus::create(['status_name' => 'Menunggu Verifikasi']);
+        $this->assignment->report->update(['status_id' => $statusPending->status_id]);
+
+        $this->actingAs($this->assignedOfficer)
+            ->post(route('follow-up-assignments.progress.store', $this->assignment->assignment_id), [
+                'progress_status'    => 'Sedang Dikerjakan',
+                'action_description' => 'Laporan belum diteruskan.',
+            ])
+            ->assertSessionHasErrors(['report_status']);
+    }
 }
 
