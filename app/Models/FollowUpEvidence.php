@@ -17,6 +17,11 @@ class FollowUpEvidence extends Model
 
     protected $guarded = [];
 
+    public function getRouteKeyName(): string
+    {
+        return 'follow_up_evidence_id';
+    }
+
     protected function casts(): array
     {
         return [
