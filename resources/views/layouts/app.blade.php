@@ -43,9 +43,10 @@
                     Riwayat verifikasi
                 </a>
 
-                <a href="#">
+                <a href="{{ route('verifikasi.status') }}"
+                    class="sidebar-link {{ request()->routeIs('verifikasi.status*') ? 'active' : '' }}">
                     <i class="fa-regular fa-folder-open"></i>
-                    Cari fasilitas
+                    <span>Kelola status</span>
                 </a>
             </nav>
 

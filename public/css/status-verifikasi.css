@@ -1,0 +1,614 @@
+
+/* =========================
+   HALAMAN KELOLA STATUS
+========================= */
+
+.status-page {
+    padding: 0;
+    color: #172033;
+}
+
+.page-heading {
+    margin-bottom: 20px;
+}
+
+.page-heading h1 {
+    margin: 0 0 7px;
+    font-size: 25px;
+    font-weight: 700;
+    color: #111827;
+}
+
+.page-heading p {
+    margin: 0;
+    font-size: 14px;
+    color: #52627d;
+}
+
+/* =========================
+   STATISTIK
+========================= */
+
+.status-stats {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+.stat-card {
+    padding: 17px;
+    background: #fff;
+    border: 1px solid #d5dfed;
+    border-radius: 10px;
+}
+
+.stat-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 10px;
+    min-height: 0;
+    color: #52627d;
+    font-size: 12px;
+}
+
+.stat-icon {
+    color: #1555e8;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.stat-card h2 {
+    margin: 20px 0 7px;
+    font-size: 26px;
+    font-weight: 700;
+    color: #111827;
+}
+
+.stat-card p {
+    margin: 0;
+    color: #52627d;
+    font-size: 11px;
+}
+
+/* =========================
+   PANEL
+========================= */
+
+.status-panel {
+    padding: 18px;
+    margin-bottom: 18px;
+    background: #fff;
+    border: 1px solid #d5dfed;
+    border-radius: 10px;
+}
+
+.panel-heading,
+.list-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    margin-bottom: 17px;
+}
+
+.panel-heading h2,
+.list-heading h2 {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 700;
+    color: #172033;
+}
+
+.report-badge,
+.total-badge {
+    padding: 5px 9px;
+    border-radius: 5px;
+    background: #eff5ff;
+    color: #1455ef;
+    font-size: 10px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+/* =========================
+   DETAIL LAPORAN
+========================= */
+
+.report-detail-grid {
+    display: grid;
+    grid-template-columns: 1.4fr 0.9fr;
+    gap: 25px;
+    margin-bottom: 18px;
+}
+
+.report-main-detail h3 {
+    margin: 0 0 17px;
+    font-size: 17px;
+    font-weight: 700;
+    color: #172033;
+}
+
+.report-meta {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.report-meta label,
+.report-current-status label {
+    display: block;
+    margin-bottom: 7px;
+    color: #52627d;
+    font-size: 11px;
+}
+
+.report-meta strong,
+.report-current-status strong {
+    display: block;
+    color: #172033;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.5;
+}
+
+.report-description {
+    margin: 12px 0 0;
+    color: #52627d;
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+.report-current-status {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* =========================
+   BADGE STATUS
+========================= */
+
+.status-badge {
+    display: inline-block;
+    width: fit-content;
+    max-width: 100%;
+    padding: 5px 8px;
+    border-radius: 5px;
+    font-size: 10px;
+    font-weight: 600;
+    line-height: 1.4;
+}
+
+.status-badge.waiting {
+    background: #eff5ff;
+    color: #1455ef;
+}
+
+.status-badge.verified {
+    background: #effbf3;
+    color: #159447;
+}
+
+.status-badge.rejected {
+    background: #fff0f0;
+    color: #d92d20;
+}
+
+.status-badge.follow-up {
+    background: #fff8e8;
+    color: #a85b00;
+}
+
+/* =========================
+   FORM UBAH STATUS
+========================= */
+
+.status-form {
+    margin-top: 15px;
+}
+
+.form-title {
+    display: block;
+    margin-bottom: 10px;
+    color: #172033;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.status-options {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+    margin-bottom: 18px;
+}
+
+.status-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 52px;
+    padding: 10px;
+    border: 1px solid #d5dfed;
+    border-radius: 7px;
+    cursor: pointer;
+    color: #172033;
+    font-size: 11px;
+    line-height: 1.5;
+    transition: 0.2s;
+}
+
+.status-option:hover {
+    border-color: #8aa9ff;
+}
+
+.status-option:has(input:checked) {
+    border: 1px solid #2455ed;
+    background: #eff5ff;
+    color: #1455ef;
+    font-weight: 600;
+}
+
+.status-option.selected,
+.status-option:has(input:checked) {
+    border: 1px solid #2455ed;
+    background: #eff5ff;
+    color: #1455ef;
+    font-weight: 600;
+}
+
+.status-option input {
+    flex-shrink: 0;
+    width: 14px;
+    height: 14px;
+    margin: 0;
+    accent-color: #2455ed;
+}
+
+.status-form textarea {
+    display: block;
+    width: 100%;
+    min-height: 70px;
+    padding: 12px;
+    resize: vertical;
+    border: 1px solid #d5dfed;
+    border-radius: 7px;
+    outline: none;
+    color: #172033;
+    background: #fff;
+    font-family: inherit;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.status-form textarea:focus,
+.status-filter input:focus,
+.status-filter select:focus {
+    border-color: #2455ed;
+    box-shadow: 0 0 0 2px rgba(36, 85, 237, 0.08);
+}
+
+.status-form textarea::placeholder {
+    color: #8995a8;
+}
+
+.form-error {
+    display: block;
+    margin-top: 5px;
+    color: #d92d20;
+    font-size: 11px;
+}
+
+.form-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    margin-top: 12px;
+}
+
+.form-footer p {
+    margin: 0;
+    color: #52627d;
+    font-size: 10px;
+}
+
+.form-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.btn-cancel,
+.btn-save,
+.btn-manage {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 34px;
+    padding: 0 15px;
+    border-radius: 7px;
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-cancel,
+.btn-manage {
+    border: 1px solid #d5dfed;
+    background: #fff;
+    color: #1455ef;
+}
+
+.btn-cancel:hover,
+.btn-manage:hover {
+    background: #eff5ff;
+}
+
+.btn-save {
+    border: 1px solid #174be5;
+    background: #2053e8;
+    color: #fff;
+}
+
+.btn-save:hover {
+    background: #1742c5;
+}
+
+/* =========================
+   FILTER
+========================= */
+
+.report-list-panel {
+    padding: 17px 16px 13px;
+}
+
+.list-heading {
+    margin-bottom: 17px;
+}
+
+.status-filter {
+    display: grid;
+    grid-template-columns: 1.5fr 0.9fr 1.1fr auto;
+    align-items: end;
+    gap: 12px;
+    padding: 0 0 16px;
+    border-bottom: 1px solid #d5dfed;
+}
+
+.filter-group label {
+    display: block;
+    margin-bottom: 7px;
+    color: #172033;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.filter-group input,
+.filter-group select {
+    width: 100%;
+    height: 39px;
+    padding: 0 11px;
+    border: 1px solid #d5dfed;
+    border-radius: 7px;
+    outline: none;
+    background: #fff;
+    color: #52627d;
+    font-family: inherit;
+    font-size: 11px;
+}
+
+.filter-submit {
+    height: 39px;
+    padding: 0 15px;
+    border: 1px solid #2053e8;
+    border-radius: 7px;
+    background: #2053e8;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* =========================
+   TABEL
+========================= */
+
+.table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    margin: 0 -16px;
+    width: calc(100% + 32px);
+}
+
+.status-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.status-table thead {
+    background: #f8fafc;
+}
+
+.status-table th {
+    padding: 13px 12px;
+    border-bottom: 1px solid #d5dfed;
+    color: #52627d;
+    font-size: 10px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.status-table td {
+    padding: 13px 12px;
+    border-bottom: 1px solid #d5dfed;
+    color: #172033;
+    font-size: 11px;
+    line-height: 1.5;
+    vertical-align: middle;
+}
+
+.status-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.status-table tbody tr.active-row {
+    background: #eff5ff;
+}
+
+.table-report-number {
+    color: #1455ef;
+    font-size: 11px;
+    white-space: nowrap;
+}
+
+.description-cell {
+    min-width: 155px;
+    max-width: 220px;
+    font-weight: 600;
+}
+
+.btn-manage {
+    min-height: 32px;
+    padding: 0 14px;
+    white-space: nowrap;
+}
+
+.empty-table,
+.empty-detail {
+    padding: 25px;
+    color: #8995a8;
+    text-align: center;
+    font-size: 12px;
+}
+
+/* =========================
+   PAGINATION
+========================= */
+
+.table-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 13px 0 0;
+}
+
+.table-footer p {
+    margin: 0;
+    color: #52627d;
+    font-size: 10px;
+}
+
+.table-footer nav {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.table-footer nav > div:first-child {
+    display: none;
+}
+
+.table-footer nav > div:last-child {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.table-footer nav span,
+.table-footer nav a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 29px;
+    height: 30px;
+    padding: 0 9px;
+    border: 1px solid #d5dfed;
+    border-radius: 6px;
+    background: #fff;
+    color: #1455ef;
+    font-size: 10px;
+    text-decoration: none;
+}
+
+.table-footer nav span[aria-current="page"] {
+    border-color: #2053e8;
+    background: #2053e8;
+    color: #fff;
+}
+
+.table-footer nav a:hover {
+    background: #eff5ff;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 1100px) {
+    .status-stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .status-options {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .status-filter {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 700px) {
+    .status-page {
+        padding: 0;
+    }
+
+    .report-detail-grid {
+        grid-template-columns: 1fr;
+        gap: 18px;
+    }
+
+    .report-meta {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .form-footer {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .table-footer {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 500px) {
+    .status-stats,
+    .status-filter,
+    .status-options {
+        grid-template-columns: 1fr;
+    }
+
+    .panel-heading,
+    .list-heading {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .form-actions {
+        width: 100%;
+    }
+
+    .form-actions a,
+    .form-actions button {
+        flex: 1;
+    }
+}

@@ -160,4 +160,88 @@ class VerificationController extends Controller
             'detail'
         ));
     }
+
+    public function kelolaStatus(Request $request)
+    {
+        $query = Report::with([
+            'user',
+            'facility',
+            'issueCategory',
+            'status',
+        ]);
+
+        // Pencarian laporan
+        if ($request->filled('search')) {
+            $search = $request->search;
+
+            $query->where(function ($q) use ($search) {
+                $q->where('report_number', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%")
+                    ->orWhereHas('facility', function ($facility) use ($search) {
+                        $facility->where('name', 'like', "%{$search}%");
+                    });
+            });
+        }
+
+        // Filter status
+        if ($request->filled('status')) {
+            $query->where('status_id', $request->status);
+        }
+
+        // Filter tanggal laporan
+        if ($request->filled('tanggal')) {
+            $query->whereDate('created_at', $request->tanggal);
+        }
+
+        // Statistik status laporan
+        $statistik = [
+            'menunggu' => Report::whereHas('status', function ($q) {
+                $q->where('status_name', 'Menunggu Verifikasi');
+            })->count(),
+
+            'terverifikasi' => Report::whereHas('status', function ($q) {
+                $q->where('status_name', 'Terverifikasi');
+            })->count(),
+
+            'ditolak' => Report::whereHas('status', function ($q) {
+                $q->where('status_name', 'Ditolak');
+            })->count(),
+
+            'lanjutan' => Report::whereHas('status', function ($q) {
+                $q->where('status_name', 'Dalam Tindak Lanjut');
+            })->count(),
+        ];
+
+        // Daftar laporan
+        $laporan = $query->latest('created_at')
+            ->paginate(5)
+            ->withQueryString();
+
+        // Detail laporan yang dipilih
+        $detail = null;
+
+        if ($request->filled('kelola')) {
+            $detail = Report::with([
+                'user',
+                'facility',
+                'issueCategory',
+                'status',
+                'evidences',
+            ])->find($request->kelola);
+        }
+
+        if (!$detail) {
+            $detail = $laporan->first();
+        }
+
+        // Daftar status untuk pilihan form
+        $daftarStatus = VerificationStatus::orderBy('status_id')->get();
+
+        return view('verifikasi.status', compact(
+            'laporan',
+            'statistik',
+            'detail',
+            'daftarStatus'
+        ));
+    }
 }
