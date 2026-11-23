@@ -63,7 +63,7 @@ class FollowUpEvidenceTest extends TestCase
      */
     private function createAssignmentWithProgress(string $roleName = 'Petugas Tindak Lanjut', bool $ownAssignment = true): array
     {
-        $role = Role::where('role_name', $roleName)->firstOrFail();
+        $role = Role::firstOrCreate(['role_name' => $roleName]);
         $user = User::factory()->create([
             'role_id' => $role->role_id,
             'account_status' => 'active',
@@ -392,7 +392,8 @@ class FollowUpEvidenceTest extends TestCase
             ]
         );
 
-        $response->assertForbidden();
+        $response->assertRedirectToRoute('login');
+        $this->assertGuest();
         $this->assertDatabaseCount('follow_up_evidences', 0);
     }
 
@@ -468,7 +469,8 @@ class FollowUpEvidenceTest extends TestCase
             route('evidence.show', $evidence->follow_up_evidence_id)
         );
 
-        $response->assertForbidden();
+        $response->assertRedirectToRoute('login');
+        $this->assertGuest();
     }
 
     /** @test */

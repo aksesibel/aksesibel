@@ -109,11 +109,13 @@
                         Daftar sebagai masyarakat
                     </a>
                 @endauth
-                <a href="{{ route('admin.facilities.index') }}"
-                   class="inline-flex items-center gap-2 px-6 py-3 rounded-lg border border-[#E2E8F0] bg-white text-[#1D4ED8] font-semibold text-sm hover:bg-[#DBEAFE] transition-colors min-h-[44px]">
-                    Buka Panel Admin
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-                </a>
+                @can('manage-public-facilities')
+                    <a href="{{ route('admin.facilities.index') }}"
+                       class="inline-flex items-center gap-2 px-6 py-3 rounded-lg border border-[#E2E8F0] bg-white text-[#1D4ED8] font-semibold text-sm hover:bg-[#DBEAFE] transition-colors min-h-[44px]">
+                        Buka Panel Admin
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                    </a>
+                @endcan
             </div>
         </div>
     </section>

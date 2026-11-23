@@ -127,7 +127,9 @@
 
                 <!-- Footer Sidebar (Persis Gambar 1) -->
                 <div class="text-[11px] text-slate-400 flex items-center justify-between pt-1">
-                    <span>Pusat bantuan</span>
+                    @if (in_array(auth()->user()->role->role_name, [\App\Models\Role::ADMIN, \App\Models\Role::FACILITY_MANAGER], true))
+                        <a href="{{ route('account') }}" class="hover:text-white">Akun saya</a>
+                    @endif
                     <span>&bull;</span>
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf

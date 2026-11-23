@@ -34,28 +34,32 @@
                 <a href="{{ route('verifikasi.antrean') }}"
                     class="{{ request()->routeIs('verifikasi.antrean') ? 'active' : '' }}">
                     <i class="fa-solid fa-border-all"></i>
-                    Antrean verifikasi
+                    Antrean Verifikasi
                 </a>
 
                 <a href="{{ route('verifikasi.riwayat') }}"
                     class="{{ request()->routeIs('verifikasi.riwayat') ? 'active' : '' }}">
                     <i class="fa-regular fa-clipboard"></i>
-                    Riwayat verifikasi
+                    Riwayat Verifikasi
                 </a>
 
-                <a href="#">
+                <a href="{{ route('verifikasi.status') }}"
+                    class="sidebar-link {{ request()->routeIs('verifikasi.status*') ? 'active' : '' }}">
                     <i class="fa-regular fa-folder-open"></i>
-                    Cari fasilitas
+                    <span>Kelola Status</span>
                 </a>
             </nav>
 
             <div class="permission-card">
                 <strong>Akses sesuai kewenangan</strong>
-                <p>Anda masuk sebagai verifikator.</p>
+                <p>Anda masuk sebagai {{ auth()->user()->role->role_name }}.</p>
             </div>
 
             <div class="sidebar-footer">
-                Pusat bantuan • Keluar
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <button type="submit" class="admin-btn">Keluar</button>
+                </form>
             </div>
         </aside>
 
@@ -67,12 +71,10 @@
                 </div>
 
                 <div class="topbar-right">
-                    <button class="illustration-btn">Data ilustrasi</button>
-                    <i class="fa-regular fa-bell notification"></i>
-                    <button class="admin-btn">
-                        <i class="fa-regular fa-user"></i> Admin
-                    </button>
-                    <span class="admin-name">Siti Rahma</span>
+                    <a href="{{ route('account') }}" class="admin-btn">
+                        <i class="fa-regular fa-user" aria-hidden="true"></i> Akun saya
+                    </a>
+                    <span class="admin-name">{{ auth()->user()->name }}</span>
                 </div>
             </header>
 

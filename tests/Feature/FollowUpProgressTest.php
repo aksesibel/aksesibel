@@ -192,7 +192,8 @@ class FollowUpProgressTest extends TestCase
                 'progress_status' => 'Sedang Dikerjakan',
                 'action_description' => 'Akun dinonaktifkan.',
             ])
-            ->assertForbidden();
+            ->assertRedirectToRoute('login');
+        $this->assertGuest();
     }
 
     public function test_facility_manager_can_store_progress(): void

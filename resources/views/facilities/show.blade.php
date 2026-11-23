@@ -28,11 +28,13 @@
                 </span>
                 <x-status-badge :status="$facility->accessibility_status" />
             </div>
-            <a href="{{ route('admin.facilities.edit', $facility->facility_id) }}"
-               class="inline-flex items-center gap-1.5 text-xs font-medium text-[#475569] border border-[#E2E8F0] px-3 py-1.5 rounded-lg hover:bg-[#F8FAFC] transition-colors min-h-[44px]">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                Ubah
-            </a>
+            @can('manage-public-facilities')
+                <a href="{{ route('admin.facilities.edit', $facility->facility_id) }}"
+                   class="inline-flex items-center gap-1.5 text-xs font-medium text-[#475569] border border-[#E2E8F0] px-3 py-1.5 rounded-lg hover:bg-[#F8FAFC] transition-colors min-h-[44px]">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                    Ubah
+                </a>
+            @endcan
         </div>
 
         <h1 class="text-2xl sm:text-3xl font-extrabold text-[#0F172A] mb-6">{{ $facility->name }}</h1>
@@ -102,7 +104,9 @@
                 <div class="bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl p-4 flex items-center gap-3 text-sm text-[#475569]">
                     <svg class="w-5 h-5 text-[#CBD5E1] shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
                     Lokasi belum ditentukan.
-                    <a href="{{ route('admin.facilities.edit', $facility->facility_id) }}" class="text-[#1D4ED8] hover:underline ml-auto text-xs">Tambah koordinat</a>
+                    @can('manage-public-facilities')
+                        <a href="{{ route('admin.facilities.edit', $facility->facility_id) }}" class="text-[#1D4ED8] hover:underline ml-auto text-xs">Tambah koordinat</a>
+                    @endcan
                 </div>
             @endif
 

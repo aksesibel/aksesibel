@@ -267,7 +267,8 @@ class FollowUpAssignmentTest extends TestCase
 
         $this->actingAs($this->admin)
             ->get(route('follow-up-assignments.index'))
-            ->assertForbidden();
+            ->assertRedirectToRoute('login');
+        $this->assertGuest();
     }
 
     public function test_inactive_officer_cannot_access_index(): void
@@ -276,7 +277,8 @@ class FollowUpAssignmentTest extends TestCase
 
         $this->actingAs($this->officer)
             ->get(route('follow-up-assignments.index'))
-            ->assertForbidden();
+            ->assertRedirectToRoute('login');
+        $this->assertGuest();
     }
 
     public function test_inactive_admin_cannot_access_ready_reports(): void
@@ -285,7 +287,8 @@ class FollowUpAssignmentTest extends TestCase
 
         $this->actingAs($this->admin)
             ->get(route('follow-up-assignments.ready-reports'))
-            ->assertForbidden();
+            ->assertRedirectToRoute('login');
+        $this->assertGuest();
     }
 
     public function test_inactive_admin_cannot_access_create_form(): void
@@ -294,7 +297,8 @@ class FollowUpAssignmentTest extends TestCase
 
         $this->actingAs($this->admin)
             ->get(route('follow-up-assignments.create'))
-            ->assertForbidden();
+            ->assertRedirectToRoute('login');
+        $this->assertGuest();
     }
 
     public function test_inactive_officer_cannot_access_show(): void
@@ -311,7 +315,8 @@ class FollowUpAssignmentTest extends TestCase
 
         $this->actingAs($this->officer)
             ->get(route('follow-up-assignments.show', $assignment->assignment_id))
-            ->assertForbidden();
+            ->assertRedirectToRoute('login');
+        $this->assertGuest();
     }
 
     public function test_ready_reports_displays_actual_reporter_and_facility_data(): void
@@ -452,14 +457,14 @@ class FollowUpAssignmentTest extends TestCase
             ->assertDontSee('Undated Verifikasi ID 1');
     }
 
-    public function test_ready_reports_converts_utc_verified_at_to_asia_jakarta_timezone(): void
+    public function test_ready_reports_displays_verified_at_in_asia_jakarta_timezone(): void
     {
         Verification::create([
             'report_id' => $this->reportInFollowUp->report_id,
             'verifier_id' => $this->admin->id,
             'verification_result' => 'Valid',
             'notes' => 'Lolos verifikasi',
-            'verified_at' => Carbon::parse('2026-11-22 10:00:00', 'UTC'),
+            'verified_at' => Carbon::parse('2026-11-22 17:00:00', 'Asia/Jakarta'),
         ]);
 
         $response = $this->actingAs($this->admin)

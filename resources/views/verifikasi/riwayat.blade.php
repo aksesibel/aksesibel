@@ -2,7 +2,7 @@
 
 @section('title', 'Riwayat Verifikasi | Aksesibel')
 
-@section('breadcrumb', 'Aksesibel / Riwayat verifikasi')
+@section('breadcrumb', 'Aksesibel / Riwayat Verifikasi')
 
 @push('styles')
 <link rel="stylesheet" href="{{ asset('css/riwayat-verifikasi.css') }}">
@@ -30,7 +30,7 @@
     <div class="history-stat-card">
         <div class="stat-label">
             Diterima
-            <i class="fa-regular fa-shield-check"></i>
+            <i class="fa-regular fa-circle-check"></i>
         </div>
         <h2>{{ $statistik['diterima'] }}</h2>
         <small>Laporan memenuhi kriteria</small>

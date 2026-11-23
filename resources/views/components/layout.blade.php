@@ -57,7 +57,9 @@
             <nav aria-label="Navigasi utama" class="hidden md:flex items-center gap-6">
                 <a href="{{ route('home') }}" class="text-sm font-medium text-[#475569] hover:text-[#1D4ED8] transition-colors {{ request()->routeIs('home') ? 'text-[#1D4ED8]' : '' }}">Beranda</a>
                 <a href="{{ route('facilities.index') }}" class="text-sm font-medium text-[#475569] hover:text-[#1D4ED8] transition-colors {{ request()->routeIs('facilities.*') ? 'text-[#1D4ED8]' : '' }}">Cari Fasilitas</a>
-                <a href="{{ route('admin.facilities.index') }}" class="text-sm font-medium text-[#475569] hover:text-[#1D4ED8] transition-colors {{ request()->routeIs('admin.*') ? 'text-[#1D4ED8]' : '' }}">Panel Admin</a>
+                @can('manage-public-facilities')
+                    <a href="{{ route('admin.facilities.index') }}" class="text-sm font-medium text-[#475569] hover:text-[#1D4ED8] transition-colors {{ request()->routeIs('admin.*') ? 'text-[#1D4ED8]' : '' }}">Panel Admin</a>
+                @endcan
                 @can('manage-supporting-data')
                     <a href="{{ route('manage.statistics') }}" class="text-sm font-medium text-[#475569] hover:text-[#1D4ED8] transition-colors">Rekap &amp; Statistik</a>
                 @endcan
@@ -65,11 +67,13 @@
 
             {{-- Tombol aksi --}}
             <div class="flex items-center gap-2">
-                <a href="{{ route('admin.facilities.create') }}"
-                   class="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#1D4ED8] hover:bg-[#1E40AF] text-white text-sm font-semibold transition-colors min-h-[44px]">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
-                    Tambah Fasilitas
-                </a>
+                @can('manage-public-facilities')
+                    <a href="{{ route('admin.facilities.create') }}"
+                       class="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#1D4ED8] hover:bg-[#1E40AF] text-white text-sm font-semibold transition-colors min-h-[44px]">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+                        Tambah Fasilitas
+                    </a>
+                @endcan
 
                 @auth
                     <a href="{{ route('account') }}" class="hidden sm:inline-flex items-center text-sm font-medium text-[#475569] hover:text-[#1D4ED8] transition-colors">{{ auth()->user()->name }}</a>
@@ -162,8 +166,10 @@
                 <nav aria-label="Navigasi footer" class="flex gap-6">
                     <a href="{{ route('home') }}" class="text-white/70 hover:text-white text-sm transition-colors">Beranda</a>
                     <a href="{{ route('facilities.index') }}" class="text-white/70 hover:text-white text-sm transition-colors">Fasilitas</a>
-                    <a href="{{ route('admin.facilities.index') }}" class="text-white/70 hover:text-white text-sm transition-colors">Admin Fasilitas</a>
-                    <a href="{{ route('admin.categories.index') }}" class="text-white/70 hover:text-white text-sm transition-colors">Admin Kategori</a>
+                    @can('manage-public-facilities')
+                        <a href="{{ route('admin.facilities.index') }}" class="text-white/70 hover:text-white text-sm transition-colors">Admin Fasilitas</a>
+                        <a href="{{ route('admin.categories.index') }}" class="text-white/70 hover:text-white text-sm transition-colors">Admin Kategori</a>
+                    @endcan
                 </nav>
             </div>
             <div class="border-t border-white/10 mt-8 pt-6 text-center text-white/50 text-xs">

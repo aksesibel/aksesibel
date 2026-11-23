@@ -36,7 +36,7 @@ Route::prefix('api')->name('api.')->group(function () {
     Route::get('/wilayah', [RegionController::class, 'index'])->name('regions.index');
     Route::get('/wilayah/{region}', [RegionController::class, 'show'])->name('regions.show');
     Route::get('/fasilitas/peta', [FacilityController::class, 'mapData'])->name('facilities.map');
-    Route::post('/geocode', GeocodeController::class)->name('geocode');
+    Route::post('/geocode', GeocodeController::class)->middleware(['auth', 'can:manage-public-facilities'])->name('geocode');
 });
 
 // ---------------------------------------------------------------
@@ -59,7 +59,7 @@ Route::middleware(['auth', 'known-role'])->group(function (): void {
 // ---------------------------------------------------------------
 // Panel Admin — kelola kategori & fasilitas (termasuk lokasi/wilayah)
 // ---------------------------------------------------------------
-Route::prefix('admin')->name('admin.')->group(function () {
+Route::prefix('admin')->name('admin.')->middleware(['auth', 'can:manage-public-facilities'])->group(function () {
 
     // Kategori
     Route::get('/kategori', [CategoryController::class, 'adminIndex'])->name('categories.index');
@@ -143,6 +143,12 @@ Route::prefix('verifikasi')->name('verifikasi.')->middleware(['auth', 'role:Admi
 
     Route::get('/riwayat', [VerificationController::class, 'riwayat'])
         ->name('riwayat');
+
+    Route::get('/status', [VerificationController::class, 'kelolaStatus'])
+        ->name('status');
+
+    Route::post('/status/{report}', [VerificationController::class, 'updateStatus'])
+        ->name('status.update');
 });
 
 /*
