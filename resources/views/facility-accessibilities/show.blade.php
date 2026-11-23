@@ -208,11 +208,4 @@
         @endif
     </div>
 
-    <div class="form-actions">
-        <a href="{{ route('facility-accessibilities.edit', $facilityAccessibility->facility_accessibility_id) }}"
-            class="btn btn-primary">
-            Edit Data
-        </a>
-    </div>
-
 @endsection
