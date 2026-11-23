@@ -39,9 +39,27 @@
                 <!-- Header Logo & Brand -->
                 <div class="h-16 flex items-center px-6 border-b border-white/10">
                     <a href="{{ url('/') }}" class="flex items-center space-x-3 text-white font-bold text-xl tracking-tight focus:outline-none focus:ring-2 focus:ring-blue-400 rounded">
-                        <div class="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-[#0B2546] shadow-sm">
-                            <svg class="w-5 h-5 text-blue-700" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                <path d="M12 2a2 2 0 100 4 2 2 0 000-4zm-1 6a1 1 0 00-1 1v5a1 1 0 00.293.707l3 3a1 1 0 001.414-1.414L12.414 14H15a1 1 0 100-2h-3V9a1 1 0 00-1-1zm-4 4a6 6 0 1012 0 1 1 0 10-2 0 4 4 0 11-8 0 1 1 0 10-2 0z"/>
+                        <div class="w-8 h-8 shrink-0 rounded-lg bg-white flex items-center justify-center text-[#0B2546] shadow-sm">
+                            <svg
+                                class="w-6 h-6 text-blue-700"
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                aria-hidden="true"
+                                focusable="false"
+                            >
+                                <circle cx="8" cy="4" r="2" fill="currentColor" />
+
+                                <g
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                >
+                                    <path d="M8 12a5 5 0 1 0 5 5" />
+                                    <path d="M8 8v7h7l3 6 3-1" />
+                                    <path d="M8 10h8" />
+                                </g>
                             </svg>
                         </div>
                         <span class="text-lg font-bold">Aksesibel</span>
@@ -54,9 +72,10 @@
                         <span class="block px-3 text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2">
                             RUANG KERJA
                         </span>
+
                         <nav class="space-y-1.5" aria-label="Navigasi Utama">
                             <!-- Antrean Penugasan (Ready Reports) -->
-                            @if (Auth::user()?->role?->role_name === 'Admin')
+                            @if (in_array(Auth::user()?->role?->role_name, ['Admin', 'Pengelola Fasilitas'], true))
                                 <a href="{{ route('follow-up-assignments.ready-reports') }}"
                                    class="flex items-center space-x-3 px-3.5 py-2.5 rounded-lg text-xs font-semibold transition-colors {{ request()->routeIs('follow-up-assignments.ready-reports') ? 'bg-[#1D4ED8] text-white shadow-sm' : 'text-slate-300 hover:text-white hover:bg-white/10' }}">
                                     <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -75,8 +94,8 @@
                                 <span>Daftar Penugasan</span>
                             </a>
 
-                            <!-- Buat Penugasan Baru (Admin) -->
-                            @if (Auth::user()?->role?->role_name === 'Admin')
+                            <!-- Buat Penugasan Baru (Admin / Pengelola Fasilitas) -->
+                            @if (in_array(Auth::user()?->role?->role_name, ['Admin', 'Pengelola Fasilitas'], true))
                                 <a href="{{ route('follow-up-assignments.create') }}"
                                    class="flex items-center space-x-3 px-3.5 py-2.5 rounded-lg text-xs font-semibold transition-colors {{ request()->routeIs('follow-up-assignments.create') ? 'bg-[#1D4ED8] text-white shadow-sm' : 'text-slate-300 hover:text-white hover:bg-white/10' }}">
                                     <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -100,29 +119,20 @@
                         </svg>
                         <span class="text-xs font-bold text-white">Akses sesuai kewenangan</span>
                     </div>
+
                     <p class="text-[11px] text-slate-300 leading-snug">
                         Anda masuk sebagai <span class="font-semibold text-white">{{ Auth::user()?->role?->role_name ?? 'Pengguna' }}</span>.
                     </p>
-                </div>
-
-                <!-- Pengalih Akun Cepat (Quick Switcher Pengujian) -->
-                <div class="flex items-center justify-between text-[11px] text-slate-300 pt-2 border-t border-white/10">
-                    <span>Ganti Akun:</span>
-                    <div class="flex items-center space-x-1">
-                        <a href="/login-as/admin" title="Login sebagai Admin" class="px-2 py-0.5 rounded text-[10px] font-bold {{ Auth::user()?->role?->role_name === 'Admin' ? 'bg-blue-600 text-white' : 'bg-white/10 text-slate-300 hover:bg-white/20' }}">
-                            Admin
-                        </a>
-                        <a href="/login-as/petugas" title="Login sebagai Petugas" class="px-2 py-0.5 rounded text-[10px] font-bold {{ Auth::user()?->role?->role_name === 'Petugas Tindak Lanjut' ? 'bg-emerald-600 text-white' : 'bg-white/10 text-slate-300 hover:bg-white/20' }}">
-                            Petugas
-                        </a>
-                    </div>
                 </div>
 
                 <!-- Footer Sidebar (Persis Gambar 1) -->
                 <div class="text-[11px] text-slate-400 flex items-center justify-between pt-1">
                     <span>Pusat bantuan</span>
                     <span>&bull;</span>
-                    <a href="/login" class="hover:text-white">Keluar</a>
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit" class="hover:text-white">Keluar</button>
+                    </form>
                 </div>
             </div>
         </aside>
@@ -136,10 +146,8 @@
                     <span>/</span>
                     <span class="text-[#475569]">Ruang Kerja Modul Tindak Lanjut</span>
                 </div>
+
                 <div class="flex items-center space-x-3">
-                    <span class="hidden sm:inline-flex items-center px-2.5 py-0.5 rounded-md border border-[#C3CFDF] text-[11px] font-medium text-[#475569] bg-white">
-                        Data ilustrasi
-                    </span>
                     <div class="flex items-center space-x-2 border-l border-[#C3CFDF] pl-3 text-xs">
                         <span class="font-bold text-[#0F172A]">{{ Auth::user()?->name ?? 'User' }}</span>
                         <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold {{ Auth::user()?->role?->role_name === 'Admin' ? 'bg-purple-100 text-purple-800' : 'bg-emerald-100 text-emerald-800' }}">
@@ -175,5 +183,7 @@
             </main>
         </div>
     </div>
+
+    @stack('scripts')
 </body>
 </html>

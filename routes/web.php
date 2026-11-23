@@ -8,6 +8,7 @@ use App\Http\Controllers\FacilityAccessibilityController;
 use App\Http\Controllers\FacilityCategoryController;
 use App\Http\Controllers\FacilityController;
 use App\Http\Controllers\FollowUpAssignmentController;
+use App\Http\Controllers\FollowUpEvidenceController;
 use App\Http\Controllers\FollowUpProgressController;
 use App\Http\Controllers\GeocodeController;
 use App\Http\Controllers\IssueCategoryController;
@@ -146,21 +147,21 @@ Route::prefix('verifikasi')->name('verifikasi.')->middleware(['auth', 'role:Admi
 
 /*
 |--------------------------------------------------------------------------
-| PBI-13 & PBI-14: Penugasan & Progres Tindak Lanjut
+| PBI-13–15: Penugasan, Progres & Bukti Tindak Lanjut
 |--------------------------------------------------------------------------
 */
-Route::middleware(['auth', 'role:Admin,Petugas Tindak Lanjut'])->group(function (): void {
+Route::middleware(['auth', 'role:Admin,Pengelola Fasilitas,Petugas Tindak Lanjut'])->group(function (): void {
     Route::get('follow-up-assignments/ready-reports', [FollowUpAssignmentController::class, 'readyReports'])
         ->name('follow-up-assignments.ready-reports')
-        ->middleware('role:Admin');
+        ->middleware('role:Admin,Pengelola Fasilitas');
 
     Route::get('follow-up-assignments/create', [FollowUpAssignmentController::class, 'create'])
         ->name('follow-up-assignments.create')
-        ->middleware('role:Admin');
+        ->middleware('role:Admin,Pengelola Fasilitas');
 
     Route::post('follow-up-assignments', [FollowUpAssignmentController::class, 'store'])
         ->name('follow-up-assignments.store')
-        ->middleware('role:Admin');
+        ->middleware('role:Admin,Pengelola Fasilitas');
 
     Route::resource('follow-up-assignments', FollowUpAssignmentController::class)
         ->only(['index', 'show'])
@@ -168,4 +169,10 @@ Route::middleware(['auth', 'role:Admin,Petugas Tindak Lanjut'])->group(function 
 
     Route::post('follow-up-assignments/{follow_up_assignment}/progress', [FollowUpProgressController::class, 'store'])
         ->name('follow-up-assignments.progress.store');
+
+    Route::post('follow-up-assignments/{follow_up_assignment}/evidence', [FollowUpEvidenceController::class, 'store'])
+        ->name('follow-up-assignments.evidence.store');
+
+    Route::get('evidence/{evidence}', [FollowUpEvidenceController::class, 'show'])
+        ->name('evidence.show');
 });

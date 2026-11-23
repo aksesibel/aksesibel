@@ -2,9 +2,12 @@
 
 namespace Tests\Feature;
 
+use App\Models\Facility;
+use App\Models\FacilityCategory;
 use App\Models\FollowUpAssignment;
-use App\Models\FollowUpProgress;
+use App\Models\IssueCategory;
 use App\Models\Report;
+use App\Models\ReportingPeriod;
 use App\Models\Role;
 use App\Models\User;
 use App\Models\VerificationStatus;
@@ -16,9 +19,13 @@ class FollowUpProgressTest extends TestCase
     use RefreshDatabase;
 
     private User $admin;
+
     private User $assignedOfficer;
+
     private User $otherOfficer;
+
     private User $citizen;
+
     private FollowUpAssignment $assignment;
 
     protected function setUp(): void
@@ -32,58 +39,58 @@ class FollowUpProgressTest extends TestCase
 
         // Users
         $this->admin = User::factory()->create([
-            'role_id'        => $roleAdmin->role_id,
+            'role_id' => $roleAdmin->role_id,
             'account_status' => 'active',
         ]);
         $this->assignedOfficer = User::factory()->create([
-            'role_id'        => $roleOfficer->role_id,
+            'role_id' => $roleOfficer->role_id,
             'account_status' => 'active',
         ]);
         $this->otherOfficer = User::factory()->create([
-            'role_id'        => $roleOfficer->role_id,
+            'role_id' => $roleOfficer->role_id,
             'account_status' => 'active',
         ]);
         $this->citizen = User::factory()->create([
-            'role_id'        => $roleCitizen->role_id,
+            'role_id' => $roleCitizen->role_id,
             'account_status' => 'active',
         ]);
 
         // Status & Report
         $status = VerificationStatus::create(['status_name' => 'Dalam Tindak Lanjut']);
-        $facilityCategory = \App\Models\FacilityCategory::firstOrCreate(['category_name' => 'Kategori Fasilitas']);
-        $facility = \App\Models\Facility::firstOrCreate(
+        $facilityCategory = FacilityCategory::firstOrCreate(['category_name' => 'Kategori Fasilitas']);
+        $facility = Facility::firstOrCreate(
             ['name' => 'Fasilitas Uji'],
             ['category_id' => $facilityCategory->category_id]
         );
-        $issueCategory = \App\Models\IssueCategory::firstOrCreate(['category_name' => 'Kendala Uji']);
-        $period = \App\Models\ReportingPeriod::firstOrCreate(
+        $issueCategory = IssueCategory::firstOrCreate(['category_name' => 'Kendala Uji']);
+        $period = ReportingPeriod::firstOrCreate(
             ['period_name' => 'Periode Uji'],
             ['start_date' => now()->startOfYear(), 'end_date' => now()->endOfYear()]
         );
 
         $report = Report::create([
-            'report_number'     => 'RPT-TEST-001',
-            'user_id'           => $this->citizen->id,
-            'facility_id'       => $facility->facility_id,
+            'report_number' => 'RPT-TEST-001',
+            'user_id' => $this->citizen->id,
+            'facility_id' => $facility->facility_id,
             'issue_category_id' => $issueCategory->issue_category_id,
-            'status_id'         => $status->status_id,
-            'period_id'         => $period->period_id,
-            'description'       => 'Deskripsi uji progres penanganan.',
+            'status_id' => $status->status_id,
+            'period_id' => $period->period_id,
+            'description' => 'Deskripsi uji progres penanganan.',
         ]);
 
         $this->assignment = FollowUpAssignment::create([
-            'report_id'         => $report->report_id,
-            'assigned_to'       => $this->assignedOfficer->id,
-            'assigned_by'       => $this->admin->id,
+            'report_id' => $report->report_id,
+            'assigned_to' => $this->assignedOfficer->id,
+            'assigned_by' => $this->admin->id,
             'assignment_status' => 'assigned',
-            'assigned_at'       => now(),
+            'assigned_at' => now(),
         ]);
     }
 
     public function test_guest_cannot_store_progress(): void
     {
         $this->post(route('follow-up-assignments.progress.store', $this->assignment->assignment_id), [
-            'progress_status'    => 'Sedang Dikerjakan',
+            'progress_status' => 'Sedang Dikerjakan',
             'action_description' => 'Memulai pembersihan area.',
         ])->assertRedirect(route('login'));
     }
@@ -92,7 +99,7 @@ class FollowUpProgressTest extends TestCase
     {
         $this->actingAs($this->citizen)
             ->post(route('follow-up-assignments.progress.store', $this->assignment->assignment_id), [
-                'progress_status'    => 'Sedang Dikerjakan',
+                'progress_status' => 'Sedang Dikerjakan',
                 'action_description' => 'Mencoba input progres.',
             ])->assertForbidden();
     }
@@ -101,7 +108,7 @@ class FollowUpProgressTest extends TestCase
     {
         $this->actingAs($this->otherOfficer)
             ->post(route('follow-up-assignments.progress.store', $this->assignment->assignment_id), [
-                'progress_status'    => 'Sedang Dikerjakan',
+                'progress_status' => 'Sedang Dikerjakan',
                 'action_description' => 'Bukan petugas yang ditunjuk.',
             ])->assertForbidden();
     }
@@ -110,16 +117,16 @@ class FollowUpProgressTest extends TestCase
     {
         $this->actingAs($this->assignedOfficer)
             ->post(route('follow-up-assignments.progress.store', $this->assignment->assignment_id), [
-                'progress_status'    => 'Sedang Dikerjakan',
+                'progress_status' => 'Sedang Dikerjakan',
                 'action_description' => 'Material penghalang telah dipindahkan sebagian.',
             ])
             ->assertRedirect(route('follow-up-assignments.show', $this->assignment->assignment_id))
             ->assertSessionHas('success');
 
         $this->assertDatabaseHas('follow_up_progress', [
-            'assignment_id'      => $this->assignment->assignment_id,
-            'actor_id'           => $this->assignedOfficer->id,
-            'progress_status'    => 'Sedang Dikerjakan',
+            'assignment_id' => $this->assignment->assignment_id,
+            'actor_id' => $this->assignedOfficer->id,
+            'progress_status' => 'Sedang Dikerjakan',
             'action_description' => 'Material penghalang telah dipindahkan sebagian.',
         ]);
 
@@ -131,16 +138,16 @@ class FollowUpProgressTest extends TestCase
     {
         $this->actingAs($this->admin)
             ->post(route('follow-up-assignments.progress.store', $this->assignment->assignment_id), [
-                'progress_status'    => 'Dalam Koordinasi Lapangan',
+                'progress_status' => 'Dalam Koordinasi Lapangan',
                 'action_description' => 'Instruksi tambahan koordinasi keamanan.',
             ])
             ->assertRedirect(route('follow-up-assignments.show', $this->assignment->assignment_id))
             ->assertSessionHas('success');
 
         $this->assertDatabaseHas('follow_up_progress', [
-            'assignment_id'      => $this->assignment->assignment_id,
-            'actor_id'           => $this->admin->id,
-            'progress_status'    => 'Dalam Koordinasi Lapangan',
+            'assignment_id' => $this->assignment->assignment_id,
+            'actor_id' => $this->admin->id,
+            'progress_status' => 'Dalam Koordinasi Lapangan',
         ]);
     }
 
@@ -148,7 +155,7 @@ class FollowUpProgressTest extends TestCase
     {
         $this->actingAs($this->assignedOfficer)
             ->post(route('follow-up-assignments.progress.store', $this->assignment->assignment_id), [
-                'progress_status'    => 'Selesai',
+                'progress_status' => 'Selesai',
                 'action_description' => 'Seluruh pekerjaan perbaikan jalur kursi roda telah rampung.',
             ])
             ->assertRedirect(route('follow-up-assignments.show', $this->assignment->assignment_id));
@@ -160,10 +167,79 @@ class FollowUpProgressTest extends TestCase
     {
         $this->actingAs($this->assignedOfficer)
             ->post(route('follow-up-assignments.progress.store', $this->assignment->assignment_id), [
-                'progress_status'    => '',
+                'progress_status' => '',
                 'action_description' => '',
             ])
             ->assertSessionHasErrors(['progress_status', 'action_description']);
     }
-}
 
+    public function test_progress_status_outside_allowed_list_is_rejected(): void
+    {
+        $this->actingAs($this->assignedOfficer)
+            ->post(route('follow-up-assignments.progress.store', $this->assignment->assignment_id), [
+                'progress_status' => 'Status Tidak Ada Di Daftar',
+                'action_description' => 'Mencoba status acak.',
+            ])
+            ->assertSessionHasErrors(['progress_status']);
+    }
+
+    public function test_inactive_officer_cannot_store_progress(): void
+    {
+        $this->assignedOfficer->update(['account_status' => 'inactive']);
+
+        $this->actingAs($this->assignedOfficer)
+            ->post(route('follow-up-assignments.progress.store', $this->assignment->assignment_id), [
+                'progress_status' => 'Sedang Dikerjakan',
+                'action_description' => 'Akun dinonaktifkan.',
+            ])
+            ->assertForbidden();
+    }
+
+    public function test_facility_manager_can_store_progress(): void
+    {
+        $roleManager = Role::firstOrCreate(['role_name' => 'Pengelola Fasilitas']);
+        $manager = User::factory()->create([
+            'role_id' => $roleManager->role_id,
+            'account_status' => 'active',
+        ]);
+
+        $this->actingAs($manager)
+            ->post(route('follow-up-assignments.progress.store', $this->assignment->assignment_id), [
+                'progress_status' => 'Dalam Koordinasi Lapangan',
+                'action_description' => 'Koordinasi pengelola dengan dinas terkait.',
+            ])
+            ->assertRedirect(route('follow-up-assignments.show', $this->assignment->assignment_id))
+            ->assertSessionHas('success');
+
+        $this->assertDatabaseHas('follow_up_progress', [
+            'assignment_id' => $this->assignment->assignment_id,
+            'actor_id' => $manager->id,
+            'progress_status' => 'Dalam Koordinasi Lapangan',
+        ]);
+    }
+
+    public function test_progress_cannot_be_stored_for_cancelled_assignment(): void
+    {
+        $this->assignment->update(['assignment_status' => 'cancelled']);
+
+        $this->actingAs($this->assignedOfficer)
+            ->post(route('follow-up-assignments.progress.store', $this->assignment->assignment_id), [
+                'progress_status' => 'Sedang Dikerjakan',
+                'action_description' => 'Mencoba update penugasan yang sudah dibatalkan.',
+            ])
+            ->assertSessionHasErrors(['assignment_status']);
+    }
+
+    public function test_progress_cannot_be_stored_for_unforwarded_report(): void
+    {
+        $statusPending = VerificationStatus::create(['status_name' => 'Menunggu Verifikasi']);
+        $this->assignment->report->update(['status_id' => $statusPending->status_id]);
+
+        $this->actingAs($this->assignedOfficer)
+            ->post(route('follow-up-assignments.progress.store', $this->assignment->assignment_id), [
+                'progress_status' => 'Sedang Dikerjakan',
+                'action_description' => 'Laporan belum diteruskan.',
+            ])
+            ->assertSessionHasErrors(['report_status']);
+    }
+}

@@ -12,9 +12,6 @@
             <span class="font-semibold text-[#0F172A]">Antrean Penugasan</span>
         </nav>
         <div class="flex items-center space-x-3">
-            <span class="hidden sm:inline-flex items-center px-3 py-1 rounded-md border border-gray-200 bg-white text-gray-600 text-xs font-medium shadow-2xs">
-                Data ilustrasi
-            </span>
             <button type="button" aria-label="Notifikasi" class="p-1.5 rounded-md border border-gray-200 bg-white text-gray-500 hover:text-gray-700 shadow-2xs">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
@@ -206,11 +203,11 @@
                         {{ $selectedReport->issueCategory?->category_name ?? 'Kendala Fasilitas Publik' }}
                     </h2>
 
-                    <!-- Meta Box (Persis Gambar 1) -->
+                    <!-- Meta Box -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 border border-[#C3CFDF] rounded-md text-xs divide-y sm:divide-y-0 sm:divide-x divide-[#C3CFDF] overflow-hidden">
                         <div class="p-2.5 bg-white">
                             <span class="text-[#475569]">Pelapor: </span>
-                            <span class="font-medium text-[#0F172A]">Rina W. (privat)</span>
+                            <span class="font-medium text-[#0F172A]">{{ $selectedReport->user?->name ?? 'Masyarakat' }} (privat)</span>
                         </div>
                         <div class="p-2.5 bg-white">
                             <span class="text-[#475569]">Masuk: </span>
@@ -223,7 +220,7 @@
                     <!-- Subtitle Lokasi Fasilitas -->
                     <div>
                         <p class="text-sm font-bold text-[#0F172A]">
-                            {{ $selectedReport->facility?->name ?? 'Fasilitas' }} &bull; Pintu masuk utara
+                            {{ $selectedReport->facility?->name ?? 'Fasilitas Publik' }}{{ $selectedReport->facility?->address ? ' • ' . $selectedReport->facility->address : '' }}
                         </p>
                         <!-- Description -->
                         <p class="mt-2 text-sm text-[#475569] leading-relaxed">
@@ -231,49 +228,112 @@
                         </p>
                     </div>
 
-                    <!-- Bukti yang Dilampirkan (Persis Gambar 1 & 2) -->
+                    <!-- Bukti yang Dilampirkan -->
                     <div class="space-y-2 pt-2">
                         <h3 class="text-sm font-bold text-[#0F172A]">Bukti yang dilampirkan</h3>
-                        <div class="border border-[#C3CFDF] rounded-lg overflow-hidden bg-gray-100">
-                            <!-- Visual Sample Preview / Photo Container -->
-                            <div class="relative w-full h-52 bg-slate-200 flex items-center justify-center overflow-hidden">
-                                <svg class="w-16 h-16 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        @php
+                            $reportEvidence = $selectedReport->evidences?->first();
+                        @endphp
+                        @if ($reportEvidence)
+                            <div class="border border-[#C3CFDF] rounded-lg overflow-hidden bg-gray-100">
+                                <div class="relative w-full h-48 bg-slate-200 flex items-center justify-center overflow-hidden">
+                                    <svg class="w-14 h-14 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                    <span class="absolute bottom-2 left-2 bg-black/60 text-white text-[10px] px-2 py-0.5 rounded">
+                                        {{ $reportEvidence->caption ?? 'Dokumentasi Laporan Masyarakat' }}
+                                    </span>
+                                </div>
+                                <div class="px-4 py-2.5 bg-white flex items-center justify-between text-xs text-[#475569] border-t border-[#C3CFDF]">
+                                    <span class="truncate max-w-[320px]">
+                                        {{ basename($reportEvidence->file_path) }}
+                                        @if ($reportEvidence->file_type)
+                                            &bull; {{ $reportEvidence->file_type }}
+                                        @endif
+                                        &bull; {{ $reportEvidence->uploaded_at ? $reportEvidence->uploaded_at->format('d M Y') : ($selectedReport->created_at ? $selectedReport->created_at->format('d M Y') : '-') }}
+                                    </span>
+                                    <span class="text-[11px] text-gray-500 italic">Bukti Pelapor</span>
+                                </div>
+                            </div>
+                        @else
+                            <div class="border border-[#C3CFDF] rounded-lg p-5 bg-gray-50 text-center text-xs text-[#475569]">
+                                <svg class="mx-auto h-7 w-7 text-gray-400 mb-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                 </svg>
-                                <span class="absolute bottom-2 left-2 bg-black/60 text-white text-[10px] px-2 py-0.5 rounded">
-                                    Dokumentasi Laporan Lapangan
-                                </span>
+                                <span>Tidak ada berkas bukti foto yang dilampirkan pada laporan ini.</span>
                             </div>
-                            <!-- Image Footer (Persis Gambar 2) -->
-                            <div class="px-4 py-2.5 bg-white flex items-center justify-between text-xs text-[#475569] border-t border-[#C3CFDF]">
-                                <span>jalur-pemandu.jpg &bull; 1,8 MB &bull; {{ $selectedReport->created_at ? $selectedReport->created_at->format('d M Y') : '-' }}</span>
-                                <button type="button" class="inline-flex items-center text-xs font-medium text-gray-700 hover:text-blue-700 space-x-1">
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
-                                    </svg>
-                                    <span>Perbesar foto</span>
-                                </button>
-                            </div>
-                        </div>
+                        @endif
                     </div>
 
-                    <!-- Daftar Pemeriksaan (Persis Gambar 2) -->
+                    <!-- Informasi Verifikasi -->
                     <div class="space-y-3 pt-2">
-                        <h3 class="text-sm font-bold text-[#0F172A]">Daftar pemeriksaan verifikasi</h3>
-                        <div class="space-y-2 text-sm text-[#0F172A]">
-                            <label class="flex items-center space-x-2.5 cursor-default">
-                                <input type="checkbox" checked disabled class="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-0">
-                                <span>Fasilitas dan jenis sarana sesuai</span>
-                            </label>
-                            <label class="flex items-center space-x-2.5 cursor-default">
-                                <input type="checkbox" checked disabled class="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-0">
-                                <span>Lokasi kejadian dapat dikenali</span>
-                            </label>
-                            <label class="flex items-center space-x-2.5 cursor-default">
-                                <input type="checkbox" checked disabled class="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-0">
-                                <span>Bukti menunjukkan kendala yang dilaporkan</span>
-                            </label>
-                        </div>
+                        <h3 class="text-sm font-bold text-[#0F172A]">Informasi Verifikasi Laporan</h3>
+                        @php
+                            $verification = $selectedReport->verifications?->sort(function ($a, $b) {
+                                $aDated = $a->verified_at !== null;
+                                $bDated = $b->verified_at !== null;
+
+                                if ($aDated && ! $bDated) return -1;
+                                if (! $aDated && $bDated) return 1;
+
+                                if ($aDated && $bDated) {
+                                    $cmp = $b->verified_at <=> $a->verified_at;
+                                    if ($cmp !== 0) return $cmp;
+                                }
+
+                                return $b->verification_id <=> $a->verification_id;
+                            })->first();
+
+                            $verifiedAtDisplay = '-';
+                            if ($verification?->verified_at) {
+                                $verifiedAtDisplay = $verification->verified_at->copy()->timezone('Asia/Jakarta')->format('d M Y, H:i') . ' WIB';
+                            }
+
+                            $rawResult = trim((string) ($verification?->verification_result ?? ''));
+                            $hasResult = $rawResult !== '';
+                            $resultLower = strtolower($rawResult);
+
+                            if (! $hasResult) {
+                                $resultText = 'Hasil verifikasi belum dicatat';
+                                $badgeClass = 'bg-gray-100 text-gray-700 border border-gray-200';
+                            } elseif (in_array($resultLower, ['valid', 'terverifikasi', 'sesuai', 'disetujui'], true)) {
+                                $resultText = $rawResult;
+                                $badgeClass = 'bg-green-100 text-green-800 border border-green-200';
+                            } elseif (in_array($resultLower, ['tidak valid', 'ditolak', 'tidak sesuai'], true)) {
+                                $resultText = $rawResult;
+                                $badgeClass = 'bg-red-100 text-red-800 border border-red-200';
+                            } else {
+                                $resultText = $rawResult;
+                                $badgeClass = 'bg-gray-100 text-gray-700 border border-gray-200';
+                            }
+                        @endphp
+                        @if ($verification)
+                            <div class="p-3.5 rounded-lg bg-blue-50/50 border border-blue-100 space-y-2 text-xs">
+                                <div class="flex items-center justify-between">
+                                    <span class="font-semibold text-blue-900">
+                                        Diverifikasi oleh: {{ $verification->verifier?->name ?? 'Verifikator' }}
+                                    </span>
+                                    <span class="text-blue-700">
+                                        {{ $verifiedAtDisplay }}
+                                    </span>
+                                </div>
+                                <div class="text-[#0F172A]">
+                                    <span class="text-[#475569]">Hasil Verifikasi:</span>
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold {{ $badgeClass }} ml-1">
+                                        {{ $resultText }}
+                                    </span>
+                                </div>
+                                @if ($verification->notes)
+                                    <p class="text-gray-700 italic bg-white p-2.5 rounded border border-blue-100/60">
+                                        "{{ $verification->notes }}"
+                                    </p>
+                                @endif
+                            </div>
+                        @else
+                            <div class="p-3 rounded-lg bg-gray-50 border border-gray-200 text-xs text-[#475569]">
+                                Laporan telah berstatus <strong>Dalam Tindak Lanjut</strong> dan siap untuk ditugaskan ke petugas lapangan.
+                            </div>
+                        @endif
                     </div>
                 </div>
 

@@ -4,8 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class FollowUpEvidence extends Model
 {
@@ -16,6 +14,11 @@ class FollowUpEvidence extends Model
     public $timestamps = false;
 
     protected $guarded = [];
+
+    public function getRouteKeyName(): string
+    {
+        return 'follow_up_evidence_id';
+    }
 
     protected function casts(): array
     {

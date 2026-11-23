@@ -21,6 +21,10 @@ class EnsureUserHasRole
             abort(403, 'Akses ditolak.');
         }
 
+        if ($user->account_status !== 'active') {
+            abort(403, 'Akun Anda tidak aktif atau dinonaktifkan.');
+        }
+
         if (! in_array($user->role->role_name, $roles, true)) {
             abort(403, 'Anda tidak memiliki kewenangan untuk mengakses halaman ini.');
         }
@@ -28,4 +32,3 @@ class EnsureUserHasRole
         return $next($request);
     }
 }
-

@@ -5,9 +5,9 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreFollowUpAssignmentRequest;
 use App\Models\FollowUpAssignment;
 use App\Models\Report;
+use App\Models\User;
 use App\Models\VerificationStatus;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class FollowUpAssignmentController extends Controller
@@ -21,6 +21,10 @@ class FollowUpAssignmentController extends Controller
     public function index(Request $request)
     {
         $user = $request->user();
+        if ($user && $user->account_status !== 'active') {
+            abort(403, 'Akun Anda tidak aktif atau dinonaktifkan.');
+        }
+
         $roleName = $user->role?->role_name;
 
         $query = FollowUpAssignment::with(['report.facility', 'assignee', 'assigner']);
@@ -42,6 +46,11 @@ class FollowUpAssignmentController extends Controller
      */
     public function readyReports(Request $request)
     {
+        $user = $request->user();
+        if ($user && $user->account_status !== 'active') {
+            abort(403, 'Akun Anda tidak aktif atau dinonaktifkan.');
+        }
+
         $statusDalamTindakLanjut = VerificationStatus::where('status_name', 'Dalam Tindak Lanjut')->first();
 
         // Statistik aktual
@@ -58,7 +67,19 @@ class FollowUpAssignmentController extends Controller
             }, function ($q) {
                 $q->whereRaw('1 = 0');
             })
-            ->with(['facility.category', 'issueCategory', 'status', 'verifications.verifier'])
+            ->with([
+                'facility.category',
+                'issueCategory',
+                'status',
+                'verifications' => function ($q) {
+                    $q->with('verifier')
+                        ->orderByRaw('CASE WHEN verified_at IS NOT NULL THEN 0 ELSE 1 END')
+                        ->orderByDesc('verified_at')
+                        ->orderByDesc('verification_id');
+                },
+                'user',
+                'evidences',
+            ])
             ->orderByDesc('report_id');
 
         if ($search = trim((string) $request->query('search'))) {
@@ -98,6 +119,11 @@ class FollowUpAssignmentController extends Controller
      */
     public function create(Request $request)
     {
+        $user = $request->user();
+        if ($user && $user->account_status !== 'active') {
+            abort(403, 'Akun Anda tidak aktif atau dinonaktifkan.');
+        }
+
         $statusDalamTindakLanjut = VerificationStatus::where('status_name', 'Dalam Tindak Lanjut')->first();
 
         $reports = collect();
@@ -114,7 +140,7 @@ class FollowUpAssignmentController extends Controller
             $selectedReport = $reports->firstWhere('report_id', (int) $selectedReportId);
         }
 
-        $officers = \App\Models\User::whereHas('role', function ($q) {
+        $officers = User::whereHas('role', function ($q) {
             $q->where('role_name', 'Petugas Tindak Lanjut');
         })->where('account_status', 'active')->get();
 
@@ -130,13 +156,13 @@ class FollowUpAssignmentController extends Controller
 
         $assignment = DB::transaction(function () use ($validated, $request) {
             return FollowUpAssignment::create([
-                'report_id'         => $validated['report_id'],
-                'assigned_to'       => $validated['assigned_to'],
-                'assigned_by'       => $request->user()->id,
+                'report_id' => $validated['report_id'],
+                'assigned_to' => $validated['assigned_to'],
+                'assigned_by' => $request->user()->id,
                 'assignment_status' => 'assigned',
-                'assigned_at'       => now(),
-                'due_date'          => $validated['due_date'] ?? null,
-                'assignment_notes'  => $validated['assignment_notes'] ?? null,
+                'assigned_at' => now(),
+                'due_date' => $validated['due_date'] ?? null,
+                'assignment_notes' => $validated['assignment_notes'] ?? null,
             ]);
         });
 
@@ -151,10 +177,19 @@ class FollowUpAssignmentController extends Controller
     public function show(Request $request, FollowUpAssignment $follow_up_assignment)
     {
         $user = $request->user();
+        if ($user && $user->account_status !== 'active') {
+            abort(403, 'Akun Anda tidak aktif atau dinonaktifkan.');
+        }
+
         $roleName = $user->role?->role_name;
 
         // Petugas Tindak Lanjut hanya boleh lihat miliknya
-        if ($roleName === 'Petugas Tindak Lanjut' && $follow_up_assignment->assigned_to !== $user->id) {
+        if ($roleName === 'Petugas Tindak Lanjut' && (int) $follow_up_assignment->assigned_to !== (int) $user->id) {
+            abort(403, 'Anda tidak memiliki akses ke penugasan ini.');
+        }
+
+        // Masyarakat atau role lain yang tidak berwenang dilarang mengakses
+        if (! in_array($roleName, ['Admin', 'Pengelola Fasilitas', 'Petugas Tindak Lanjut'], true)) {
             abort(403, 'Anda tidak memiliki akses ke penugasan ini.');
         }
 
@@ -166,11 +201,10 @@ class FollowUpAssignmentController extends Controller
             'assignee',
             'assigner',
             'progress' => function ($q) {
-                $q->with('actor')->orderByDesc('recorded_at');
+                $q->with(['actor', 'evidences'])->orderByDesc('recorded_at');
             },
         ]);
 
         return view('follow-up-assignments.show', ['assignment' => $follow_up_assignment]);
     }
 }
-
