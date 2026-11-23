@@ -40,7 +40,7 @@
 
     @if(!$activePeriod)
         <div class="alert alert-warning">
-            Periode pelaporan saat ini belum tersedia. Silakan hubungi pengelola.
+            {{ $periodError }}
         </div>
     @endif
 
@@ -58,7 +58,8 @@
 
     <form action="{{ route('reports.store') }}"
           method="POST"
-          enctype="multipart/form-data">
+          enctype="multipart/form-data"
+          id="report-form">
         @csrf
 
         <h6 class="fw-bold mb-3">Informasi Kendala</h6>
@@ -68,6 +69,7 @@
 
             <select name="facility_id"
                     id="facility_id"
+                    data-accessibility-endpoint="{{ route('reports.facilities.accessibilities', ['facility' => '__FACILITY_ID__']) }}"
                     class="form-select"
                     required>
                 <option value="">Pilih fasilitas</option>
@@ -146,11 +148,18 @@
         <div class="mb-3">
             <label class="form-label fw-semibold">Deskripsi Kendala *</label>
             <textarea name="description"
-                      class="form-control"
-                      rows="5"
-                      maxlength="5000"
-                      placeholder="Jelaskan kendala yang ditemukan secara terperinci..."
-                      required>{{ old('description') }}</textarea>
+                    id="description"
+                    class="form-control"
+                    rows="5"
+                    maxlength="5000"
+                    placeholder="Jelaskan kendala yang ditemukan secara terperinci..."
+                    required>{{ old('description') }}</textarea>
+
+            <div class="d-flex justify-content-end mt-1">
+                <small id="description-count" class="text-muted">
+                    0/5000 karakter
+                </small>
+            </div>
         </div>
 
         <hr class="my-4">
@@ -159,15 +168,27 @@
 
         <div class="mb-3">
             <label class="form-label fw-semibold">Unggah Foto</label>
+
             <input type="file"
-                   name="evidences[]"
-                   class="form-control"
-                   accept=".jpg,.jpeg,.png,.webp"
-                   multiple>
+                name="evidences[]"
+                id="evidences"
+                aria-describedby="evidence-count evidence-error"
+                class="form-control"
+                accept=".jpg,.jpeg,.png,.webp"
+                multiple>
+
             <div class="form-text">
                 Maksimal 5 foto, format JPG, JPEG, PNG, atau WEBP.
                 Maksimal 2 MB per foto.
             </div>
+
+            <!-- Preview foto yang dipilih -->
+            <div id="evidence-preview" class="row g-3 mt-2"></div>
+
+            <div id="evidence-count" class="form-text mt-2">
+                0 dari 5 foto dipilih
+            </div>
+            <div id="evidence-error" class="text-danger small mt-2" role="alert"></div>
         </div>
 
         <hr class="my-4">
@@ -190,9 +211,14 @@
                 Batal
             </a>
             <button type="submit"
+                    id="submit-report"
                     class="btn btn-primary"
                     @disabled(!$activePeriod || $facilities->isEmpty() || $categories->isEmpty())>
-                Kirim Laporan
+                <span id="submit-text">Kirim Laporan</span>
+                <span id="submit-loading" class="d-none">
+                    <span class="spinner-border spinner-border-sm me-1" role="status"></span>
+                    Mengirim Laporan...
+                </span>
             </button>
         </div>
     </form>
@@ -205,14 +231,157 @@
 document.addEventListener('DOMContentLoaded', function () {
     const facilitySelect = document.getElementById('facility_id');
     const accessibilitySelect = document.getElementById('facility_accessibility_id');
+    // Preview foto bukti laporan sebelum diunggah.
+    const evidenceInput = document.getElementById('evidences');
+    const evidencePreview = document.getElementById('evidence-preview');
+    const evidenceCount = document.getElementById('evidence-count');
+    const evidenceError = document.getElementById('evidence-error');
+
+    // Konfirmasi sebelum laporan dikirim dan tampilkan loading state.
+    const reportForm = document.getElementById('report-form');
+    const submitButton = document.getElementById('submit-report');
+    const submitText = document.getElementById('submit-text');
+    const submitLoading = document.getElementById('submit-loading');
+
+    reportForm.addEventListener('submit', function (event) {
+        const confirmed = window.confirm(
+            'Apakah Anda yakin ingin mengirim laporan ini? Pastikan informasi dan bukti foto sudah benar.'
+        );
+
+        if (!confirmed) {
+            event.preventDefault();
+            return;
+        }
+
+        submitButton.disabled = true;
+        submitText.classList.add('d-none');
+        submitLoading.classList.remove('d-none');
+    });
+    // Counter karakter deskripsi laporan.
+    const descriptionInput = document.getElementById('description');
+    const descriptionCount = document.getElementById('description-count');
+
+    function updateDescriptionCount() {
+        const currentLength = descriptionInput.value.length;
+
+        descriptionCount.textContent =
+            currentLength + '/5000 karakter';
+
+        if (currentLength >= 5000) {
+            descriptionCount.classList.add('text-danger');
+            descriptionCount.classList.remove('text-muted');
+        } else {
+            descriptionCount.classList.remove('text-danger');
+            descriptionCount.classList.add('text-muted');
+        }
+    }
+
+    // Perbarui counter ketika pengguna mengetik.
+    descriptionInput.addEventListener('input', updateDescriptionCount);
+
+    // Tampilkan jumlah karakter awal, termasuk old input.
+    updateDescriptionCount();
+
+    let previewUrls = [];
+
+    evidenceInput.addEventListener('change', function () {
+        // Bersihkan preview sebelumnya.
+        previewUrls.forEach(function (url) {
+            URL.revokeObjectURL(url);
+        });
+
+        previewUrls = [];
+        evidencePreview.innerHTML = '';
+        evidenceError.innerHTML = '';
+
+        const files = Array.from(this.files);
+
+        // Perbarui counter jumlah foto.
+        evidenceCount.textContent = files.length + ' dari 5 foto dipilih';
+
+        const allowedTypes = [
+            'image/jpeg',
+            'image/png',
+            'image/webp'
+        ];
+
+        const maxSize = 2 * 1024 * 1024;
+        const errors = [];
+
+        if (files.length > 5) {
+            errors.push('Maksimal hanya 5 foto yang dapat diunggah.');
+        }
+
+        files.forEach(function (file) {
+            if (!allowedTypes.includes(file.type)) {
+                errors.push(file.name + ': Format file tidak didukung.');
+            }
+
+            if (file.size > maxSize) {
+                errors.push(file.name + ': Ukuran file melebihi 2 MB.');
+            }
+        });
+
+        // Tampilkan pesan jika terdapat kesalahan.
+        if (errors.length > 0) {
+            evidenceError.innerHTML = errors
+                .map(function (message) {
+                    const item = document.createElement('div');
+                    item.textContent = message;
+                    return item;
+                })
+                .map(function (item) {
+                    return item.outerHTML;
+                })
+                .join('');
+
+            this.value = '';
+            evidenceCount.textContent = '0 dari 5 foto dipilih';
+            return;
+        }
+
+        // Tampilkan preview foto jika semua valid.
+        files.forEach(function (file) {
+            const previewUrl = URL.createObjectURL(file);
+            previewUrls.push(previewUrl);
+
+            const column = document.createElement('div');
+            column.className = 'col-6 col-md-4 col-lg-3';
+
+            const card = document.createElement('div');
+            card.className = 'card h-100';
+
+            const image = document.createElement('img');
+            image.src = previewUrl;
+            image.alt = 'Preview ' + file.name;
+            image.className = 'card-img-top';
+            image.style.height = '150px';
+            image.style.objectFit = 'cover';
+
+            const cardBody = document.createElement('div');
+            cardBody.className = 'card-body p-2';
+
+            const fileName = document.createElement('p');
+            fileName.className = 'small text-muted mb-0 text-break';
+            fileName.textContent = file.name;
+
+            cardBody.appendChild(fileName);
+            card.appendChild(image);
+            card.appendChild(cardBody);
+            column.appendChild(card);
+
+            evidencePreview.appendChild(column);
+        });
+    });
 
     const oldAccessibilityId = @json(old('facility_accessibility_id'));
 
-    const endpointTemplate = @json(
-        route('reports.facilities.accessibilities', ['facility' => '__FACILITY_ID__'])
-    );
+    const endpointTemplate = facilitySelect.dataset.accessibilityEndpoint;
+
+    let accessibilityRequest;
 
     async function loadAccessibilities(facilityId) {
+        accessibilityRequest?.abort();
         accessibilitySelect.innerHTML = '';
         accessibilitySelect.disabled = true;
 
@@ -225,19 +394,26 @@ document.addEventListener('DOMContentLoaded', function () {
         accessibilitySelect.innerHTML =
             '<option value="">Memuat item aksesibilitas...</option>';
 
+        const request = new AbortController();
+        accessibilityRequest = request;
+
         try {
             const endpoint = endpointTemplate.replace(
                 '__FACILITY_ID__',
                 facilityId
             );
 
-            const response = await fetch(endpoint);
+            const response = await fetch(endpoint, { signal: request.signal });
 
             if (!response.ok) {
                 throw new Error('Gagal mengambil data');
             }
 
             const items = await response.json();
+
+            if (request.signal.aborted) {
+                return;
+            }
 
             accessibilitySelect.innerHTML =
                 '<option value="">Pilih item aksesibilitas (opsional)</option>';
@@ -271,6 +447,10 @@ document.addEventListener('DOMContentLoaded', function () {
             accessibilitySelect.disabled = false;
 
         } catch (error) {
+            if (request.signal.aborted) {
+                return;
+            }
+
             accessibilitySelect.innerHTML =
                 '<option value="">Gagal memuat item aksesibilitas</option>';
 
