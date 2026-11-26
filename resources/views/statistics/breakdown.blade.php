@@ -5,7 +5,7 @@
 @endphp
 <section class="panel min-w-0" aria-labelledby="{{ $id }}-title">
     <h2 id="{{ $id }}-title">{{ $title }}</h2>
-    <p class="mt-2 text-xs leading-5 text-slate-500">{{ $id === 'status' ? 'Jumlah laporan menurut status terakhir pada periode terpilih.' : 'Distribusi laporan sesuai filter yang diterapkan.' }}</p>
+    <p class="mt-2 text-xs leading-5 text-slate-500">{{ $description ?? ($id === 'status' ? 'Jumlah laporan menurut status terakhir pada periode terpilih.' : 'Distribusi laporan sesuai filter yang diterapkan.') }}</p>
 
     @if ($variant === 'columns' && $rows->isNotEmpty())
         <div class="chart-legend" aria-hidden="true"><span class="inline-flex items-center gap-2"><span class="legend-dot bg-blue-700"></span>Jumlah laporan</span></div>
@@ -28,7 +28,7 @@
                     @php($offset += $percentage)
                 @endforeach
             </svg>
-            <div class="donut-center"><strong>{{ number_format($reportTotal, 0, ',', '.') }}</strong><span>laporan</span></div>
+            <div class="donut-center"><strong>{{ number_format($reportTotal, 0, ',', '.') }}</strong><span>{{ $id === 'condition' ? 'sarana' : 'laporan' }}</span></div>
         </div>
     @elseif ($variant === 'bars' && $rows->isNotEmpty())
         <div class="status-bars" aria-hidden="true">
@@ -53,7 +53,7 @@
                 @forelse ($rows as $row)
                     <tr><th scope="row">@if($variant === 'donut')<span class="legend-dot mr-2" style="background-color: {{ $colors[$loop->index % count($colors)] }}" aria-hidden="true"></span>@endif{{ $row->label }}{{ isset($row->is_active) && ! $row->is_active ? ' (nonaktif)' : '' }}</th><td>{{ number_format($row->total, 0, ',', '.') }}</td></tr>
                 @empty
-                    <tr><td colspan="2">Belum ada data laporan.</td></tr>
+                    <tr><td colspan="2">{{ $id === 'condition' ? 'Belum ada data sarana.' : 'Belum ada data laporan.' }}</td></tr>
                 @endforelse
             </tbody>
         </table>

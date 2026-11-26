@@ -30,116 +30,114 @@
     }
 </style>
 
-<div class="max-w-6xl mx-auto px-4 sm:px-6 py-10" x-data="facilityList()" x-init="init()">
-
-    <h1 class="text-2xl font-extrabold text-[#0F172A] mb-1">Daftar Fasilitas Publik</h1>
-    <p class="text-[#475569] text-sm mb-6">Temukan fasilitas yang aksesibel di sekitar Anda.</p>
-
-    {{-- Chip filter kategori --}}
-    <div class="flex flex-wrap gap-2 mb-6" role="group" aria-label="Filter berdasarkan kategori">
-        <a href="{{ route('facilities.index', array_merge(request()->except('category_id'), ['page' => 1])) }}"
-           class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-semibold border transition-colors min-h-[44px]
-                  {{ !request('category_id') ? 'bg-[#1D4ED8] text-white border-[#1D4ED8]' : 'bg-white text-[#475569] border-[#E2E8F0] hover:border-[#1D4ED8] hover:text-[#1D4ED8]' }}"
-           aria-pressed="{{ !request('category_id') ? 'true' : 'false' }}">Semua</a>
-        @foreach($categories as $cat)
-            @php $isActive = request('category_id') == $cat->category_id; @endphp
-            <a href="{{ route('facilities.index', array_merge(request()->except('category_id'), ['category_id' => $cat->category_id, 'page' => 1])) }}"
-               class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-semibold border transition-colors min-h-[44px]
-                      {{ $isActive ? 'bg-[#1D4ED8] text-white border-[#1D4ED8]' : 'bg-white text-[#475569] border-[#E2E8F0] hover:border-[#1D4ED8] hover:text-[#1D4ED8]' }}"
-               aria-pressed="{{ $isActive ? 'true' : 'false' }}">
-                <x-category-icon :icon="$cat->icon" class="w-3.5 h-3.5" />
-                {{ $cat->category_name }}
-                <span class="{{ $isActive ? 'bg-white/20 text-white' : 'bg-[#F1F5F9] text-[#475569]' }} text-xs px-1.5 py-0.5 rounded-full font-semibold">{{ $cat->facilities_count }}</span>
-            </a>
-        @endforeach
+<div class="py-2" x-data="facilityList()" x-init="init()">
+    <div class="mb-6">
+        <p class="mb-2 text-xs font-semibold text-primary"><a href="{{ route('home') }}" class="hover:underline">Beranda</a> / Cari fasilitas</p>
+        <h1 class="text-2xl font-bold tracking-tight sm:text-[32px]">Temukan fasilitas yang sesuai kebutuhan</h1>
+        <p class="mt-2 text-sm text-slate-600">Informasi kondisi sarana membantu Anda menyiapkan kunjungan.</p>
     </div>
-
-    {{-- Search & filter (tersinkron dengan query string URL) --}}
-    <form method="GET" action="{{ route('facilities.index') }}" role="search" aria-label="Filter fasilitas"
-          x-ref="filterForm"
-          class="bg-white border border-[#E2E8F0] rounded-xl p-4 mb-6 flex flex-col sm:flex-row gap-3 flex-wrap">
-        @if(request('category_id'))<input type="hidden" name="category_id" value="{{ request('category_id') }}">@endif
+    <form id="facility-filter" method="GET" action="{{ route('facilities.index') }}" role="search" aria-label="Filter fasilitas" x-ref="filterForm" class="mb-6 flex flex-wrap items-end gap-3">
         <input type="hidden" name="sort" x-model="sortBy">
         <input type="hidden" name="lat" x-model="userLat">
         <input type="hidden" name="lng" x-model="userLng">
-
-        <div class="flex-1 min-w-[180px]">
-            <label for="q" class="sr-only">Cari nama, wilayah, atau alamat</label>
-            <input id="q" type="search" name="q" value="{{ request('q') }}"
-                   placeholder="Cari nama, wilayah, atau alamat…"
-                   class="w-full px-3 py-2 rounded-lg border border-[#E2E8F0] text-sm text-[#0F172A] placeholder-[#94A3B8] focus:outline-none focus:ring-2 focus:ring-[#1D4ED8] min-h-[44px]">
+        <div class="min-w-48 flex-1">
+            <label for="q">Cari fasilitas atau alamat</label>
+            <input id="q" class="field" type="search" name="q" value="{{ is_string(request('q')) ? request('q') : '' }}" placeholder="Nama fasilitas, wilayah, atau alamat">
         </div>
-
-        {{-- Filter wilayah berjenjang --}}
-        <div>
-            <label for="province_id" class="sr-only">Provinsi</label>
-            <select id="province_id" name="province_id" x-model="provinceId" @change="onProvinceChange()"
-                    class="px-3 py-2 rounded-lg border border-[#E2E8F0] text-sm text-[#0F172A] bg-white focus:outline-none focus:ring-2 focus:ring-[#1D4ED8] min-h-[44px]">
-                <option value="">Semua Provinsi</option>
-                @foreach($provinces as $prov)
-                    <option value="{{ $prov->region_id }}">{{ $prov->name }}</option>
+        <div class="min-w-40 flex-1">
+            <label for="province_id">Wilayah</label>
+            <select id="province_id" name="province_id" class="field" x-model="provinceId" @change="onProvinceChange()">
+                <option value="">Semua provinsi</option>
+                @foreach($provinces as $province)
+                    <option value="{{ $province->region_id }}" @selected(request('province_id') == $province->region_id)>{{ $province->name }}</option>
                 @endforeach
             </select>
         </div>
-
-        <div x-show="cities.length" x-cloak>
-            <label for="city_id" class="sr-only">Kota/Kabupaten</label>
-            <select id="city_id" name="city_id" x-model="cityId" @change="onCityChange()"
-                    class="px-3 py-2 rounded-lg border border-[#E2E8F0] text-sm text-[#0F172A] bg-white focus:outline-none focus:ring-2 focus:ring-[#1D4ED8] min-h-[44px]">
-                <option value="">Semua Kota</option>
-                <template x-for="c in cities" :key="c.region_id">
-                    <option :value="c.region_id" x-text="c.name"></option>
-                </template>
-            </select>
-        </div>
-
-        <div x-show="districts.length" x-cloak>
-            <label for="district_id" class="sr-only">Kecamatan</label>
-            <select id="district_id" name="district_id" x-model="districtId"
-                    class="px-3 py-2 rounded-lg border border-[#E2E8F0] text-sm text-[#0F172A] bg-white focus:outline-none focus:ring-2 focus:ring-[#1D4ED8] min-h-[44px]">
-                <option value="">Semua Kecamatan</option>
-                <template x-for="d in districts" :key="d.region_id">
-                    <option :value="d.region_id" x-text="d.name"></option>
-                </template>
-            </select>
-        </div>
-
-        <div>
-            <label for="accessibility_status" class="sr-only">Status aksesibilitas</label>
-            <select id="accessibility_status" name="accessibility_status"
-                    class="px-3 py-2 rounded-lg border border-[#E2E8F0] text-sm text-[#0F172A] bg-white focus:outline-none focus:ring-2 focus:ring-[#1D4ED8] min-h-[44px]">
-                <option value="">Semua Status</option>
-                @foreach(\App\Models\Facility::statusOptions() as $value => $label)
-                    <option value="{{ $value }}" {{ request('accessibility_status') === $value ? 'selected' : '' }}>{{ $label }}</option>
-                @endforeach
-            </select>
-        </div>
-
-        <button type="submit" class="px-5 py-2 rounded-lg bg-[#1D4ED8] hover:bg-[#1E40AF] text-white font-semibold text-sm transition-colors min-h-[44px] flex items-center gap-2">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-            Terapkan
-        </button>
-
-        {{-- Dekat saya: memakai Geolocation API, koordinat tidak dikirim/disimpan di server --}}
-        <button type="button" @click="useMyLocation()"
-                class="px-4 py-2 rounded-lg border border-[#E2E8F0] text-[#1D4ED8] text-sm font-semibold hover:bg-[#EFF6FF] transition-colors min-h-[44px] flex items-center gap-2">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>
-            <span x-text="geoBusy ? 'Mencari…' : 'Dekat saya'">Dekat saya</span>
-        </button>
-
-        @if(request()->hasAny(['q','category_id','accessibility_status','province_id','city_id','district_id','sort']))
-            <a href="{{ route('facilities.index') }}" class="px-4 py-2 rounded-lg border border-[#E2E8F0] text-[#475569] text-sm hover:bg-[#F8FAFC] transition-colors min-h-[44px] flex items-center">Hapus Filter</a>
-        @endif
+        <button class="button" type="submit"><x-icon name="search" :size="16" /> Cari fasilitas</button>
     </form>
 
-    {{-- Status geolokasi --}}
-    <p x-show="geoStatus" x-cloak role="status" aria-live="polite" class="mb-4 text-sm text-[#475569]" x-text="geoStatus"></p>
-
+    <div class="grid items-start gap-6 lg:grid-cols-[17rem_minmax(0,1fr)]">
+        <aside class="panel grid gap-4 !p-4" aria-labelledby="filter-heading">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+                <h2 id="filter-heading" class="text-base font-bold">Filter fasilitas</h2>
+                <a href="{{ route('facilities.index') }}" class="text-xs font-semibold text-primary hover:underline">Atur ulang</a>
+            </div>
+            <div class="grid gap-3">
+                <div>
+                    <label for="category_id">Jenis fasilitas</label>
+                    <select class="field" id="category_id" name="category_id" form="facility-filter">
+                        <option value="">Semua jenis</option>
+                        @foreach($categories as $category)
+                            <option value="{{ $category->category_id }}" @selected(request('category_id') == $category->category_id)>{{ $category->category_name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div x-show="cities.length" x-cloak>
+                    <label for="city_id">Kota atau kabupaten</label>
+                    <select id="city_id" name="city_id" form="facility-filter" class="field" x-model="cityId" @change="onCityChange()">
+                        <option value="">Semua kota</option>
+                        <template x-for="city in cities" :key="city.region_id"><option :value="city.region_id" x-text="city.name"></option></template>
+                    </select>
+                </div>
+                <div x-show="districts.length" x-cloak>
+                    <label for="district_id">Kecamatan</label>
+                    <select id="district_id" name="district_id" form="facility-filter" class="field" x-model="districtId">
+                        <option value="">Semua kecamatan</option>
+                        <template x-for="district in districts" :key="district.region_id"><option :value="district.region_id" x-text="district.name"></option></template>
+                    </select>
+                </div>
+                @if(request()->filled('region_id'))
+                    <input type="hidden" name="region_id" value="{{ request('region_id') }}" form="facility-filter">
+                @endif
+                <fieldset class="grid gap-1.5">
+                    <legend class="mb-2 text-sm font-semibold">Sarana yang dibutuhkan</legend>
+                    @forelse($accessibilityTypes as $type)
+                        <label class="flex min-h-9 items-center gap-2 text-sm font-normal">
+                            <input type="checkbox" name="sarana[]" form="facility-filter" value="{{ $type->accessibility_type_id }}" class="size-4 shrink-0 accent-blue-700" @checked(in_array($type->accessibility_type_id, $facilityFilters['sarana'] ?? []))>
+                            {{ $type->type_name }}
+                        </label>
+                    @empty
+                        <p class="text-xs text-slate-500">Jenis sarana belum tercatat.</p>
+                    @endforelse
+                </fieldset>
+                <fieldset class="grid gap-1.5">
+                    <legend class="mb-2 text-sm font-semibold">Kondisi sarana</legend>
+                    @foreach(['good' => 'Berfungsi', 'repair' => 'Perlu perbaikan', 'unavailable' => 'Belum tersedia'] as $value => $label)
+                        <label class="flex min-h-9 items-center gap-2 text-sm font-normal">
+                            <input type="checkbox" name="kondisi[]" form="facility-filter" value="{{ $value }}" class="size-4 shrink-0 accent-blue-700" @checked(in_array($value, $facilityFilters['kondisi'] ?? [], true))>
+                            {{ $label }}
+                        </label>
+                    @endforeach
+                </fieldset>
+                <div>
+                    <label for="pemeriksaan">Pemeriksaan sarana</label>
+                    <select class="field" id="pemeriksaan" name="pemeriksaan" form="facility-filter">
+                        <option value="">Semua informasi</option>
+                        <option value="recorded" @selected(($facilityFilters['pemeriksaan'] ?? null) === 'recorded')>Ada catatan pemeriksaan</option>
+                        <option value="unrecorded" @selected(($facilityFilters['pemeriksaan'] ?? null) === 'unrecorded')>Belum ada catatan pemeriksaan</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="accessibility_status">Status fasilitas</label>
+                    <select id="accessibility_status" name="accessibility_status" form="facility-filter" class="field">
+                        <option value="">Semua status</option>
+                        @foreach(\App\Models\Facility::statusOptions() as $value => $label)
+                            <option value="{{ $value }}" @selected(request('accessibility_status') === $value)>{{ $label }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+            <button class="button w-full" type="submit" form="facility-filter">Terapkan filter</button>
+            <button class="button-secondary w-full" type="button" @click="useMyLocation()"><span x-text="geoBusy ? 'Mencari…' : 'Dekat saya'">Dekat saya</span></button>
+            <p class="text-xs text-slate-600">Filter sarana menampilkan fasilitas dengan informasi sarana tersebut.</p>
+        </aside>
+        <div class="min-w-0">
+            <p x-show="geoStatus" x-cloak role="status" class="mb-4 text-sm text-slate-600" x-text="geoStatus"></p>
     {{-- Tab Daftar / Peta --}}
     <div class="flex items-center justify-between mb-6 flex-wrap gap-3">
-        <p class="text-sm text-[#475569]" aria-live="polite" id="result-count">
+        <p class="text-lg font-bold" aria-live="polite" id="result-count">
             @if(!$facilities->isEmpty())
-                Menampilkan {{ $facilities->firstItem() }}–{{ $facilities->lastItem() }} dari {{ $facilities->total() }} fasilitas
+                {{ $facilities->total() }} fasilitas ditemukan
                 @if($sortByDistance)<span class="text-[#1D4ED8] font-medium">· diurutkan dari terdekat</span>@endif
             @endif
         </p>
@@ -162,6 +160,8 @@
         </div>
     </div>
 
+    <p class="information-note mb-5"><x-icon name="info" :size="17" /><span><strong class="text-primary">Periksa kondisi per sarana.</strong> Satu fasilitas dapat memiliki sarana yang berfungsi dan sarana yang perlu perbaikan.</span></p>
+
     {{-- ==================== Tampilan Daftar ==================== --}}
     <div id="panel-list" role="tabpanel" aria-labelledby="tab-list" x-show="tab === 'list'">
         @if($facilities->isEmpty())
@@ -172,9 +172,9 @@
                 <a href="{{ route('facilities.index') }}" class="mt-4 inline-flex text-sm text-[#1D4ED8] hover:underline">Lihat semua fasilitas</a>
             </div>
         @else
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="grid gap-4">
                 @foreach($facilities as $facility)
-                    <x-facility-card :facility="$facility" :distance-km="$sortByDistance ? ($facility->distance_km ?? null) : null" />
+                    <x-facility-card :facility="$facility" horizontal :distance-km="$sortByDistance ? ($facility->distance_km ?? null) : null" />
                 @endforeach
             </div>
             <div class="mt-10" aria-label="Navigasi halaman">{{ $facilities->links() }}</div>
@@ -270,7 +270,8 @@
 
         <div id="after-map-panel"></div>
     </div>
-
+        </div>
+    </div>
 </div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
@@ -429,18 +430,12 @@ function facilityList() {
 
             params.set('bbox', [b.getWest(), b.getSouth(), b.getEast(), b.getNorth()].map(v => v.toFixed(6)).join(','));
 
-            const q = document.getElementById('q')?.value?.trim();
-            if (q) params.set('q', q);
-
-            const cat = @json((string) request('category_id', ''));
-            if (cat) params.set('category_id', cat);
-
-            const status = document.getElementById('accessibility_status')?.value;
-            if (status) params.set('accessibility_status', status);
-
-            if (this.provinceId) params.set('province_id', this.provinceId);
-            if (this.cityId)     params.set('city_id', this.cityId);
-            if (this.districtId) params.set('district_id', this.districtId);
+            const activeFilters = new FormData(this.$refs.filterForm);
+            for (const [name, value] of activeFilters) {
+                if (value && !['sort', 'lat', 'lng'].includes(name)) {
+                    params.append(name, value);
+                }
+            }
 
             return params;
         },

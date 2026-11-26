@@ -5,10 +5,14 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreFollowUpAssignmentRequest;
 use App\Models\FollowUpAssignment;
 use App\Models\Report;
+use App\Models\Role;
 use App\Models\User;
 use App\Models\VerificationStatus;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\View\View;
 
 class FollowUpAssignmentController extends Controller
 {
@@ -18,7 +22,7 @@ class FollowUpAssignmentController extends Controller
      * Admin: semua penugasan.
      * Petugas Tindak Lanjut: hanya penugasan miliknya.
      */
-    public function index(Request $request)
+    public function index(Request $request): View
     {
         $user = $request->user();
         if ($user && $user->account_status !== 'active') {
@@ -32,86 +36,109 @@ class FollowUpAssignmentController extends Controller
         if ($roleName === 'Petugas Tindak Lanjut') {
             $query->where('assigned_to', $user->id);
         }
-        // Admin melihat semua
+        $summary = (clone $query)->selectRaw('assignment_status, COUNT(*) AS total')
+            ->groupBy('assignment_status')->pluck('total', 'assignment_status');
+        $selectedStatus = $request->validate([
+            'status' => ['nullable', 'in:assigned,in_progress,completed,cancelled'],
+        ])['status'] ?? null;
 
-        $assignments = $query->orderByDesc('assigned_at')->paginate(15);
+        $assignments = $query->when($selectedStatus, fn ($items) => $items->where('assignment_status', $selectedStatus))
+            ->orderByDesc('assigned_at')->paginate(15)->withQueryString();
 
-        return view('follow-up-assignments.index', compact('assignments'));
+        return view('follow-up-assignments.index', compact('assignments', 'summary', 'selectedStatus'));
     }
 
-    /**
-     * Daftar laporan yang memenuhi syarat untuk ditugaskan.
-     *
-     * Hanya laporan berstatus "Dalam Tindak Lanjut".
-     */
-    public function readyReports(Request $request)
+    public function readyReports(Request $request): View
     {
-        $user = $request->user();
-        if ($user && $user->account_status !== 'active') {
-            abort(403, 'Akun Anda tidak aktif atau dinonaktifkan.');
-        }
+        abort_unless($request->user()?->account_status === 'active', 403, 'Akun Anda tidak aktif atau dinonaktifkan.');
 
-        $statusDalamTindakLanjut = VerificationStatus::where('status_name', 'Dalam Tindak Lanjut')->first();
+        $filters = $request->validate([
+            'stage' => ['nullable', 'in:all,unassigned,review'],
+            'search' => ['nullable', 'string', 'max:255'],
+            'selected_id' => ['nullable', 'integer', 'min:1'],
+        ]);
+        $stage = $filters['stage'] ?? 'all';
+        $search = trim($filters['search'] ?? '');
+        $openStatuses = ['assigned', 'in_progress'];
 
-        // Statistik aktual
-        $readyCount = 0;
-        if ($statusDalamTindakLanjut) {
-            $readyCount = Report::where('status_id', $statusDalamTindakLanjut->status_id)->count();
-        }
-        $inProgressCount = FollowUpAssignment::whereIn('assignment_status', ['assigned', 'in_progress'])->count();
-        $completedCount = FollowUpAssignment::where('assignment_status', 'completed')->count();
+        $queue = Report::whereRelation('status', 'status_name', 'Dalam Tindak Lanjut');
+        $unassigned = (clone $queue)->whereDoesntHave(
+            'followUpAssignments',
+            fn (Builder $assignments) => $assignments->whereIn('assignment_status', [...$openStatuses, 'completed']),
+        );
+        $handling = (clone $queue)->whereHas(
+            'followUpAssignments',
+            fn (Builder $assignments) => $assignments->whereIn('assignment_status', $openStatuses),
+        );
+        $review = (clone $queue)
+            ->whereRelation('followUpAssignments', 'assignment_status', 'completed')
+            ->whereDoesntHave('followUpAssignments', fn (Builder $assignments) => $assignments->whereIn('assignment_status', $openStatuses));
 
-        $query = Report::query()
-            ->when($statusDalamTindakLanjut, function ($q) use ($statusDalamTindakLanjut) {
-                $q->where('status_id', $statusDalamTindakLanjut->status_id);
-            }, function ($q) {
-                $q->whereRaw('1 = 0');
-            })
-            ->with([
-                'facility.category',
-                'issueCategory',
-                'status',
-                'verifications' => function ($q) {
-                    $q->with('verifier')
-                        ->orderByRaw('CASE WHEN verified_at IS NOT NULL THEN 0 ELSE 1 END')
-                        ->orderByDesc('verified_at')
-                        ->orderByDesc('verification_id');
-                },
-                'user',
-                'evidences',
-            ])
-            ->orderByDesc('report_id');
+        $reportQuery = match ($stage) {
+            'unassigned' => clone $unassigned,
+            'review' => clone $review,
+            default => clone $queue,
+        };
+        $relations = [
+            'facility',
+            'user',
+            'followUpAssignments' => fn ($assignments) => $assignments
+                ->whereIn('assignment_status', [...$openStatuses, 'completed'])
+                ->with('assignee')->latest('assigned_at')->orderByDesc('assignment_id'),
+        ];
 
-        if ($search = trim((string) $request->query('search'))) {
-            $query->where(function ($q) use ($search) {
-                $q->where('report_number', 'like', "%{$search}%")
-                    ->orWhereHas('facility', function ($fq) use ($search) {
-                        $fq->where('name', 'like', "%{$search}%");
-                    })
-                    ->orWhereHas('issueCategory', function ($iq) use ($search) {
-                        $iq->where('category_name', 'like', "%{$search}%");
-                    });
-            });
-        }
+        $reports = $reportQuery->with($relations)
+            ->when($search !== '', fn (Builder $reports) => $reports->where(function (Builder $matching) use ($search): void {
+                $matching->where('report_number', 'like', "%{$search}%")
+                    ->orWhere('report_title', 'like', "%{$search}%")
+                    ->orWhereHas('facility', fn (Builder $facilities) => $facilities->where('name', 'like', "%{$search}%"));
+            }))
+            ->orderByDesc('report_id')->paginate(10)->withQueryString();
 
-        $reports = $query->paginate(10)->withQueryString();
+        $selected = $reports->getCollection()->firstWhere('report_id', $filters['selected_id'] ?? null) ?? $reports->first();
+        $selectedAssignments = $selected?->followUpAssignments ?? collect();
+        $selectedActive = $selectedAssignments->first(fn (FollowUpAssignment $assignment): bool => in_array($assignment->assignment_status, $openStatuses, true));
 
-        $selectedId = $request->query('selected_id');
-        $selectedReport = null;
-        if ($selectedId) {
-            $selectedReport = $reports->firstWhere('report_id', (int) $selectedId);
-        }
-        if (! $selectedReport && $reports->isNotEmpty()) {
-            $selectedReport = $reports->first();
-        }
+        $assignmentReport = $selected && $selectedAssignments->isEmpty()
+            ? $selected
+            : ($search === '' && $stage === 'all' ? (clone $unassigned)->with($relations)->latest('report_id')->first() : null);
+        $reviewReport = $selected && ! $selectedActive && $selectedAssignments->isNotEmpty()
+            ? $selected
+            : ($search === '' && $stage === 'all' ? (clone $review)->with($relations)->latest('report_id')->first() : null);
 
-        return view('follow-up-assignments.ready-reports', compact(
-            'reports',
-            'selectedReport',
-            'readyCount',
-            'inProgressCount',
-            'completedCount'
-        ));
+        $assignmentReport?->load([
+            'evidences',
+            'verifications' => fn ($verifications) => $verifications->with('verifier')
+                ->orderByRaw('CASE WHEN verified_at IS NOT NULL THEN 0 ELSE 1 END')
+                ->orderByDesc('verified_at')->orderByDesc('verification_id'),
+        ]);
+        $reviewAssignment = $reviewReport?->followUpAssignments->first();
+        $reviewAssignment?->loadMissing('progress.evidences');
+
+        return view('follow-up-assignments.ready-reports', [
+            'reports' => $reports,
+            'selected' => $selected,
+            'stage' => $stage,
+            'search' => $search,
+            'counts' => [
+                'unassigned' => $unassigned->count(),
+                'handling' => $handling->count(),
+                'review' => $review->count(),
+            ],
+            'assignmentReport' => $assignmentReport,
+            'officers' => $assignmentReport ? $this->activeOfficers() : collect(),
+            'reviewReport' => $reviewReport,
+            'reviewAssignment' => $reviewAssignment,
+            'completedStatus' => $reviewAssignment && $request->user()->role?->role_name === Role::ADMIN
+                ? VerificationStatus::where('status_name', 'Selesai')->value('status_id')
+                : null,
+        ]);
+    }
+
+    private function activeOfficers(): Collection
+    {
+        return User::whereRelation('role', 'role_name', Role::FOLLOW_UP_OFFICER)
+            ->where('account_status', 'active')->orderBy('name')->get();
     }
 
     /**
@@ -140,9 +167,7 @@ class FollowUpAssignmentController extends Controller
             $selectedReport = $reports->firstWhere('report_id', (int) $selectedReportId);
         }
 
-        $officers = User::whereHas('role', function ($q) {
-            $q->where('role_name', 'Petugas Tindak Lanjut');
-        })->where('account_status', 'active')->get();
+        $officers = $this->activeOfficers();
 
         return view('follow-up-assignments.create', compact('reports', 'officers', 'selectedReport'));
     }

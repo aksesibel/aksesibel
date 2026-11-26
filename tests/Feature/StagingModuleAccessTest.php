@@ -101,6 +101,45 @@ class StagingModuleAccessTest extends TestCase
         $this->assertDatabaseCount('verification_histories', 1);
     }
 
+    public function test_admin_can_update_a_report_selected_from_a_filtered_page(): void
+    {
+        $admin = $this->createUserForRole(Role::ADMIN);
+        $reporter = $this->createUserForRole(Role::PUBLIC);
+        $pending = VerificationStatus::create(['status_name' => 'Menunggu Verifikasi']);
+        $verified = VerificationStatus::create(['status_name' => 'Terverifikasi']);
+        $report = $this->createReport($reporter, $pending);
+        $report->update(['report_title' => 'Ramp simulasi', 'created_at' => now()->subDay()]);
+
+        foreach (range(2, 6) as $number) {
+            $report->replicate()->fill(['report_number' => 'AKS-UJI-00'.$number])->save();
+        }
+
+        $listQuery = ['search' => 'Ramp simulasi', 'status' => $pending->getKey(), 'page' => 2];
+        $selection = [...$listQuery, 'kelola' => $report->getKey()];
+        $formAction = route('verifikasi.status.update', [$report, ...$listQuery]);
+
+        $this->actingAs($admin)->get(route('verifikasi.status', $listQuery))
+            ->assertOk()
+            ->assertSee(route('verifikasi.status', $selection).'#ubah-status');
+
+        $this->get(route('verifikasi.status', $selection))
+            ->assertOk()
+            ->assertViewHas('detail', fn (Report $selected) => $selected->is($report))
+            ->assertSee($formAction);
+
+        $this->post($formAction, ['status_id' => $verified->getKey(), 'notes' => 'Bukti sesuai.'])
+            ->assertRedirectToRoute('verifikasi.status', $selection)
+            ->assertSessionHas('success', 'Status laporan berhasil diperbarui.');
+
+        $this->assertDatabaseHas('reports', ['report_id' => $report->getKey(), 'status_id' => $verified->getKey()]);
+
+        $this->get(route('verifikasi.status', $selection))
+            ->assertOk()
+            ->assertViewHas('detail', fn (Report $selected) => $selected->is($report) && $selected->status->is($verified))
+            ->assertViewHas('laporan', fn ($reports) => $reports->currentPage() === 1 && $reports->count() === 5)
+            ->assertViewHas('filters', ['search' => 'Ramp simulasi', 'status' => $pending->getKey()]);
+    }
+
     private function createReport(User $reporter, VerificationStatus $pending): Report
     {
         $category = FacilityCategory::create(['category_name' => 'Taman', 'slug' => 'taman']);

@@ -148,7 +148,7 @@
         @if ($inspections->isEmpty())
             <p>Belum ada data pemeriksaan.</p>
         @else
-            <div class="table-responsive">
+            <div class="table-wrap relative max-w-full">
                 <table class="table">
                     <thead>
                         <tr>

@@ -40,6 +40,24 @@
         @endif
     </div>
 
+    <div class="grid gap-4 sm:grid-cols-3">
+        @foreach([
+            ['Tugas aktif', (int) $summary->get('assigned', 0) + (int) $summary->get('in_progress', 0), 'report'],
+            ['Dalam penanganan', (int) $summary->get('in_progress', 0), 'tool'],
+            ['Penugasan selesai', (int) $summary->get('completed', 0), 'check'],
+        ] as [$label, $value, $icon])
+            <section class="panel">
+                <div class="flex items-center justify-between gap-2 text-sm text-slate-600">{{ $label }} <x-icon :name="$icon" :size="18" class="text-primary" /></div>
+                <p class="mt-3 text-3xl font-bold">{{ $value }}</p>
+            </section>
+        @endforeach
+    </div>
+    <nav class="flex flex-wrap gap-2" aria-label="Filter tugas">
+        @foreach(['' => 'Semua tugas', 'assigned' => 'Ditugaskan', 'in_progress' => 'Dalam penanganan', 'completed' => 'Selesai', 'cancelled' => 'Dibatalkan'] as $status => $label)
+            <a href="{{ route('follow-up-assignments.index', $status === '' ? [] : ['status' => $status]) }}" class="module-tab {{ ($selectedStatus ?? '') === $status ? 'is-active' : '' }}" @if(($selectedStatus ?? '') === $status) aria-current="page" @endif>{{ $label }}</a>
+        @endforeach
+    </nav>
+
     <!-- Table Card Container -->
     <div class="bg-white shadow-sm rounded-lg border border-gray-200 overflow-hidden">
         <div class="overflow-x-auto">

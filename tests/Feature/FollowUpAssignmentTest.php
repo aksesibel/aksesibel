@@ -319,6 +319,54 @@ class FollowUpAssignmentTest extends TestCase
         $this->assertGuest();
     }
 
+    public function test_coordination_queue_distinguishes_open_assignments_from_results_ready_for_confirmation(): void
+    {
+        $pending = $this->createReport($this->statusDalamTindakLanjut->status_id);
+        $handling = $this->createReport($this->statusDalamTindakLanjut->status_id);
+        $review = $this->reportInFollowUp;
+        $completed = VerificationStatus::create(['status_name' => 'Selesai']);
+
+        foreach ([[$review, 'completed'], [$handling, 'completed'], [$handling, 'in_progress'], [$pending, 'cancelled']] as [$report, $status]) {
+            FollowUpAssignment::create([
+                'report_id' => $report->getKey(),
+                'assigned_to' => $this->officer->getKey(),
+                'assigned_by' => $this->admin->getKey(),
+                'assignment_status' => $status,
+                'assigned_at' => now(),
+            ]);
+        }
+
+        $this->actingAs($this->admin)
+            ->get(route('follow-up-assignments.ready-reports', ['stage' => 'unassigned']))
+            ->assertOk()
+            ->assertViewHas('reports', fn ($reports) => $reports->pluck('report_id')->all() === [$pending->getKey()])
+            ->assertViewHas('counts', ['unassigned' => 1, 'handling' => 1, 'review' => 1]);
+
+        $this->get(route('follow-up-assignments.ready-reports', ['stage' => 'review']))
+            ->assertOk()
+            ->assertViewHas('reports', fn ($reports) => $reports->pluck('report_id')->all() === [$review->getKey()])
+            ->assertSee(route('verifikasi.status.update', $review));
+
+        $manager = User::factory()->create([
+            'role_id' => Role::create(['role_name' => Role::FACILITY_MANAGER])->getKey(),
+            'account_status' => 'active',
+        ]);
+        $this->actingAs($manager)
+            ->get(route('follow-up-assignments.ready-reports', ['stage' => 'review']))
+            ->assertOk()
+            ->assertDontSee(route('verifikasi.status.update', $review));
+
+        $this->actingAs($this->admin)
+            ->post(route('verifikasi.status.update', $review), [
+                'status_id' => $completed->getKey(),
+                'notes' => 'Hasil penanganan sudah diperiksa.',
+            ])->assertRedirectToRoute('verifikasi.status', ['kelola' => $review->getKey()]);
+
+        $this->get(route('follow-up-assignments.ready-reports', ['stage' => 'review']))
+            ->assertOk()
+            ->assertViewHas('counts', ['unassigned' => 1, 'handling' => 1, 'review' => 0]);
+    }
+
     public function test_ready_reports_displays_actual_reporter_and_facility_data(): void
     {
         $this->actingAs($this->admin)

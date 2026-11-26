@@ -1,6 +1,6 @@
-<x-layout title="Panel Admin – Fasilitas">
+<x-layout title="Panel Admin – Fasilitas" :show-heading="false">
 
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-10">
+    <div class="w-full min-w-0">
 
         {{-- Header --}}
         <div class="flex flex-wrap items-center justify-between gap-4 mb-8">
@@ -58,7 +58,7 @@
             </div>
         @else
             <div class="bg-white rounded-xl border border-[#E2E8F0] overflow-hidden">
-                <div class="overflow-x-auto">
+                <div class="relative max-w-full overflow-x-auto">
                     <table class="w-full text-sm" aria-label="Tabel daftar fasilitas">
                         <thead>
                             <tr class="bg-[#F8FAFC] border-b border-[#E2E8F0]">

@@ -1,333 +1,153 @@
 @extends('layouts.app')
 
 @section('title', 'Kelola Status Verifikasi')
-
-@section('breadcrumb', 'Aksesibel / Kelola Status')
+@section('breadcrumb', 'Kelola status')
 
 @section('content')
-<div class="status-page">
-
-    <!-- HEADER -->
-    <div class="page-heading">
+<div class="page-heading">
+    <div>
         <h1>Kelola Status Verifikasi</h1>
         <p>Pantau tahapan laporan masyarakat dan perbarui status verifikasinya.</p>
     </div>
+</div>
 
-    <!-- STATISTIK -->
-    @if (session('success'))
-    <p role="status">{{ session('success') }}</p>
-    @endif
+<div class="grid grid-cols-2 gap-3 xl:grid-cols-4 xl:gap-4">
+    <x-workspace-metric label="Menunggu verifikasi" :value="$statistik['menunggu']" description="Laporan belum diperiksa" icon="report" />
+    <x-workspace-metric label="Terverifikasi" :value="$statistik['terverifikasi']" description="Laporan telah dinyatakan sesuai" icon="shield" />
+    <x-workspace-metric label="Ditolak" :value="$statistik['ditolak']" description="Laporan tidak memenuhi kriteria" icon="close" />
+    <x-workspace-metric label="Dalam tindak lanjut" :value="$statistik['lanjutan']" description="Laporan diteruskan untuk penanganan" icon="tool" />
+</div>
 
-    <div class="status-stats">
-
-        <div class="stat-card">
-            <div class="stat-top">
-                <span>Menunggu verifikasi</span>
-                <i class="fa-regular fa-clipboard stat-icon"></i>
-            </div>
-            <h2>{{ $statistik['menunggu'] }}</h2>
-            <p>Laporan belum diperiksa</p>
+@if($detail)
+    <section class="panel grid scroll-mt-5 gap-5" id="ubah-status" aria-labelledby="status-detail-heading">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+            <h2 id="status-detail-heading">Detail laporan dan perubahan status</h2>
+            <span class="badge bg-blue-50 text-primary">{{ $detail->report_number }}</span>
         </div>
-
-        <div class="stat-card">
-            <div class="stat-top">
-                <span>Terverifikasi</span>
-                <i class="fa-regular fa-circle-check stat-icon"></i>
+        <div class="grid gap-4 lg:grid-cols-[minmax(0,1.65fr)_minmax(0,1fr)]">
+            <div class="grid gap-3">
+                <h3 class="text-lg font-bold">{{ $detail->report_title ?: ($detail->issueCategory?->category_name ?? 'Laporan masyarakat') }}</h3>
+                <dl class="grid gap-3 text-sm sm:grid-cols-2">
+                    <div><dt class="text-xs text-slate-600">Fasilitas</dt><dd class="mt-1 font-semibold">{{ $detail->facility?->name ?? '—' }}</dd></div>
+                    <div><dt class="text-xs text-slate-600">Tanggal laporan</dt><dd class="mt-1 font-semibold">{{ $detail->created_at?->translatedFormat('d F Y, H.i') ?? '—' }}@if($detail->created_at) WIB @endif</dd></div>
+                </dl>
+                <p class="whitespace-pre-line text-sm leading-6 text-slate-600">{{ $detail->description }}</p>
+                @if($detail->evidences->isNotEmpty())
+                    <ul class="flex flex-wrap gap-2" aria-label="Bukti laporan">
+                        @foreach($detail->evidences as $evidence)
+                            <li><a class="button-secondary !min-h-9 !px-3 !py-1.5" href="{{ asset('storage/'.$evidence->file_path) }}" target="_blank" rel="noopener">Lihat bukti {{ $loop->iteration }}</a></li>
+                        @endforeach
+                    </ul>
+                @endif
             </div>
-            <h2>{{ $statistik['terverifikasi'] }}</h2>
-            <p>Laporan telah dinyatakan sesuai</p>
+            <dl class="grid content-start gap-3 text-sm">
+                <div><dt class="text-xs text-slate-600">Status saat ini</dt><dd class="mt-1"><x-verification-status-badge :status="$detail->status?->status_name" /></dd></div>
+                <div><dt class="text-xs text-slate-600">Terakhir diperbarui</dt><dd class="mt-1 font-semibold">{{ $detail->updated_at?->translatedFormat('d F Y, H.i') ?? '—' }}@if($detail->updated_at) WIB @endif</dd></div>
+            </dl>
         </div>
-
-        <div class="stat-card">
-            <div class="stat-top">
-                <span>Ditolak</span>
-                <i class="fa-regular fa-circle-xmark stat-icon"></i>
-            </div>
-            <h2>{{ $statistik['ditolak'] }}</h2>
-            <p>Laporan tidak memenuhi kriteria</p>
-        </div>
-
-        <div class="stat-card">
-            <div class="stat-top">
-                <span>Memerlukan pemeriksaan lanjutan</span>
-                <i class="fa-solid fa-shield-halved stat-icon"></i>
-            </div>
-            <h2>{{ $statistik['lanjutan'] }}</h2>
-            <p>Perlu pengecekan tambahan</p>
-        </div>
-
-    </div>
-
-    <!-- DETAIL DAN FORM STATUS -->
-    @if ($detail)
-    <div class="status-panel">
-
-        <div class="panel-heading">
-            <h2>Detail laporan dan perubahan status</h2>
-            <span class="report-badge">
-                {{ $detail->report_number }}
-            </span>
-        </div>
-
-        <div class="report-detail-grid">
-
-            <div class="report-main-detail">
-                <h3>{{ $detail->description }}</h3>
-
-                <div class="report-meta">
-                    <div>
-                        <label>Fasilitas</label>
-                        <strong>{{ $detail->facility?->name ?? '-' }}</strong>
-                    </div>
-
-                    <div>
-                        <label>Tanggal laporan</label>
-                        <strong>
-                            {{ $detail->created_at?->format('d F Y, H.i') ?? '-' }} WIB
-                        </strong>
-                    </div>
-                </div>
-
-                <p class="report-description">
-                    {{ $detail->description }}
-                </p>
-            </div>
-
-            <div class="report-current-status">
-                <div>
-                    <label>Status saat ini</label>
-                    <span class="status-badge
-                            @if ($detail->status?->status_name == 'Terverifikasi') verified
-                            @elseif ($detail->status?->status_name == 'Ditolak') rejected
-                            @elseif ($detail->status?->status_name == 'Dalam Tindak Lanjut') follow-up
-                            @else waiting
-                            @endif">
-                        {{ $detail->status?->status_name ?? '-' }}
-                    </span>
-                </div>
-
-                <div>
-                    <label>Terakhir diperbarui</label>
-                    <strong>
-                        {{ $detail->updated_at?->format('d F Y, H.i') ?? '-' }} WIB
-                    </strong>
-                </div>
-            </div>
-
-        </div>
-
-        @if ($detail->evidences->isNotEmpty())
-        <section aria-labelledby="report-evidence-heading">
-            <h3 id="report-evidence-heading">Bukti laporan</h3>
-            <ul>
-                @foreach ($detail->evidences as $evidence)
-                <li><a href="{{ asset('storage/'.$evidence->file_path) }}">Lihat bukti {{ $loop->iteration }}</a></li>
-                @endforeach
-            </ul>
-        </section>
-        @endif
-
-        <!-- FORM PERUBAHAN STATUS -->
-        <form
-            action="{{ route('verifikasi.status.update', $detail->report_id) }}"
-            method="POST"
-            class="status-form">
+        <form action="{{ route('verifikasi.status.update', [$detail, ...$listQuery]) }}" method="POST" class="grid gap-4 border-t border-slate-200 pt-5" aria-label="Ubah status laporan">
             @csrf
-
-            <label class="form-title">Ubah status menjadi</label>
-
-            <div class="status-options">
-                @foreach ($daftarStatus as $status)
-                <label class="status-option">
-                    <input
-                        type="radio"
-                        name="status_id"
-                        value="{{ $status->status_id }}"
-                        {{ (int) old('status_id', $detail->status_id) === $status->status_id ? 'checked' : '' }}
-                        required>
-
-                    <span>{{ $status->status_name }}</span>
-                </label>
-                @endforeach
+            <fieldset>
+                <legend class="mb-2 text-sm font-semibold text-slate-700">Ubah status menjadi</legend>
+                <div class="grid gap-2 sm:grid-cols-2 lg:grid-cols-[repeat(auto-fit,minmax(9.25rem,1fr))]">
+                    @foreach($daftarStatus as $status)
+                        <label class="mb-0 flex min-h-12 cursor-pointer items-center gap-2 rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium hover:border-blue-500 has-checked:border-blue-600 has-checked:bg-blue-50">
+                            <input type="radio" name="status_id" value="{{ $status->getKey() }}" @checked((int) old('status_id', $detail->status_id) === $status->getKey()) required class="shrink-0 accent-blue-700">
+                            <span>{{ $status->status_name }}</span>
+                        </label>
+                    @endforeach
+                </div>
+            </fieldset>
+            <div>
+                <label for="notes">Catatan perubahan status</label>
+                <textarea class="field" name="notes" id="notes" rows="3" maxlength="2000" placeholder="Tuliskan alasan atau catatan perubahan status">{{ old('notes') }}</textarea>
             </div>
-
-            <label for="notes" class="form-title">
-                Catatan perubahan status
-            </label>
-
-            <textarea
-                name="notes"
-                id="notes"
-                rows="3"
-                maxlength="2000"
-                placeholder="Tuliskan alasan atau catatan perubahan status...">{{ old('notes') }}</textarea>
-
-            @error('status_id')
-            <small class="form-error">{{ $message }}</small>
-            @enderror
-
-            @error('notes')
-            <small class="form-error">{{ $message }}</small>
-            @enderror
-
-            <div class="form-footer">
-                <p>Perubahan status dan catatan akan tercatat setelah disimpan.</p>
-
-                <div class="form-actions">
-                    <a
-                        href="{{ route('verifikasi.status') }}"
-                        class="btn-cancel">
-                        Batal
-                    </a>
-
-                    <button type="submit" class="btn-save">
-                        Simpan Perubahan
-                    </button>
+            <div class="flex flex-wrap items-center justify-between gap-3">
+                <p class="text-xs leading-5 text-slate-600">Perubahan status dan catatan akan tercatat setelah disimpan.</p>
+                <div class="flex flex-wrap gap-2">
+                    <a href="{{ route('verifikasi.status', $listQuery) }}#daftar-status" class="button-secondary">Batal</a>
+                    <button type="submit" class="button">Simpan perubahan</button>
                 </div>
             </div>
         </form>
+    </section>
+@endif
 
-    </div>
-    @else
-    <div class="status-panel empty-detail">
-        <p>Belum ada laporan yang dapat ditampilkan.</p>
-    </div>
-    @endif
-
-    <!-- DAFTAR LAPORAN -->
-    <div class="status-panel report-list-panel">
-
-        <div class="list-heading">
-            <h2>Daftar status laporan</h2>
-            <span class="total-badge">
-                {{ $laporan->total() }} laporan
-            </span>
+<section class="panel scroll-mt-5 overflow-hidden !p-0" id="daftar-status" aria-labelledby="status-list-heading">
+    <div class="grid gap-4 p-4 sm:p-5">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+            <h2 id="status-list-heading">Daftar status laporan</h2>
+            <span class="badge bg-blue-50 text-primary">{{ $laporan->total() }} laporan</span>
         </div>
-
-        <!-- FILTER -->
-        <form action="{{ route('verifikasi.status') }}" method="GET" class="status-filter">
-
-            <div class="filter-group">
+        <form action="{{ route('verifikasi.status') }}#daftar-status" method="GET" class="grid items-end gap-3 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)_minmax(0,1fr)_auto]" aria-label="Filter daftar status">
+            <div>
                 <label for="search">Cari laporan</label>
-                <input
-                    type="text"
-                    id="search"
-                    name="search"
-                    value="{{ request('search') }}"
-                    placeholder="Nomor laporan atau fasilitas">
+                <div class="relative">
+                    <x-icon name="search" :size="16" class="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-slate-500" />
+                    <input class="field !pl-9" type="search" id="search" name="search" value="{{ $filters['search'] ?? '' }}" placeholder="Nomor, judul, atau fasilitas">
+                </div>
             </div>
-
-            <div class="filter-group">
+            <div>
                 <label for="status">Status verifikasi</label>
-                <select name="status" id="status">
+                <select class="field" name="status" id="status">
                     <option value="">Semua status</option>
-                    @foreach ($daftarStatus as $status)
-                    <option
-                        value="{{ $status->status_id }}"
-                        {{ request('status') == $status->status_id ? 'selected' : '' }}>
-                        {{ $status->status_name }}
-                    </option>
+                    @foreach($daftarStatus as $status)
+                        <option value="{{ $status->getKey() }}" @selected(($filters['status'] ?? null) === $status->getKey())>{{ $status->status_name }}</option>
                     @endforeach
                 </select>
             </div>
-
-            <div class="filter-group">
+            <div>
                 <label for="tanggal">Tanggal laporan</label>
-                <input
-                    type="date"
-                    name="tanggal"
-                    id="tanggal"
-                    value="{{ request('tanggal') }}">
+                <input class="field" type="date" name="tanggal" id="tanggal" value="{{ $filters['tanggal'] ?? '' }}">
             </div>
-
-            <button type="submit" class="filter-submit">Cari</button>
+            <div class="flex gap-2">
+                <button type="submit" class="button-secondary">Cari</button>
+                @if($filters)
+                    <a href="{{ route('verifikasi.status') }}#daftar-status" class="button-secondary">Reset</a>
+                @endif
+            </div>
         </form>
-
-        <!-- TABEL -->
-        <div class="table-wrapper">
-            <table class="status-table">
-                <thead>
-                    <tr>
-                        <th>Nomor laporan</th>
-                        <th>Uraian laporan</th>
-                        <th>Fasilitas</th>
-                        <th>Tanggal laporan</th>
-                        <th>Status saat ini</th>
-                        <th>Terakhir diperbarui</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    @forelse ($laporan as $item)
-                    <tr class="{{ $detail && $detail->report_id == $item->report_id ? 'active-row' : '' }}">
-                        <td>
-                            <strong class="table-report-number">
-                                {{ $item->report_number }}
-                            </strong>
-                        </td>
-
-                        <td class="description-cell">
-                            {{ $item->description }}
-                        </td>
-
-                        <td>
-                            {{ $item->facility?->name ?? '-' }}
-                        </td>
-
-                        <td>
-                            {{ $item->created_at?->format('d M Y') ?? '-' }}
-                        </td>
-
-                        <td>
-                            <span class="status-badge
-                                    @if ($item->status?->status_name == 'Terverifikasi') verified
-                                    @elseif ($item->status?->status_name == 'Ditolak') rejected
-                                    @elseif ($item->status?->status_name == 'Dalam Tindak Lanjut') follow-up
-                                    @else waiting
-                                    @endif">
-                                {{ $item->status?->status_name ?? '-' }}
-                            </span>
-                        </td>
-
-                        <td>
-                            {{ $item->updated_at?->format('d M Y H.i') ?? '-' }} WIB
-                        </td>
-
-                        <td>
-                            <a
-                                href="{{ route('verifikasi.status', array_merge(request()->except('kelola', 'page'), ['kelola' => $item->report_id])) }}"
-                                class="btn-manage">
-                                Kelola
-                            </a>
-                        </td>
-                    </tr>
-                    @empty
-                    <tr>
-                        <td colspan="7" class="empty-table">
-                            Tidak ada laporan yang ditemukan.
-                        </td>
-                    </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
-
-        <!-- PAGINATION -->
-        <div class="table-footer">
-            <p>
-                Menampilkan {{ $laporan->firstItem() ?? 0 }}–{{ $laporan->lastItem() ?? 0 }}
-                dari {{ $laporan->total() }} laporan
-            </p>
-
-            {{ $laporan->links() }}
-        </div>
-
     </div>
-
-</div>
+    <div class="relative max-w-full overflow-x-auto">
+        <table class="min-w-[890px]" aria-label="Tabel status laporan">
+            <thead>
+                <tr>
+                    <th scope="col">Nomor laporan</th><th scope="col">Uraian laporan</th><th scope="col">Fasilitas</th>
+                    <th scope="col">Tanggal laporan</th><th scope="col">Status saat ini</th><th scope="col">Terakhir diperbarui</th><th scope="col">Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse($laporan as $item)
+                    @php
+                        $isSelected = $detail?->is($item);
+                        $manageUrl = route('verifikasi.status', [...$listQuery, 'kelola' => $item->getKey()]).'#ubah-status';
+                    @endphp
+                    <tr @class(['!bg-blue-50' => $isSelected])>
+                        <td class="whitespace-nowrap"><a class="!font-semibold" href="{{ $manageUrl }}">{{ $item->report_number }}</a></td>
+                        <td class="min-w-40 font-semibold">{{ $item->report_title ?: $item->description }}</td>
+                        <td class="min-w-32 text-sm">{{ $item->facility?->name ?? '—' }}</td>
+                        <td class="whitespace-nowrap text-xs text-slate-600">{{ $item->created_at?->translatedFormat('d M Y') ?? '—' }}</td>
+                        <td><x-verification-status-badge :status="$item->status?->status_name" class="whitespace-nowrap" /></td>
+                        <td class="whitespace-nowrap text-xs text-slate-600">
+                            @if($item->updated_at)
+                                <time datetime="{{ $item->updated_at->toIso8601String() }}">{{ $item->updated_at->translatedFormat('d M Y') }}<br>{{ $item->updated_at->format('H.i') }} WIB</time>
+                            @else
+                                —
+                            @endif
+                        </td>
+                        <td>
+                            <a class="button-secondary !min-h-9 !px-3 !py-1.5" href="{{ $manageUrl }}" @if($isSelected) aria-current="true" @endif>Kelola<span class="sr-only"> {{ $item->report_number }}</span></a>
+                        </td>
+                    </tr>
+                @empty
+                    <tr><td colspan="7" class="text-sm text-slate-600">Tidak ada laporan yang ditemukan.</td></tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+    <div class="flex flex-wrap items-center justify-between gap-3 border-t border-slate-200 px-4 py-3 sm:px-5">
+        <p class="text-xs text-slate-600">Menampilkan {{ $laporan->firstItem() ?? 0 }}–{{ $laporan->lastItem() ?? 0 }} dari {{ $laporan->total() }} laporan</p>
+        {{ $laporan->links() }}
+    </div>
+</section>
 @endsection
-
-@push('styles')
-<link rel="stylesheet" href="{{ asset('css/status-verifikasi.css') }}">
-@endpush

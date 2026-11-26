@@ -31,7 +31,7 @@
 
     /* Token ruang kerja admin (Data Pendukung) */
     --color-brand:   #1d4ed8;
-    --color-navy:    #122d60;
+    --color-navy:    #0f2a5f;
     --color-blue-50:  #eff6ff;
     --color-blue-600: #2563eb;
     --color-blue-700: #1d4ed8;
@@ -78,7 +78,7 @@
     .skip-link { @apply sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-white focus:p-4; }
     .icon { @apply inline-block shrink-0 align-middle; }
     .icon-button { @apply inline-flex size-10 shrink-0 items-center justify-center rounded-lg hover:bg-blue-50; }
-    .workspace { @apply bg-[#f7f9fb] text-[#141b2b]; }
+    .workspace { @apply bg-[#f5f7fa] text-text-main; }
     .workspace-sidebar { @apply fixed inset-y-0 left-0 z-40 flex w-[232px] flex-col overflow-y-auto bg-navy px-5 py-7 text-white; }
     .brand { @apply inline-flex items-center gap-3 text-2xl font-medium no-underline; }
     .brand-mark { @apply inline-flex size-9 shrink-0 items-center justify-center rounded-lg bg-white text-[27px] leading-none text-blue-700; }
@@ -171,7 +171,7 @@
 }
 
 @media (min-width: 1024px) {
-    .workspace { background: linear-gradient(to right, #122d60 232px, #f7f9fb 232px); }
+    .workspace { background: linear-gradient(to right, #0f2a5f 232px, #f5f7fa 232px); }
 }
 
 @media (max-width: 479px) {
@@ -197,3 +197,36 @@
 @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { scroll-behavior: auto !important; transition-duration: 0s !important; }
 }
+
+[x-cloak] { display: none !important; }
+
+@layer components {
+    .public-container { @apply mx-auto w-full max-w-[1440px] px-4 sm:px-8 xl:px-16; }
+    .public-header { @apply sticky top-0 z-40 border-b border-slate-300 bg-white; }
+    .public-header nav a { @apply text-sm font-medium text-slate-600 hover:text-primary; }
+    .public-header [aria-current="page"] { @apply font-bold text-primary; }
+    .public-brand { @apply inline-flex shrink-0 items-center gap-2.5 text-lg font-medium text-navy sm:text-[23px]; }
+    .public-brand-mark { @apply grid size-[34px] shrink-0 place-items-center rounded-[10px] bg-primary; }
+    .mobile-menu-link { @apply block rounded-lg px-2 py-3 hover:bg-blue-50; }
+    .mobile-tabbar { @apply fixed inset-x-0 bottom-0 z-20 flex justify-around gap-1 border-t border-slate-300 bg-white px-2 pb-[env(safe-area-inset-bottom)] text-center text-slate-600; }
+    .mobile-tabbar a { @apply flex min-h-14 min-w-0 flex-1 flex-col items-center justify-center gap-1 px-1 text-[11px] leading-tight; }
+    .mobile-tabbar [aria-current="page"] { @apply bg-blue-50 font-semibold text-primary; }
+    .footer-links { @apply flex flex-col gap-3 text-sm text-blue-100; }
+    .footer-links h2 { @apply font-semibold text-white; }
+    .footer-links a { @apply hover:text-white hover:underline; }
+    .form-stepper { @apply grid grid-cols-3 gap-1 rounded-lg bg-blue-50 p-1 text-xs font-semibold text-primary sm:text-sm; }
+    .form-stepper a { @apply flex min-h-11 items-center gap-1.5 rounded-md p-2 hover:bg-white/80 sm:gap-2 sm:px-3; }
+    .form-stepper a span { @apply inline-grid size-5 shrink-0 place-items-center rounded-full bg-white text-xs sm:size-6; }
+    .upload-area { @apply relative grid min-h-32 cursor-pointer place-items-center gap-2 rounded-lg border border-dashed border-blue-400 bg-blue-50 p-4 text-center text-primary focus-within:ring-2 focus-within:ring-blue-700; }
+}
+
+@media (max-width: 1023px) {
+    .workspace-content { padding-bottom: calc(3.5rem + env(safe-area-inset-bottom)); }
+}
+
+@media (max-width: 767px) {
+    .public-site { padding-bottom: calc(3.5rem + env(safe-area-inset-bottom)); }
+}
+
+.workspace, .public-site { font-family: var(--font-sans); }
+.public-brand.text-white { color: white; }

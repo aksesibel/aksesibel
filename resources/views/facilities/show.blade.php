@@ -1,52 +1,106 @@
 <x-layout :title="$facility->name">
+    @if($facility->hasCoordinates())
+        @push('styles')
+            <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+        @endpush
+    @endif
+    @php
+        $items = $facility->facilityAccessibilities;
+        $lastInspection = $items->max('inspections_max_inspection_date');
+        $photoGallery = $facility->name === 'Perpustakaan Jakarta – Cikini';
+        $reportAction = auth()->user()?->role?->role_name === \App\Models\Role::PUBLIC ? 'reports.create' : 'login';
+    @endphp
 
-@if($facility->hasCoordinates())
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
-@endif
-
-<div class="max-w-3xl mx-auto px-4 sm:px-6 py-10">
-
-    <nav aria-label="Lokasi halaman" class="mb-6">
-        <ol class="flex items-center gap-2 text-sm text-[#475569]">
-            <li><a href="{{ route('home') }}" class="hover:text-[#1D4ED8] transition-colors">Beranda</a></li>
-            <li aria-hidden="true"><span class="mx-1 text-[#CBD5E1]">/</span></li>
-            <li><a href="{{ route('facilities.index') }}" class="hover:text-[#1D4ED8] transition-colors">Fasilitas</a></li>
-            <li aria-hidden="true"><span class="mx-1 text-[#CBD5E1]">/</span></li>
-            <li aria-current="page" class="text-[#0F172A] font-medium truncate max-w-[200px]">{{ $facility->name }}</li>
-        </ol>
-    </nav>
-
-    <article>
-        <div class="h-48 bg-[#EFF6FF] rounded-xl flex items-center justify-center mb-6" aria-hidden="true">
-            <svg class="w-14 h-14 text-[#1D4ED8]/20" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
-        </div>
-
-        <div class="flex flex-wrap items-start justify-between gap-4 mb-4">
-            <div class="flex flex-wrap items-center gap-2">
-                <span class="text-xs font-semibold text-[#475569] uppercase tracking-wide bg-[#F1F5F9] px-2.5 py-1 rounded-full">
-                    {{ $facility->category?->category_name ?? '–' }}
-                </span>
+    <div class="grid gap-6 pb-6">
+        <div>
+            <p class="mb-2 text-xs font-semibold text-primary"><a href="{{ route('home') }}" class="hover:underline">Beranda</a> / <a href="{{ route('facilities.index') }}" class="hover:underline">Cari fasilitas</a> / Detail fasilitas</p>
+            <div class="flex flex-wrap items-start justify-between gap-3">
+                <div><h1 class="text-2xl font-bold tracking-tight sm:text-[32px]">{{ $facility->name }}</h1><p class="mt-2 text-sm text-slate-600">{{ $facility->full_address }}</p></div>
                 <x-status-badge :status="$facility->accessibility_status" />
             </div>
+        </div>
+
+        <div @class(['grid min-w-0 gap-3', 'sm:grid-cols-[minmax(0,3fr)_minmax(0,1fr)]' => $photoGallery])>
+            <x-facility-photo :facility="$facility" detail class="min-h-52 sm:min-h-80" />
+            @if($photoGallery)
+                <div class="grid grid-cols-2 gap-3 sm:grid-cols-1 sm:grid-rows-2">
+                    <img src="{{ asset('images/aksesibel/perpustakaan-galeri-sarana.jpg') }}" alt="Ilustrasi jalur landai di fasilitas" class="size-full min-h-24 rounded-lg object-cover" loading="lazy">
+                    <img src="{{ asset('images/aksesibel/perpustakaan-galeri-akses.jpg') }}" alt="Ilustrasi jalur pemandu di dalam fasilitas" class="size-full min-h-24 rounded-lg object-cover" loading="lazy">
+                </div>
+            @endif
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2 text-xs text-slate-600">
+            @if($facility->category)
+                <span class="module-tab"><x-icon name="building" :size="15" />{{ $facility->category->category_name }}</span>
+            @endif
+            @if($lastInspection)
+                <span class="module-tab is-active"><x-icon name="shield" :size="15" />Diperiksa {{ \Illuminate\Support\Carbon::parse($lastInspection)->translatedFormat('j M Y') }}</span>
+            @endif
+            @if($photoGallery)
+                <span>Foto ilustrasi fasilitas dan sarana.</span>
+            @endif
             @can('manage-public-facilities')
-                <a href="{{ route('admin.facilities.edit', $facility->facility_id) }}"
-                   class="inline-flex items-center gap-1.5 text-xs font-medium text-[#475569] border border-[#E2E8F0] px-3 py-1.5 rounded-lg hover:bg-[#F8FAFC] transition-colors min-h-[44px]">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                    Ubah
-                </a>
+                <a class="button-secondary ml-auto" href="{{ route('admin.facilities.edit', $facility) }}">Ubah fasilitas</a>
             @endcan
         </div>
 
-        <h1 class="text-2xl sm:text-3xl font-extrabold text-[#0F172A] mb-6">{{ $facility->name }}</h1>
-
-        {{-- Deskripsi --}}
-        <section aria-labelledby="desc-h" class="mb-6">
-            <h2 id="desc-h" class="text-sm font-semibold text-[#475569] uppercase tracking-wide mb-2">Deskripsi</h2>
-            <p class="text-[#0F172A] text-sm leading-relaxed whitespace-pre-line">{{ $facility->description }}</p>
-        </section>
-
+        <div class="grid items-start gap-6 lg:grid-cols-[minmax(0,2.65fr)_minmax(0,1fr)]">
+            <div class="grid min-w-0 gap-5">
+                <section class="panel" aria-labelledby="sarana-heading">
+                    <div class="flex justify-between gap-3">
+                        <div>
+                            <h2 id="sarana-heading" class="text-lg font-bold">Kondisi sarana aksesibilitas</h2>
+                            @if($items->isNotEmpty())<p class="mt-1 text-sm text-slate-600">{{ $items->count() }} sarana terdata</p>@endif
+                        </div>
+                        <x-icon name="shield" class="text-primary" :size="23" />
+                    </div>
+                    @if($facility->entrance_note)
+                        <p class="mt-4 rounded-lg bg-amber-50 p-3 text-sm text-amber-900">{{ $facility->entrance_note }}</p>
+                    @endif
+                    <ul class="mt-3 divide-y divide-slate-200">
+                        @forelse($items as $item)
+                            @php
+                                $availability = $item->availability_status;
+                                $condition = $item->condition_status;
+                                $label = match (true) {
+                                    $availability === \App\Models\FacilityAccessibility::AVAILABILITY_UNAVAILABLE => 'Belum tersedia',
+                                    $condition === \App\Models\FacilityAccessibility::CONDITION_GOOD => 'Berfungsi',
+                                    filled($condition) => \App\Models\FacilityAccessibility::CONDITION_LABELS[$condition] ?? 'Belum diperiksa',
+                                    default => 'Belum diperiksa',
+                                };
+                            @endphp
+                            <li class="flex items-start justify-between gap-3 py-4">
+                                <div class="flex min-w-0 items-start gap-3">
+                                    <x-icon name="check" :size="19" class="mt-0.5 text-primary" />
+                                    <div>
+                                        <p class="font-semibold">{{ $item->accessibilityType?->type_name ?? 'Sarana' }}</p>
+                                        @if($item->location_description)<p class="mt-1 text-sm text-slate-600">{{ $item->location_description }}</p>@endif
+                                    </div>
+                                </div>
+                                <span @class(['badge text-center', 'bg-emerald-50 text-emerald-800' => $label === 'Berfungsi', 'bg-amber-50 text-amber-900' => str_starts_with($label, 'Rusak')])>{{ $label }}</span>
+                            </li>
+                        @empty
+                            <li class="py-2 text-sm text-slate-600">Informasi kondisi sarana belum tercatat.</li>
+                        @endforelse
+                    </ul>
+                </section>
+                @if($facility->description)
+                    <section class="panel"><h2 class="text-lg font-bold">Tentang fasilitas</h2><p class="mt-2 whitespace-pre-line text-sm leading-6 text-slate-600">{{ $facility->description }}</p></section>
+                @endif
+                <section class="panel">
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                        <h2 class="text-lg font-bold">Laporan masyarakat</h2>
+                        <span class="badge">{{ $activeReports }} laporan aktif</span>
+                    </div>
+                    <p class="mt-2 text-sm text-slate-600">Sampaikan kondisi sarana yang perlu ditinjau di fasilitas ini.</p>
+                    <a href="{{ route($reportAction) }}" class="button mt-4"><x-icon name="report" :size="16" />{{ $reportAction === 'reports.create' ? 'Buat laporan' : 'Masuk untuk melapor' }}</a>
+                </section>
+            </div>
+            <aside class="panel min-w-0 !p-4 sm:!p-5" aria-label="Informasi kunjungan">
+                <h2 class="mb-4 text-lg font-bold">Rencanakan kunjungan</h2>
         {{-- Lokasi --}}
-        <section aria-labelledby="loc-h" class="mb-6">
+        <section aria-labelledby="loc-h" class="mb-6 last:mb-0">
             <h2 id="loc-h" class="text-sm font-semibold text-[#475569] uppercase tracking-wide mb-3">Lokasi</h2>
 
             {{-- Alamat --}}
@@ -71,7 +125,7 @@
             {{-- Tombol salin & petunjuk arah --}}
             <div class="flex flex-wrap gap-2 mb-4" x-data>
                 <button type="button"
-                        @click="navigator.clipboard.writeText('{{ addslashes($facility->full_address) }}').then(() => $dispatch('toast', 'Alamat disalin!'))"
+                        @click="navigator.clipboard.writeText((@js($facility->full_address))).then(() => $dispatch('toast', 'Alamat disalin!'))"
                         class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-[#E2E8F0] text-xs font-medium text-[#475569] hover:bg-[#F8FAFC] transition-colors min-h-[44px]">
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
                     Salin alamat
@@ -138,7 +192,7 @@
             $hariMap = ['senin'=>'Senin','selasa'=>'Selasa','rabu'=>'Rabu','kamis'=>'Kamis','jumat'=>'Jumat','sabtu'=>'Sabtu','minggu'=>'Minggu'];
             $hariIni = strtolower(now()->locale('id')->dayName);
         @endphp
-        <section aria-labelledby="hours-h" class="mb-6">
+        <section aria-labelledby="hours-h" class="mb-6 last:mb-0">
             <h2 id="hours-h" class="text-sm font-semibold text-[#475569] uppercase tracking-wide mb-3">Jam Operasional</h2>
             <div class="bg-[#F8FAFC] rounded-xl border border-[#E2E8F0] overflow-hidden">
                 <table class="w-full text-sm" aria-label="Jam operasional per hari">
@@ -164,7 +218,7 @@
 
         {{-- Kontak --}}
         @if($facility->phone || $facility->email)
-        <section aria-labelledby="contact-h" class="mb-6">
+        <section aria-labelledby="contact-h" class="mb-6 last:mb-0">
             <h2 id="contact-h" class="text-sm font-semibold text-[#475569] uppercase tracking-wide mb-2">Kontak</h2>
             <div class="flex flex-col gap-2">
                 @if($facility->phone)
@@ -183,12 +237,9 @@
         </section>
         @endif
 
-        <footer class="text-xs text-[#94A3B8] border-t border-[#E2E8F0] pt-4 mt-6">
-            Diperbarui: {{ $facility->updated_at?->translatedFormat('d F Y') ?? '–' }}
-        </footer>
-    </article>
-</div>
-
+            </aside>
+        </div>
+    </div>
 @if($facility->hasCoordinates())
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 <script>
@@ -201,9 +252,14 @@ document.addEventListener('DOMContentLoaded', function() {
         maxZoom: {{ (int) config('services.osm.tile_max_zoom', 19) }},
     }).addTo(map);
 
+    const popup = document.createElement('div');
+    const name = document.createElement('strong');
+    name.textContent = @js($facility->name);
+    popup.append(name, document.createElement('br'), @js($facility->address ?? ''));
+
     L.marker([{{ $facility->latitude }}, {{ $facility->longitude }}])
         .addTo(map)
-        .bindPopup('<strong>{{ addslashes($facility->name) }}</strong><br>{{ addslashes($facility->address) }}')
+        .bindPopup(popup)
         .openPopup();
 });
 </script>

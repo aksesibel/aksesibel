@@ -14,9 +14,19 @@
         @php
             $completedTotal = (int) $byStatus->where('label', 'Selesai')->sum('total');
             $followUpTotal = (int) $byStatus->where('label', 'Dalam Tindak Lanjut')->sum('total');
+            $summaryDownload = implode("\r\n", [
+                'Indikator,Jumlah',
+                "Jumlah fasilitas (global),{$facilityTotal}",
+                "Jumlah laporan sesuai filter,{$reportTotal}",
+                "Laporan selesai,{$completedTotal}",
+                "Dalam tindak lanjut,{$followUpTotal}",
+            ]);
         @endphp
+        <x-slot:actions>
+            <a class="button-secondary" download="ringkasan-aksesibel.csv" href="data:text/csv;charset=utf-8,{{ rawurlencode($summaryDownload) }}"><x-icon name="report" :size="16" /> Unduh ringkasan</a>
+        </x-slot:actions>
         <form method="GET" action="{{ route('manage.statistics') }}" aria-label="Filter statistik">
-            <div class="grid gap-4 md:grid-cols-3">
+            <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
                 <div>
                     <label for="period_id">Periode pelaporan</label>
                     <select id="period_id" name="period_id" class="field">
@@ -41,6 +51,15 @@
                         <option value="">Semua kategori kendala</option>
                         @foreach ($issueCategories as $category)
                             <option value="{{ $category->issue_category_id }}" @selected(($filters['issue_category_id'] ?? '') == $category->issue_category_id)>{{ $category->category_name }}{{ $category->is_active ? '' : ' (nonaktif)' }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div>
+                    <label for="region_id">Wilayah</label>
+                    <select id="region_id" name="region_id" class="field">
+                        <option value="">Semua wilayah</option>
+                        @foreach($regions as $region)
+                            <option value="{{ $region->region_id }}" @selected(($filters['region_id'] ?? '') == $region->region_id)>{{ $region->name }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -80,9 +99,14 @@
         @endif
 
         <div class="statistics-charts">
-            @include('statistics.breakdown', ['title' => 'Laporan berdasarkan kategori fasilitas', 'id' => 'facility', 'rows' => $byFacility, 'reportTotal' => $reportTotal, 'variant' => 'columns'])
-            @include('statistics.breakdown', ['title' => 'Laporan berdasarkan kategori kendala', 'id' => 'issue', 'rows' => $byIssue, 'reportTotal' => $reportTotal, 'variant' => 'donut'])
+            @include('statistics.monthly-trend', ['months' => $byMonth])
+            @include('statistics.breakdown', ['title' => 'Kondisi sarana terdata', 'id' => 'condition', 'rows' => $byCondition, 'reportTotal' => $byCondition->sum('total'), 'variant' => 'donut', 'description' => 'Jumlah sarana mengikuti filter kategori fasilitas dan wilayah.'])
         </div>
+        <div class="statistics-charts">
+            @include('statistics.breakdown', ['title' => 'Distribusi menurut wilayah', 'id' => 'region', 'rows' => $byRegion, 'reportTotal' => $reportTotal, 'variant' => 'bars'])
+            @include('statistics.breakdown', ['title' => 'Laporan berdasarkan kategori fasilitas', 'id' => 'facility', 'rows' => $byFacility, 'reportTotal' => $reportTotal, 'variant' => 'columns'])
+        </div>
+        @include('statistics.breakdown', ['title' => 'Laporan berdasarkan kategori kendala', 'id' => 'issue', 'rows' => $byIssue, 'reportTotal' => $reportTotal, 'variant' => 'donut'])
 
         <div class="statistics-recap">
         @include('statistics.breakdown', ['title' => 'Laporan berdasarkan status', 'id' => 'status', 'rows' => $byStatus, 'reportTotal' => $reportTotal, 'variant' => 'bars'])

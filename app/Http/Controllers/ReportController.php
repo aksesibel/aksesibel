@@ -38,6 +38,17 @@ class ReportController extends Controller
         $direction = $sort === 'oldest' ? 'asc' : 'desc';
 
         $statuses = VerificationStatus::orderBy('status_name')->get();
+        $totalsByStatus = Report::where('user_id', auth()->id())
+            ->selectRaw('status_id, COUNT(*) AS total')
+            ->groupBy('status_id')
+            ->pluck('total', 'status_id');
+        $completed = $statuses->firstWhere('status_name', 'Selesai');
+        $closed = $statuses->whereIn('status_name', ['Selesai', 'Ditolak', 'Dibatalkan'])->modelKeys();
+        $summary = [
+            'total' => (int) $totalsByStatus->sum(),
+            'active' => (int) $totalsByStatus->except($closed)->sum(),
+            'completed' => (int) $totalsByStatus->get($completed?->getKey(), 0),
+        ];
 
         $reports = Report::with([
             'facility',
@@ -65,7 +76,8 @@ class ReportController extends Controller
             'search',
             'statuses',
             'statusId',
-            'sort'
+            'sort',
+            'summary',
         ));
     }
 
@@ -295,9 +307,27 @@ class ReportController extends Controller
             'status',
             'period',
             'evidences',
+            'verifications.histories.newStatus',
+            'followUpAssignments.progress',
         ]);
 
-        return view('reports.show', compact('report'));
+        $timeline = collect([['label' => 'Laporan masuk', 'date' => $report->created_at]]);
+        foreach ($report->verifications as $verification) {
+            foreach ($verification->histories as $entry) {
+                if ($entry->newStatus) {
+                    $timeline->push(['label' => $entry->newStatus->status_name, 'date' => $entry->changed_at]);
+                }
+            }
+        }
+        foreach ($report->followUpAssignments as $assignment) {
+            $timeline->push(['label' => 'Ditugaskan kepada petugas', 'date' => $assignment->assigned_at]);
+            foreach ($assignment->progress as $progress) {
+                $timeline->push(['label' => 'Progres: '.$progress->progress_status, 'date' => $progress->recorded_at]);
+            }
+        }
+        $timeline = $timeline->sortBy('date')->values();
+
+        return view('reports.show', compact('report', 'timeline'));
     }
 
     public function getFacilityAccessibilities(Facility $facility): JsonResponse
