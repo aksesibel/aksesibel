@@ -12,5 +12,11 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call(MasterDataSeeder::class);
+
+        // Data wilayah — DKI Jakarta
+        $this->call(RegionSeeder::class);
+
+        // Data contoh fasilitas publik
+        $this->call(FacilitySeeder::class);
     }
 }

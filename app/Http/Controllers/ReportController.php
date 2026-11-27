@@ -2,48 +2,89 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Facility;
+use App\Models\FacilityAccessibility;
+use App\Models\IssueCategory;
 use App\Models\Report;
 use App\Models\ReportEvidence;
-use App\Models\Facility;
-use App\Models\IssueCategory;
 use App\Models\ReportingPeriod;
 use App\Models\VerificationStatus;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use App\Models\FacilityAccessibility;
+use Illuminate\Validation\ValidationException;
+use Illuminate\View\View;
 
 class ReportController extends Controller
 {
     /**
      * Menampilkan daftar laporan milik pengguna yang login.
      */
-    public function index()
+    public function index(Request $request): View|RedirectResponse
     {
-        if (!auth()->check()) {
+        if (! auth()->check()) {
             return redirect()
                 ->route('reports.create')
                 ->with('info', 'Silakan login untuk melihat laporan Anda.');
         }
 
+        $search = $request->query('search');
+        $search = is_string($search) ? trim($search) : '';
+        $statusId = filter_var($request->query('status_id'), FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]) ?: null;
+        $sort = $request->query('sort') === 'oldest' ? 'oldest' : 'latest';
+        $direction = $sort === 'oldest' ? 'asc' : 'desc';
+
+        $statuses = VerificationStatus::orderBy('status_name')->get();
+        $totalsByStatus = Report::where('user_id', auth()->id())
+            ->selectRaw('status_id, COUNT(*) AS total')
+            ->groupBy('status_id')
+            ->pluck('total', 'status_id');
+        $completed = $statuses->firstWhere('status_name', 'Selesai');
+        $closed = $statuses->whereIn('status_name', ['Selesai', 'Ditolak', 'Dibatalkan'])->modelKeys();
+        $summary = [
+            'total' => (int) $totalsByStatus->sum(),
+            'active' => (int) $totalsByStatus->except($closed)->sum(),
+            'completed' => (int) $totalsByStatus->get($completed?->getKey(), 0),
+        ];
+
         $reports = Report::with([
             'facility',
             'issueCategory',
             'status',
-            'evidences',
         ])
             ->where('user_id', auth()->id())
-            ->latest()
-            ->paginate(10);
+            ->when($search !== '', function ($query) use ($search) {
+                $query->where(function ($subQuery) use ($search) {
+                    $subQuery->where('report_number', 'like', "%{$search}%")
+                        ->orWhere('report_title', 'like', "%{$search}%")
+                        ->orWhereHas('facility', function ($facilityQuery) use ($search) {
+                            $facilityQuery->where('name', 'like', "%{$search}%");
+                        });
+                });
+            })
+            ->when($statusId, fn ($query) => $query->where('status_id', $statusId))
+            ->orderBy('created_at', $direction)
+            ->orderBy('report_id', $direction)
+            ->paginate(10)
+            ->appends(['search' => $search, 'status_id' => $statusId, 'sort' => $sort]);
 
-        return view('reports.index', compact('reports'));
+        return view('reports.index', compact(
+            'reports',
+            'search',
+            'statuses',
+            'statusId',
+            'sort',
+            'summary',
+        ));
     }
 
     /**
      * Menampilkan form pembuatan laporan.
      */
-    public function create()
+    public function create(): View
     {
         $facilities = Facility::where('facility_status', 'active')
             ->orderBy('name')
@@ -53,51 +94,44 @@ class ReportController extends Controller
             ->orderBy('category_name')
             ->get();
 
-        $activePeriod = ReportingPeriod::whereDate(
-            'start_date',
-            '<=',
-            now()->toDateString()
-        )
-            ->whereDate('end_date', '>=', now()->toDateString())
-            ->first();
+        $activePeriod = null;
+        $periodError = null;
+
+        try {
+            $activePeriod = ReportingPeriod::forReportDate(now());
+        } catch (ValidationException $exception) {
+            $periodError = $exception->errors()['period_id'][0];
+        }
 
         return view('reports.create', compact(
             'facilities',
             'categories',
-            'activePeriod'
+            'activePeriod',
+            'periodError',
         ));
     }
 
     /**
      * Menyimpan laporan dan bukti pendukung.
      */
-    public function store(Request $request)
+    public function store(Request $request): RedirectResponse
     {
         // Identitas pelapor tidak boleh berasal dari input form.
-        if (!auth()->check()) {
+        if (! auth()->check()) {
             return back()->withErrors([
                 'authentication' => 'Silakan login terlebih dahulu sebelum mengirim laporan.',
             ])->withInput();
         }
 
-        $today = now()->toDateString();
-
-        $activePeriod = ReportingPeriod::whereDate('start_date', '<=', $today)
-            ->whereDate('end_date', '>=', $today)
-            ->first();
-
-        if (!$activePeriod) {
-            return back()->withErrors([
-                'period' => 'Belum tersedia periode pelaporan yang aktif.',
-            ])->withInput();
-        }
+        $reportCreatedAt = now();
+        $activePeriod = ReportingPeriod::forReportDate($reportCreatedAt);
 
         $status = VerificationStatus::where(
             'status_name',
             'Menunggu Verifikasi'
         )->first();
 
-        if (!$status) {
+        if (! $status) {
             return back()->withErrors([
                 'status' => 'Status awal laporan belum tersedia.',
             ])->withInput();
@@ -158,14 +192,13 @@ class ReportController extends Controller
                 'facility_accessibility_id',
                 $request->facility_accessibility_id
             )
-            ->where('facility_id', $request->facility_id)
-            ->exists();
+                ->where('facility_id', $request->facility_id)
+                ->exists();
 
-            if (!$accessibilityExists) {
+            if (! $accessibilityExists) {
                 return back()
                     ->withErrors([
-                        'facility_accessibility_id' =>
-                            'Item aksesibilitas tidak sesuai dengan fasilitas yang dipilih.',
+                        'facility_accessibility_id' => 'Item aksesibilitas tidak sesuai dengan fasilitas yang dipilih.',
                     ])
                     ->withInput();
             }
@@ -177,7 +210,7 @@ class ReportController extends Controller
             $validated['facility_id']
         )->where('facility_status', 'active')->first();
 
-        if (!$facility) {
+        if (! $facility) {
             return back()->withErrors([
                 'facility_id' => 'Fasilitas tidak tersedia atau sudah tidak aktif.',
             ])->withInput();
@@ -188,7 +221,7 @@ class ReportController extends Controller
             $validated['issue_category_id']
         )->where('is_active', true)->first();
 
-        if (!$category) {
+        if (! $category) {
             return back()->withErrors([
                 'issue_category_id' => 'Kategori kendala tidak tersedia atau sudah tidak aktif.',
             ])->withInput();
@@ -202,10 +235,11 @@ class ReportController extends Controller
                 $validated,
                 $activePeriod,
                 $status,
+                $reportCreatedAt,
                 &$storedFiles
             ) {
                 $report = Report::create([
-                    'report_number' => 'LAP-' . now()->format('Ymd') . '-' . Str::upper(Str::random(8)),
+                    'report_number' => 'LAP-'.$reportCreatedAt->format('Ymd').'-'.Str::upper(Str::random(8)),
                     'report_title' => $validated['report_title'],
                     'user_id' => auth()->id(),
                     'facility_id' => $validated['facility_id'],
@@ -213,6 +247,7 @@ class ReportController extends Controller
                     'issue_category_id' => $validated['issue_category_id'],
                     'status_id' => $status->status_id,
                     'period_id' => $activePeriod->period_id,
+                    'created_at' => $reportCreatedAt,
                     'description' => $validated['description'],
                     'incident_date' => $validated['incident_date'],
                     'specific_location' => $validated['specific_location'] ?? null,
@@ -222,7 +257,7 @@ class ReportController extends Controller
                 foreach ($request->file('evidences', []) as $file) {
                     $path = $file->store('report-evidences', 'public');
 
-                    if (!$path) {
+                    if (! $path) {
                         throw new \RuntimeException('Gagal menyimpan file bukti.');
                     }
 
@@ -258,7 +293,7 @@ class ReportController extends Controller
     /**
      * Menampilkan detail laporan milik pengguna yang login.
      */
-    public function show(Report $report)
+    public function show(Report $report): View
     {
         abort_unless(
             auth()->check() && $report->user_id === auth()->id(),
@@ -272,21 +307,34 @@ class ReportController extends Controller
             'status',
             'period',
             'evidences',
+            'verifications.histories.newStatus',
+            'followUpAssignments.progress',
         ]);
 
-        return view('reports.show', compact('report'));
+        $timeline = collect([['label' => 'Laporan masuk', 'date' => $report->created_at]]);
+        foreach ($report->verifications as $verification) {
+            foreach ($verification->histories as $entry) {
+                if ($entry->newStatus) {
+                    $timeline->push(['label' => $entry->newStatus->status_name, 'date' => $entry->changed_at]);
+                }
+            }
+        }
+        foreach ($report->followUpAssignments as $assignment) {
+            $timeline->push(['label' => 'Ditugaskan kepada petugas', 'date' => $assignment->assigned_at]);
+            foreach ($assignment->progress as $progress) {
+                $timeline->push(['label' => 'Progres: '.$progress->progress_status, 'date' => $progress->recorded_at]);
+            }
+        }
+        $timeline = $timeline->sortBy('date')->values();
+
+        return view('reports.show', compact('report', 'timeline'));
     }
 
-    public function getFacilityAccessibilities($facilityId)
-{
-        // Pastikan fasilitas yang diminta masih aktif.
-        $facility = Facility::where('facility_id', $facilityId)
-            ->where('facility_status', 'active')
-            ->firstOrFail();
+    public function getFacilityAccessibilities(Facility $facility): JsonResponse
+    {
+        abort_unless($facility->facility_status === 'active', 404);
 
-        $accessibilities = FacilityAccessibility::with('accessibilityType')
-            ->where('facility_id', $facility->facility_id)
-            ->get();
+        $accessibilities = $facility->facilityAccessibilities()->with('accessibilityType')->get();
 
         return response()->json(
             $accessibilities->map(function ($item) {

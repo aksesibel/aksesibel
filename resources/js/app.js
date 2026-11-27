@@ -1,3 +1,40 @@
+import Alpine from 'alpinejs';
+window.Alpine = Alpine;
+
+Alpine.data('verificationReview', (key, priorDecision, rejected, priorNotes) => ({
+    decision: priorDecision,
+    rejected,
+    notes: priorNotes,
+    checks: [],
+    feedback: '',
+    init() {
+        try {
+            const saved = JSON.parse(sessionStorage.getItem(key) ?? 'null');
+            if (saved) {
+                this.decision ||= saved.decision;
+                this.notes ||= saved.notes;
+                this.checks = Array.isArray(saved.checks) ? saved.checks : [];
+            }
+        } catch {
+            this.feedback = 'Draf pemeriksaan belum dapat dibaca.';
+        }
+    },
+    saveDraft() {
+        try {
+            sessionStorage.setItem(key, JSON.stringify({
+                decision: this.decision,
+                notes: this.notes,
+                checks: this.checks,
+            }));
+            this.feedback = 'Draf pemeriksaan tersimpan di jendela ini.';
+        } catch {
+            this.feedback = 'Draf pemeriksaan belum dapat disimpan di jendela ini.';
+        }
+    },
+}));
+
+Alpine.start();
+
 document.addEventListener('submit', (event) => {
     const message = event.target.dataset.confirm;
     if (message && !window.confirm(message)) {

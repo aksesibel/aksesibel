@@ -26,7 +26,17 @@ class IssueCategoryController extends Controller
             ->orderBy('category_name')->orderBy('issue_category_id')
             ->paginate(15)->withQueryString();
 
+        $statusCounts = IssueCategory::query()
+            ->selectRaw('is_active, COUNT(*) AS total')
+            ->groupBy('is_active')
+            ->pluck('total', 'is_active');
+
         return view('manage.categories.index', [
+            'categoryCounts' => [
+                'Total kategori kendala' => $statusCounts->sum(),
+                'Kategori aktif' => (int) $statusCounts->get(1, 0),
+                'Kategori nonaktif' => (int) $statusCounts->get(0, 0),
+            ],
             'categories' => $categories,
             'title' => 'Kategori Kendala',
             'routePrefix' => 'manage.issue-categories',

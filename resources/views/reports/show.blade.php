@@ -86,6 +86,18 @@
     </div>
 </div>
 
+<section class="panel" aria-labelledby="report-timeline">
+    <h2 id="report-timeline">Kronologi laporan</h2>
+    <ol class="mt-5 grid gap-5 border-l-2 border-blue-100 pl-5">
+        @foreach($timeline as $entry)
+            <li class="relative">
+                <span class="absolute top-1.5 -left-[27px] size-3 rounded-full border-2 border-white bg-primary" aria-hidden="true"></span>
+                <p class="text-sm font-semibold">{{ $entry['label'] }}</p>
+                @if($entry['date'])<time class="text-xs text-slate-600" datetime="{{ $entry['date']->toIso8601String() }}">{{ $entry['date']->translatedFormat('j M Y, H.i') }}</time>@endif
+            </li>
+        @endforeach
+    </ol>
+</section>
 <div class="content-card">
     <h5 class="fw-bold mb-3">Bukti Pendukung</h5>
 

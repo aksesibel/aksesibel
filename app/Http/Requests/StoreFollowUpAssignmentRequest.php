@@ -13,13 +13,13 @@ class StoreFollowUpAssignmentRequest extends FormRequest
     public function authorize(): bool
     {
         $user = $this->user();
-        if (! $user) {
+        if (! $user || $user->account_status !== 'active') {
             return false;
         }
 
         $user->loadMissing('role');
 
-        return $user->role?->role_name === 'Admin';
+        return in_array($user->role?->role_name, ['Admin', 'Pengelola Fasilitas'], true);
     }
 
     /**
@@ -28,10 +28,10 @@ class StoreFollowUpAssignmentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'report_id'        => ['required', 'integer', 'exists:reports,report_id'],
-            'assigned_to'      => ['required', 'integer', 'exists:users,id'],
+            'report_id' => ['required', 'integer', 'exists:reports,report_id'],
+            'assigned_to' => ['required', 'integer', 'exists:users,id'],
             'assignment_notes' => ['nullable', 'string', 'max:2000'],
-            'due_date'         => ['nullable', 'date', 'after_or_equal:today'],
+            'due_date' => ['nullable', 'date', 'after_or_equal:today'],
         ];
     }
 
@@ -107,12 +107,12 @@ class StoreFollowUpAssignmentRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'report_id.required'       => 'Laporan wajib dipilih.',
-            'report_id.exists'         => 'Laporan tidak ditemukan.',
-            'assigned_to.required'     => 'Petugas wajib dipilih.',
-            'assigned_to.exists'       => 'Petugas tidak ditemukan.',
-            'due_date.after_or_equal'  => 'Tenggat tidak boleh di masa lalu.',
-            'assignment_notes.max'     => 'Catatan penugasan maksimal 2000 karakter.',
+            'report_id.required' => 'Laporan wajib dipilih.',
+            'report_id.exists' => 'Laporan tidak ditemukan.',
+            'assigned_to.required' => 'Petugas wajib dipilih.',
+            'assigned_to.exists' => 'Petugas tidak ditemukan.',
+            'due_date.after_or_equal' => 'Tenggat tidak boleh di masa lalu.',
+            'assignment_notes.max' => 'Catatan penugasan maksimal 2000 karakter.',
         ];
     }
 
@@ -122,11 +122,10 @@ class StoreFollowUpAssignmentRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'report_id'        => 'laporan',
-            'assigned_to'      => 'petugas',
+            'report_id' => 'laporan',
+            'assigned_to' => 'petugas',
             'assignment_notes' => 'catatan penugasan',
-            'due_date'         => 'tenggat',
+            'due_date' => 'tenggat',
         ];
     }
 }
-

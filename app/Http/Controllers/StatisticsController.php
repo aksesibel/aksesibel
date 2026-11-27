@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StatisticsRequest;
 use App\Models\FacilityCategory;
 use App\Models\IssueCategory;
+use App\Models\Region;
 use App\Models\ReportingPeriod;
 use App\Queries\ReportStatistics;
 use Illuminate\Contracts\View\View;
@@ -25,6 +26,7 @@ class StatisticsController extends Controller
             'periods' => ReportingPeriod::query()->orderByDesc('start_date')->orderByDesc('period_id')->get(),
             'facilityCategories' => FacilityCategory::query()->orderBy('category_name')->orderBy('category_id')->get(),
             'issueCategories' => IssueCategory::query()->orderBy('category_name')->orderBy('issue_category_id')->get(),
+            'regions' => Region::where('level', Region::LEVEL_KOTA_KABUPATEN)->orderBy('name')->get(),
             ...$statistics->summarize($request->validated()),
         ]);
     }

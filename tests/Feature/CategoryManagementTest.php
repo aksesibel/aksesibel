@@ -79,6 +79,25 @@ class CategoryManagementTest extends TestCase
             ->assertOk()->assertSee('Tidak ada kategori yang sesuai.');
     }
 
+    public function test_issue_category_summary_counts_all_statuses_while_the_list_is_filtered(): void
+    {
+        $this->asManager();
+        IssueCategory::create(['category_name' => 'Jalur terhalang', 'is_active' => true]);
+        IssueCategory::create(['category_name' => 'Data lama', 'is_active' => false]);
+
+        $response = $this->get(route('manage.issue-categories.index', ['status' => 'inactive']));
+
+        $response->assertOk()
+            ->assertSee('Ringkasan kategori kendala')
+            ->assertViewHas('categoryCounts', [
+                'Total kategori kendala' => 2,
+                'Kategori aktif' => 1,
+                'Kategori nonaktif' => 1,
+            ])
+            ->assertSee('Data lama')
+            ->assertDontSee('Jalur terhalang');
+    }
+
     #[DataProvider('categoryTypes')]
     public function test_category_name_is_required_and_status_must_be_boolean(string $modelClass, string $routePrefix): void
     {

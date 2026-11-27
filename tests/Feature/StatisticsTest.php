@@ -70,6 +70,31 @@ class StatisticsTest extends TestCase
         $this->assertSame($before, Report::query()->orderBy('report_id')->get()->toArray());
     }
 
+    public function test_monthly_trend_uses_the_latest_recorded_completion_date(): void
+    {
+        $data = $this->reportData();
+        $report = $data['reports'][1];
+        $completed = $data['statuses'][1];
+        $report->update(['status_id' => $completed->getKey()]);
+        $verification = $report->verifications()->create(['verifier_id' => $data['manager']->getKey()]);
+
+        foreach (['2026-02-12 10:00:00', '2026-03-05 10:00:00'] as $date) {
+            $verification->histories()->create([
+                'actor_id' => $data['manager']->getKey(),
+                'new_status_id' => $completed->getKey(),
+                'changed_at' => $date,
+            ]);
+        }
+
+        $response = $this->actingAs($data['manager'])->get(route('manage.statistics'))->assertOk();
+        $monthly = $response->viewData('byMonth');
+
+        $this->assertSame(5, $monthly->sum('received'));
+        $this->assertSame(1, $monthly->sum('completed'));
+        $this->assertSame(1, $monthly->firstWhere('month', '2026-03')['completed']);
+        $response->assertSee('Unduh ringkasan');
+    }
+
     /** @return array<string, array{array<string, int>, int}> */
     public static function filterCombinations(): array
     {

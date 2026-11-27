@@ -22,6 +22,7 @@ class StatisticsRequest extends FormRequest
             'period_id' => ['reporting_periods', 'period_id'],
             'category_id' => ['facility_categories', 'category_id'],
             'issue_category_id' => ['issue_categories', 'issue_category_id'],
+            'region_id' => ['regions', 'region_id'],
         ] as $field => [$table, $key]) {
             $rules[$field] = ['bail', 'nullable', 'integer', 'min:1'];
 
@@ -50,6 +51,7 @@ class StatisticsRequest extends FormRequest
             'period_id' => 'Periode pelaporan',
             'category_id' => 'Kategori fasilitas',
             'issue_category_id' => 'Kategori kendala',
+            'region_id' => 'Wilayah',
             'page' => 'Halaman',
         ];
     }

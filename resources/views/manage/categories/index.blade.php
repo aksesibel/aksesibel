@@ -1,6 +1,17 @@
 <x-layout :title="$title" subtitle="Kelola kategori bersama untuk seluruh modul. Kategori nonaktif tetap tersimpan dalam histori.">
     <x-slot:actions><a class="button" href="{{ route($routePrefix.'.create') }}"><x-icon name="plus" />Tambah kategori</a></x-slot:actions>
 
+    @isset($categoryCounts)
+        <dl aria-label="Ringkasan kategori kendala" class="mb-6 grid gap-4 sm:grid-cols-3">
+            @foreach ($categoryCounts as $label => $count)
+                <div class="panel">
+                    <dt>{{ $label }}</dt>
+                    <dd class="text-2xl font-semibold">{{ $count }}</dd>
+                </div>
+            @endforeach
+        </dl>
+    @endisset
+
     <section class="panel">
     <div class="section-heading"><div><h2>Daftar {{ strtolower($title) }}</h2><p>Atur kategori yang tersedia untuk pilihan data baru.</p></div><span class="badge">{{ $categories->total() }} kategori</span></div>
     <form method="GET" action="{{ route($routePrefix.'.index') }}" class="form-grid filter-panel mb-6">
