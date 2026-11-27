@@ -3,6 +3,8 @@
 namespace Tests\Feature;
 
 use App\Models\AccessibilityType;
+use App\Models\Role;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -12,6 +14,8 @@ class AccessibilityTypeTest extends TestCase
 
     public function test_pengguna_dapat_membuka_halaman_daftar_jenis_aksesibilitas(): void
     {
+        $this->signInAsFacilityManager();
+
         $response = $this->get(route('accessibility-types.index'));
 
         $response->assertOk();
@@ -20,6 +24,8 @@ class AccessibilityTypeTest extends TestCase
 
     public function test_pengguna_dapat_mencari_jenis_aksesibilitas(): void
     {
+        $this->signInAsFacilityManager();
+
         AccessibilityType::create([
             'type_name' => 'Ramp',
             'description' => 'Jalur bidang miring dengan kemiringan landai.',
@@ -41,6 +47,8 @@ class AccessibilityTypeTest extends TestCase
 
     public function test_pengguna_dapat_membuka_halaman_tambah_jenis_aksesibilitas(): void
     {
+        $this->signInAsFacilityManager();
+
         $response = $this->get(route('accessibility-types.create'));
 
         $response->assertOk();
@@ -49,6 +57,8 @@ class AccessibilityTypeTest extends TestCase
 
     public function test_pengguna_dapat_menambahkan_jenis_aksesibilitas(): void
     {
+        $this->signInAsFacilityManager();
+
         $response = $this->post(route('accessibility-types.store'), [
             'type_name' => 'Informasi Audio',
             'description' => 'Sistem pengumuman pengeras suara, layar interaktif bersuara, atau alarm berbunyi yang memberikan informasi nomor antrean, arah lokasi, maupun peringatan kondisi darurat bagi penyandang disabilitas netra.',
@@ -66,6 +76,8 @@ class AccessibilityTypeTest extends TestCase
 
     public function test_pengguna_tidak_dapat_menambahkan_jenis_tanpa_nama(): void
     {
+        $this->signInAsFacilityManager();
+
         $response = $this->post(route('accessibility-types.store'), [
             'type_name' => '',
             'description' => 'Deskripsi jenis aksesibilitas.',
@@ -78,6 +90,8 @@ class AccessibilityTypeTest extends TestCase
 
     public function test_pengguna_tidak_dapat_menambahkan_nama_jenis_yang_sudah_ada(): void
     {
+        $this->signInAsFacilityManager();
+
         AccessibilityType::create([
             'type_name' => 'Ramp',
             'description' => 'Jalur landai.',
@@ -95,6 +109,8 @@ class AccessibilityTypeTest extends TestCase
 
     public function test_pengguna_dapat_membuka_halaman_edit_jenis_aksesibilitas(): void
     {
+        $this->signInAsFacilityManager();
+
         $type = AccessibilityType::create([
             'type_name' => 'Display Taktual / Braille',
             'description' => 'Peta dengan informasi yang dapat diraba.',
@@ -112,6 +128,8 @@ class AccessibilityTypeTest extends TestCase
 
     public function test_pengguna_dapat_mengubah_jenis_aksesibilitas(): void
     {
+        $this->signInAsFacilityManager();
+
         $type = AccessibilityType::create([
             'type_name' => 'Informasi Audio',
             'description' => 'Deskripsi lama.',
@@ -137,6 +155,8 @@ class AccessibilityTypeTest extends TestCase
 
     public function test_pengguna_dapat_menghapus_jenis_aksesibilitas_yang_tidak_digunakan(): void
     {
+        $this->signInAsFacilityManager();
+
         $type = AccessibilityType::create([
             'type_name' => 'Peta Taktil',
             'description' => 'Peta dengan informasi yang dapat diraba.',
@@ -152,5 +172,11 @@ class AccessibilityTypeTest extends TestCase
         $this->assertDatabaseMissing('accessibility_types', [
             'accessibility_type_id' => $type->accessibility_type_id,
         ]);
+    }
+
+    private function signInAsFacilityManager(): void
+    {
+        $role = Role::create(['role_name' => Role::FACILITY_MANAGER]);
+        $this->actingAs(User::factory()->for($role)->create(['account_status' => 'active']));
     }
 }

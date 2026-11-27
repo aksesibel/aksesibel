@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="/Users/haimac/Documents/GitHub/aksesibel/phpunit.mysql.xml" tests="2" assertions="34" errors="0" failures="0" skipped="0" time="0.772121">
+    <testsuite name="MysqlConcurrency" tests="2" assertions="34" errors="0" failures="0" skipped="0" time="0.772121">
+      <testsuite name="Tests\Concurrency\UserManagementConcurrencyTest" file="/Users/haimac/Documents/GitHub/aksesibel/tests/Concurrency/UserManagementConcurrencyTest.php" tests="2" assertions="34" errors="0" failures="0" skipped="0" time="0.772121">
+        <testcase name="test_simultaneous_self_demotions_leave_one_authorized_active_manager" file="/Users/haimac/Documents/GitHub/aksesibel/tests/Concurrency/UserManagementConcurrencyTest.php" line="14" class="Tests\Concurrency\UserManagementConcurrencyTest" classname="Tests.Concurrency.UserManagementConcurrencyTest" assertions="17" time="0.537558"/>
+        <testcase name="test_simultaneous_cross_suspensions_reauthorize_the_losing_actor" file="/Users/haimac/Documents/GitHub/aksesibel/tests/Concurrency/UserManagementConcurrencyTest.php" line="27" class="Tests\Concurrency\UserManagementConcurrencyTest" classname="Tests.Concurrency.UserManagementConcurrencyTest" assertions="17" time="0.234563"/>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>
